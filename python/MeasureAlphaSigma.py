@@ -1,7 +1,6 @@
 import os
 import sys
-sys.path.insert(0, 'util')
-from MeasureAlphaSigma_Functions import *
+from Functions_MeasureAlphaSigma import *
 
 
 #One config file correspond to one job
