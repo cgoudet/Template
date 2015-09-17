@@ -1,0 +1,47 @@
+#include <iostream>
+#include <boost/program_options.hpp>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
+namespace po = boost::program_options;
+
+void Style_Christophe();
+
+int main( int argc, char* argv[] ) {
+  po::options_description desc("LikelihoodProfiel Usage");
+
+  //define all options in the program
+  string alphaBaseFileName, sigmaBaseFileName;
+  vector<string> alphaSystFileNames, sigmaSystFileNames;
+  desc.add_options()
+    ("help", "Display this help message")
+    ("alphaBaseFileName", po::value<string>(&alphaBaseFileName)->multitoken(), "")
+    ("alphaSystFileNames", po::value<vector<string>>(&alphaSystFileNames)->multitoken(), "" )
+    ("sigmaBaseFileName", po::value<string>(&sigmaBaseFileName)->multitoken(), "")
+    ("sigmaSystFileNames", po::value<vector<string>>(&sigmaSystFileNames)->multitoken(), "" )
+    ;
+  // create a map vm that contains options and all arguments of options       
+  po::variables_map vm;
+  po::store(po::command_line_parser(argc, argv).options(desc).style(po::command_line_style::unix_style ^ po::command_line_style::allow_short).run(), vm);
+  po::notify(vm);
+  
+  if (vm.count("help")) {cout << desc; return 0;}
+  //########################################
+  Style_Christophe();
+
+  if ( alphaBaseFileName=="" && sigmaBaseFileName=="" ) {
+    cout << "No base measurement available. exiting." << endl;
+    return 1;
+  }
+
+  if ( !alphaSystFileNames.size() && !sigmaSystFileNames.size() ) {
+    cout << "No systematic files. exiting" << endl;
+    return 2;
+  }
+
+
+
+  return 0;
+}

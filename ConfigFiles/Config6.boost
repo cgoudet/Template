@@ -1,0 +1,66 @@
+# Define the Mode here
+# 1VAR : binning in eta for both electrons
+# 2VAR : binning in eta and pt for both electrons
+mode = 1VAR
+#Define the binning variables
+var1 = ETA_CALO
+var2 = 
+
+#Define in binning is in absolute value (1)
+symBin = 0
+
+#Define the minimum determination of distributions
+fitMethod = 3
+
+#Define binning for the variables
+etaBins =  -2.47 -1.55 -1.37 0 1.37 1.55 2.47
+ptBins  =
+
+#Define the range in scale factors
+optimizeRanges = 10
+
+doScale    = 1
+alphaMin   = -0.1
+alphaMax   = 0.1
+alphaNBins =  20
+
+doSmearing = 1
+sigmaMin   = 0.00
+sigmaMax   = 0.1
+sigmaNBins = 20
+
+#Define the properties of the mass histograms
+ZMassMin   = 80
+ZMassMax   = 100
+ZMassNBins = 20
+
+#Define the simulation mode
+doSimulation = 0
+alphaSimEta  = -0.01 -0.03 -0.01 -0.01 -0.03 -0.01
+alphaSimPt   =  0
+sigmaSimEta  = 0.01 0.015 0.005 0.005 0.015 0.01
+sigmaSimPt   = 0
+
+#Switch debug mode
+debug = 1
+
+#Decide which variable remains constant for the first round of fit
+#SIGMA = smearing factor
+#ALPHA = scale factor
+constVarFit = SIGMA 
+
+#For extra event selection
+selection   = 0
+
+#Define how many time each MC event is used
+nUseEl = 1
+
+#define how many data events are used
+nUseEvent = 0
+
+#isGoodQuality
+nEventCut = 10
+thresholdMass = 70
+
+indepDistorded = 0
+indepTemplates = 0

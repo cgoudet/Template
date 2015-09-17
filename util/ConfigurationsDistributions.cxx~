@@ -1,0 +1,73 @@
+#include <iostream>
+#include <boost/program_options.hpp>
+#include <vector>
+#include <string>
+#include "TFile.h"
+#include "Template/MiscFunctions.h"
+#include "TTree.h"
+
+using std::string;
+using std::cout;
+using std::endl;
+using std::vector;
+namespace po = boost::program_options;
+
+void Style_Christophe();
+
+int main( int argc, char* argv[] ) {
+  po::options_description desc("LikelihoodProfiel Usage");
+
+  vector<string> inFiles;
+  //define all options in the program
+  desc.add_options()
+    ("help", "Display this help message")
+    ("inFiles", po::value<vector <string> >(&inFiles), "" )
+     ;
+  
+  //Define options gathered by position                                                          
+  po::positional_options_description p;
+  p.add("inFiles", -1);
+
+  // create a map vm that contains options and all arguments of options       
+  po::variables_map vm;
+  po::store(po::command_line_parser(argc, argv).options(desc).positional(p).style(po::command_line_style::unix_style ^ po::command_line_style::allow_short).run(), vm);
+  po::notify(vm);
+  
+  if (vm.count("help")) {cout << desc; return 0;}
+  //########################################
+
+  vector< vector< double > > configMean, configSigma;
+  double cVal,iConf ,jConf, statConf, input, nUseEvent;
+
+  for ( unsigned int iFile = 0; iFile < inFiles.size(); iFile++ ) {
+    TFile *inFile = TFile::Open( inFiles[iFile].c_str() );
+    TTree *inTree = (TTree*) inFile->Get( "final_output" );
+
+    inTree->SetBranchAddress( "sigma", &cVal );
+    inTree->SetBranchAddress( "stat", &statConf );
+    inTree->SetBranchAddress( "nUseEvent", &nUseEvent );
+    inTree->SetBranchAddress( "input", &input );
+    inTree->SetBranchAddress( "bin_number_i", &iConf );
+    inTree->SetBranchAddress( "bin_number_j", &jConf );
+
+    unsigned int nEntries = inTree->GetEntries();
+    for ( unsigned int iEntry = 0; iEntry< nEntries; iEntry++ ) {
+
+      while ( iConf >= (double) configMean.size() ) {
+	configMean.push_back( vector<double>() );
+	configSigma.push_back( vector<double>() );
+      }
+
+      while ( jConf >= (double) configMean[(int) iConf].size() ) {
+	configMean[(int) iConf].push_back( 0 );
+	configSigma[(int) iConf].push_back( 0 );
+      }
+
+      configMean[(int) iConf][(int) jConf] += sigma;
+      configMean[(int) iConf][(int) jConf] += sigma*sigma;
+    }
+
+  }
+
+  return 0;
+}
