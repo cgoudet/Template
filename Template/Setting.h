@@ -65,6 +65,7 @@ class Setting
   bool GetIndepDistorded() const { return m_indepDistorded; };
   bool GetIndepTemplates() const { return m_indepTemplates; };
   unsigned int GetInversionMethod() const { return m_inversionMethod; }
+  bool GetBootstrap() const { return m_bootstrap; }
 
   double GetOptimizeRanges()  const { return m_optimizeRanges; };
   vector< double > const &GetEtaBins()     const { return m_etaBins;     };
@@ -243,6 +244,7 @@ class Setting
   bool m_indepDistorded;
   bool m_indepTemplates;
   unsigned int m_inversionMethod;
+  bool m_bootstrap;
 };
 
 

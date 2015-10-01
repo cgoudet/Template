@@ -71,6 +71,14 @@ int main( int argc, char* argv[] ) {
   multi_array< TProfile*, 3 > configProfileRMS;
   //binMeanConfig[nBin][stat][input][iConf][2]
   multi_array< TH1D*, 4 > binMeanConfig;
+
+  // nBins statTot iConf jConf
+  multi_array< unsigned int, 4 > configStat;
+  multi_array< unsigned int, 4 > configRMS;
+
+  //nBins statTot IBin
+  multi_array< unsigned int, 3 > binStat;
+  multi_array< unsigned int, 3 > binRMS;
  
   vector< TH1* > saveHist;
   vector< double > inputVals;
@@ -117,18 +125,13 @@ int main( int argc, char* argv[] ) {
     for ( unsigned int iEntry = 0; iEntry< nEntriesConf; iEntry++ ) {
       confTree->GetEntry(iEntry);
       statBin = SearchVectorBin( statTree, inputStat );
+      if ( statBin == inputStat.size() ) inputStat.push_back( statTree );
       inputBin = SearchVectorBin( input, inputVals );
+      if ( inputBin == inputVals.size() ) inputVals.push_back( input );
       binBin = SearchVectorBin( nBins, inputBins );
+      if ( binBin == inputBins.size() ) inputBins.push_back( nBins );
       if ( nBins > maxBins ) maxBins = nBins;
       TString titleConfig;
-
-      //if ( statTree==200000 ) cout << inFile->GetName() << endl;
-
-      // if ( iConf==1 && jConf==1 && statTree==500000) {
-      // 	cout << "inputVals size : " << statBin << " " << inputBin << endl;
-      // 	cout << statTree << " " << input << endl;
-      // }
-
 
       configCDistrib.resize( extents[inputBins.size()][inputStat.size()][inputVals.size()][maxBins][maxBins][2] );
       if ( !configCDistrib[binBin][statBin][inputBin][iConf][jConf][0] ) {
@@ -193,6 +196,8 @@ int main( int argc, char* argv[] ) {
       }
       if ( iConf == jConf ) 	binMeanConfig[binBin][statBin][inputBin][iConf]->Fill( cVal-input );
 
+      configStat.resize( extents[inputBins.size()][inputStat.size()][maxBins][maxBins] );
+      if ( !configStat[binBin][statBin][iConf][jConf] ) configStat[binBin][statBin][iConf][jConf] = statConf;
     }//end nEntriesConf
 
   //===================================
@@ -201,8 +206,11 @@ int main( int argc, char* argv[] ) {
   for ( unsigned int iEntry = 0; iEntry < nEntriesBin; iEntry++ ) {
     binTree->GetEntry( iEntry );
     statBin = SearchVectorBin( statTree, inputStat );
+    if ( statBin == inputStat.size() ) inputStat.push_back( statTree );
     inputBin = SearchVectorBin( input, inputVals );
+    if ( inputBin == inputVals.size() ) inputVals.push_back( input );
     binBin = SearchVectorBin( nBins, inputBins );
+    if ( binBin == inputBins.size() ) inputBins.push_back( nBins );
     TString title;
 
     binCDistrib.resize( extents[inputBins.size()][inputStat.size()][inputVals.size()][maxBins][2] );
@@ -253,6 +261,7 @@ int main( int argc, char* argv[] ) {
   }
   outFile->Close( "R" );
 
+  return 0;
   //================================================
   //Prepare a latex file to store plots
   cout << "starting plots" << endl;

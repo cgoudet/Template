@@ -12,6 +12,7 @@
 #include <map>
 #include "boost/multi_array.hpp"
 
+
 using boost::multi_array;
 using std::vector;
 using std::string;
@@ -296,4 +297,9 @@ class Template
   multi_array< TMatrixD*, 2> m_vectMatrix;
   vector<string> m_matrixNames;
 };
+
+//#########################################
+
 #endif
+
+

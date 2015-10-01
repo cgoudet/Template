@@ -107,6 +107,7 @@ int main( int argc, char* argv[] ) {
 	  Template TempDistorded( "", configFile, {}, {}, {}, dataFileNames, dataTreeNames, dataWeights );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
 	  settingDistorded.SetDebug( 0 );
+	  settingDistorded.SetNUseEvent( inputStat[iStat] );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
 	  settingDistorded.SetIndepDistorded( indepDistorded );

@@ -6,12 +6,14 @@ from Functions_MeasureAlphaSigma import *
 #One config file correspond to one job
 configFiles=[]
 
-if 0 :
+if 1 :
     configFiles=[ 
-        ['Config6.boost', 0, 0, 'Data6_50ns.root'],
-        ['Config6.boost', 1, 0, 'Data6_50ns_dataScaled.root']
-        ['Config6.boost', 8, 0, 'Data6_50ns_periodD.root'],
-        ['Config6.boost', 9, 0, 'Data6_50ns_periodAC.root']
+        # ['Config6.boost', 0, 0, 'Data6_50ns.root'],
+        # ['Config6.boost', 1, 0, 'Data6_50ns_dataScaled.root'],
+        # ['Config1.boost', 0, 0, 'Data1_50ns.root'],
+        ['Config6.boost', 2, 5, 'Data6_25ns.root'],
+        ['Config6.boost', 3, 5, 'Data6_25ns_dataScaled.root'],
+        ['Config1.boost', 2, 5, 'Data1_25ns.root']
         # ['../../testKirill/150830/data/ConfigKirill.boost', 6, 4, "Data_stand.root"],
         # ['../../testKirill/150830/data/ConfigKirill.boost', 7, 5, "Data_dw.root"]
         ]
@@ -26,6 +28,7 @@ logPath="Log/"
 for confFile in range( 0, len( configFiles ) ) :
 
     launcherFile=CreateLauncher( configFiles[confFile], 0, "" , 0)
+
     if  configFiles[confFile][3] == "" :
         logFile = StripName( configFiles[confFile][0] )
     else :
@@ -33,7 +36,7 @@ for confFile in range( 0, len( configFiles ) ) :
 
     launchLine='~/sub28.sh ' + logFile + ' ' \
         + spsPath + logPath + logFile + '.log ' \
-        + spsPath + logFile + '.err ' \
+        + spsPath + logPath + logFile + '.err ' \
         + launcherFile
 
     os.system( launchLine )

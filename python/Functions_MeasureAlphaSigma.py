@@ -2,37 +2,46 @@ PREFIXPATH="/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/"
 
 MCFILESETS=[
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_Lkh1_1.root' ],
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_Lkh1_scaled_1.root'], 
-    [ PREFIXDATASETS + 'MC_8TeV_ZeeDiLepton_scaled_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_ZeeDiLepton_scaled_Lkh1_1.root', PREFIXDATASETS + 'MC_8TeV_ZeeDiLepton_scaled_Lkh1_2.root', PREFIXDATASETS + 'MC_8TeV_Zee1Lepton_scaled_Lkh1_0.root'],
-    [ PREFIXDATASETS + 'DataxAOD/MC13/MC_13TeV_Zee_Lkh1_0.root' ],
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ],
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root'], 
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root' ],
     [ PREFIXDATASETS + 'testKirill/150830/data/MC_stand.root' ],
-    [ PREFIXDATASETS + 'testKirill/150830/data/MC_dw.root' ]
+    [ PREFIXDATASETS + 'testKirill/150830/data/MC_dw.root' ],
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ],
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root']
     ]
 
 MCWEIGHTSET=[ 
     [ 1, 1 ],
-    [ 1, 1, 1],
-    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
+    [ 1, 1 ],
+#    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
     [1],
     [1],
-    [1]
+    [1],
+    [ 1, 1 ],
+    [ 1, 1 ]
     ]
 
 DATAFILESETS=[
     [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_Lkh1_0.root'],
     [ PREFIXDATASETS + 'DataxAOD/Data13_50ns_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root'],
+    [ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_0.root'],
+    [ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled_0.root'],
+    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_1.root' ],
     [ PREFIXDATASETS + 'DataxAOD/DATA8/Data_8TeV_ZeeLkh1_0.root'],
     [ PREFIXDATASETS + 'DataxAOD/EGAM1_DATA15/Data_13TeV_PA_Zee_Lkh1_scaled_0.root' ],
     [ PREFIXDATASETS + 'DataxAOD/EGAM1_DATA15/Data_13TeV_PC_Zee_Lkh1_scaled_0.root' ],
     [ PREFIXDATASETS + 'DataxAOD/MC13/MC_13TeV_Zee_Lkh1_1.root' ],
     [ PREFIXDATASETS + 'testKirill/150830/data/Data_stand.root' ],
     [ PREFIXDATASETS + 'testKirill/150830/data/Data_dw.root' ],
-    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_276731_id43130364_0.root'],
+
+    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_276731_id43501357_0.root'],
     [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_periodAC_0.root']
     ]
 
 DATAWEIGHTSET=[
+    [1],
+    [1],
     [1],
     [1],
     [1],
@@ -74,24 +83,19 @@ def CreateLauncher( inVector, mode = 0, optionLine="" , doDistorded=0 ) :
     batchPath="Batch/"
     resultPath="Results/"
     plotPath="Plots/"
-    fileName = batchPath + StripName( outNameFile ) + '.sh'
+    fileName = PREFIXPATH + batchPath + StripName( outNameFile ) + '.sh'
+
 
     with open( fileName, 'w+') as batch:
 #Configure the server
         batch.write('server=`pwd`\n' 
-                    # + 'cp  /afs/in2p3.fr/home/c/cgoudet/private/Template/* -r . \n'
-                    # + 'export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase \n'
-                    # + 'source ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh \n'
-                    # + 'rcSetup Base,2.3.25 \n rc clean \n rc find_packages \n rc compile \n'
-                 #    + 'cd /afs/cern.ch/atlas/project/HSG7/root/root_v5-34-19/x86_64-slc6-gcc47/ \n' 
-                 # + 'source bin/thisroot.sh \n'
                     + 'cd ${server} \n'
                     + 'ulimit -S -s 100000 \n'
-                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Template/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Template/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
-                    + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Template/RootCoreBin/ \n'
+                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
+                    + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/ \n'
                     + 'source local_setup.sh \n'
                     + 'cd ${server} \n'
-                    + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Template/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+                    + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
                     )
         
 #Copy the configuration file to the server
@@ -138,7 +142,7 @@ def CreateLauncher( inVector, mode = 0, optionLine="" , doDistorded=0 ) :
                                  + ' --dataFileName MC_distorded.root ' + MCLine + correctionLine + outNameFile + ' --makePlot\n')
 
 #Copy the output pdf and root file to result folder
-                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
+#                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
                 batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 

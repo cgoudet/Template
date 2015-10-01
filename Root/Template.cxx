@@ -537,12 +537,13 @@ void Template::FillDistrib( bool isData ) {
       if ( nEntry && counterEntry== nEntry ) return;
 
       inputTree->GetEntry( iEvent );
+      if ( isData ) cout << m_mapVar1["PT"] << endl;
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       TLorentzVector e1, e2;  
       e1.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
       e2.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
       m_mapVarEvent["WEIGHT"] *= ( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile];
-      if ( !m_mapVarEvent["WEIGHT"] ) m_mapVarEvent["WEIGHT"] = 1;
+      //      if ( !m_mapVarEvent["WEIGHT"] ) m_mapVarEvent["WEIGHT"] = 1;
       //##############################
       //For special cases, one can perform an additional selection here
       switch ( m_setting.GetSelection() ) {
@@ -598,6 +599,26 @@ void Template::CreateDistordedTree( string outFileName ) {
     cout << "RandomSeed : " << m_rand.GetSeed() << endl;
   }
 
+  if ( m_setting.GetBootstrap() ) {
+  vector< TTree* > vectorTree;
+  for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
+    TFile inFile( m_MCFileNames[iFile].c_str() );
+    TTree *MCTree = (TTree*) inFile.Get( m_MCTreeNames[iFile].c_str() );
+    MCTree->SetDirectory( 0 );
+    vectorTree.push_back(0);
+    vectorTree.back() = MCTree;
+  }
+  TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
+  TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent() );
+  bootTree->Write();
+  m_MCFileNames.clear();
+  m_MCFileNames.push_back( distordedFile.GetName() );
+  m_MCTreeNames.clear();
+  m_MCTreeNames.push_back( bootTree->GetName() );
+  distordedFile.Close( "R" );
+  }
+  
+  
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
   cout << "outFileName : " << outFileName << endl;
   string treeName = outFileName;
@@ -617,8 +638,8 @@ void Template::CreateDistordedTree( string outFileName ) {
   dataTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
   dataTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
   dataTree->Branch( "m12"   , &m_mapVarEvent["MASS"] );
-  dataTree->SetBranchAddress( "eventNumber"   , &m_mapVarNumber["EVENTNUMBER"] );
-  dataTree->SetBranchAddress( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
+  dataTree->Branch( "eventNumber"   , &m_mapVarNumber["EVENTNUMBER"] );
+  dataTree->Branch( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
 
 
   vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
@@ -629,6 +650,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   int counterEvent=0;
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
+    cout << m_MCFileNames[iFile] << " " << m_MCTreeNames[iFile] << endl;
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
     LinkTree( MCTree );
@@ -658,6 +680,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   cout << "tree entries : " << dataTree->GetEntries() << endl;
 
   TFile *distorded = new TFile( outFileName.c_str(), "RECREATE" );
+  cout << "Writting in : " << outFileName.c_str() << endl;
   dataTree->Write( "", TObject::kOverwrite );
     
   m_dataFileNames.clear();
