@@ -104,12 +104,13 @@ int main( int argc, char* argv[] ) {
   }
   
 
-   Temp.Save( saveTemplateFileName, true );  
+  if ( !vm.count("loadFull" ) )   Temp.Save( saveTemplateFileName, true );  
 
 
   cout << endl;
 
   if ( !vm.count( "noExtraction" ) )  {
+    cout << "extraction" << endl;
     err = Temp.ExtractFactors();
     if ( err ) {
       cout << "Template::Extraction failed : " << err << endl;
@@ -120,12 +121,13 @@ int main( int argc, char* argv[] ) {
       cout << "Template::Save failed : " << err << endl;
       return 2;
     }
-    cout << "makePlot" << endl;
+  }
+  cout << "makePlot" << endl;
     if ( vm.count("makePlot") )  {
       string title = outFileName.substr( 0, outFileName.find_last_of( "." ) ) + ".tex";
       Temp.MakePlot( "", "" );
     }
-  }
+
 
   return 0;
 }

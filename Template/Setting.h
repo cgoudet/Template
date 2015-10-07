@@ -66,6 +66,8 @@ class Setting
   bool GetIndepTemplates() const { return m_indepTemplates; };
   unsigned int GetInversionMethod() const { return m_inversionMethod; }
   bool GetBootstrap() const { return m_bootstrap; }
+  bool GetDoPileup() const { return m_doPileup;}
+  bool GetDoWeight() const { return m_doWeight; }
 
   double GetOptimizeRanges()  const { return m_optimizeRanges; };
   vector< double > const &GetEtaBins()     const { return m_etaBins;     };
@@ -91,6 +93,8 @@ class Setting
   void SetNUseEl( unsigned int nUseEl ) { m_nUseEl = nUseEl; }
   void SetIndepDistorded( bool indepDistorded ) { m_indepDistorded = indepDistorded; }
   void SetIndepTemplates( bool indepTemplates ) { m_indepTemplates = indepTemplates; }
+  void SetDoWeight( bool doWeight ) { m_doWeight = doWeight; };
+
   /**\brief Save the content into a file
      \param outFile output TFile
 
@@ -245,6 +249,8 @@ class Setting
   bool m_indepTemplates;
   unsigned int m_inversionMethod;
   bool m_bootstrap;
+  bool m_doPileup;
+  bool m_doWeight;
 };
 
 

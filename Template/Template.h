@@ -243,6 +243,7 @@ class Template
        */
   void FillDistrib( bool isData );
   
+  void SetWeightNoPileup();
   
   /**\brief Class containing all configuration attributes
    */

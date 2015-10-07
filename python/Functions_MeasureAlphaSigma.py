@@ -1,61 +1,48 @@
 PREFIXPATH="/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/"
 
-MCFILESETS=[
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ],
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root'], 
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root' ],
-    [ PREFIXDATASETS + 'testKirill/150830/data/MC_stand.root' ],
-    [ PREFIXDATASETS + 'testKirill/150830/data/MC_dw.root' ],
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ],
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root']
-    ]
+# MCFILESETS=[
+#     [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ],
+#     [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root'], 
+#     [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ],
+#     [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root'],
+#     [ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1/MC_13TeV_Zee_50ns_Lkh1_0.root' ],
+#     [ PREFIXDATASETS + 'testKirill/150830/data/MC_stand.root' ],
+#     [ PREFIXDATASETS + 'testKirill/150830/data/MC_dw.root' ],
+#     ]
+MCFILESETS={}
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ]
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root']
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root']
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1_0.root' ]
 
-MCWEIGHTSET=[ 
-    [ 1, 1 ],
-    [ 1, 1 ],
+MCWEIGHTSET={}
+MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1']       =[ 1, 1]
+MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1']       =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_0']     =[ 1, 1] 
+
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
-    [1],
-    [1],
-    [1],
-    [ 1, 1 ],
-    [ 1, 1 ]
-    ]
+DATAFILESETS={}
+DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh1/Data_13TeV_Zee_50ns_Lkh1_0.root']
+DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh1_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'DataxAOD/Data13_25ns/Data_13TeV_Zee_25ns_Lkh1_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'DataxAOD/Data13_25ns_scaled/Data_13TeV_Zee_25ns_Lkh1_scaled_0.root']
+DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_1']       =[ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1_1.root' ]
+DATAFILESETS['Data_13TeV_Zee_50ns_Lkh2']       =[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh2/Data_13TeV_Zee_50ns_Lkh2_0.root']
 
-DATAFILESETS=[
-    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_Lkh1_0.root'],
-    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root'],
-    [ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_0.root'],
-    [ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled_0.root'],
-    [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_1.root' ],
-    [ PREFIXDATASETS + 'DataxAOD/DATA8/Data_8TeV_ZeeLkh1_0.root'],
-    [ PREFIXDATASETS + 'DataxAOD/EGAM1_DATA15/Data_13TeV_PA_Zee_Lkh1_scaled_0.root' ],
-    [ PREFIXDATASETS + 'DataxAOD/EGAM1_DATA15/Data_13TeV_PC_Zee_Lkh1_scaled_0.root' ],
-    [ PREFIXDATASETS + 'DataxAOD/MC13/MC_13TeV_Zee_Lkh1_1.root' ],
-    [ PREFIXDATASETS + 'testKirill/150830/data/Data_stand.root' ],
-    [ PREFIXDATASETS + 'testKirill/150830/data/Data_dw.root' ],
-
-    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_276731_id43501357_0.root'],
-    [ PREFIXDATASETS + 'DataxAOD/Data13_50ns/Data_13TeV_Zee_50ns_periodAC_0.root']
-    ]
-
-DATAWEIGHTSET=[
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1],
-    [1]
-    ]
+DATAWEIGHTSET={}
+DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1']       =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1']       =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_1']       =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh2']       =[ 1 ]
 
 
-def CreateLauncher( inVector, mode = 0, optionLine="" , doDistorded=0 ) :
+def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
 #mode 
     # 0 MeasureScale
@@ -70,13 +57,16 @@ def CreateLauncher( inVector, mode = 0, optionLine="" , doDistorded=0 ) :
         print 'ConfigFile DataFiles MCFiles outNameFile'
         exit(1)
 
+
     configFile=inVector[0]
     dataFiles=DATAFILESETS[ inVector[1] ]
     dataWeights=DATAWEIGHTSET[ inVector[1] ]  
     MCFiles=MCFILESETS[ inVector[2] ]
     MCWeights=MCWEIGHTSET[ inVector[2] ]
     outNameFile=inVector[3]
-
+    doDistorded = 0
+    if  len( inVector ) > 4 :
+        doDistorded = inVector[4]
 
 
     configPath="Config/"
@@ -153,8 +143,10 @@ def CreateLauncher( inVector, mode = 0, optionLine="" , doDistorded=0 ) :
                              + dataLine + MCLine + optionLine + outNameFile +' \n' )
 #                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v ' + inVector[3] + ' ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
+                # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+
+        batch.write( 'ls -lh \n' ) 
         return fileName
 
 

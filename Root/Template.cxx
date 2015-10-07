@@ -45,6 +45,10 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_mapVar2["ETA_CALO"] = 0;
   m_mapVar2["PHI"] = 0;
   m_mapVarEvent["WEIGHT"]=1;
+  m_mapVar1["SFWEIGHT"]=1;
+  m_mapVar2["SFWEIGHT"]=1;
+  m_mapVarEvent["PUWEIGHT"]=1;
+  m_mapVarEvent["VERTEXWEIGHT"]=1;
   m_mapVarEvent["MASS"]=0;
   m_mapVarNumber["EVENTNUMBER"]=0;
   m_mapVarNumber["RUNNUMBER"]=0;
@@ -175,7 +179,8 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     cout << "Input file not found : " << inFileName << endl; 
     return 1;
   }
-
+  inFile->ls();
+  
   //Get the proper information from saved configuration file
   int err = m_setting.Load( inFileName, justTemplate );
   if ( err ) {
@@ -191,14 +196,15 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
   ClearChiMatrix();
 
   //Open the tree into which alpha ranges values for each chiMatrix are stored
+  int i_eta=-99, j_eta=-99;
   TTree *treeChiMatrixRanges = (TTree* ) inFile->Get( "chiMatrixRanges" );
   if ( !treeChiMatrixRanges ) {
     cout << "chiMatrixRanges not found" << endl;
     return 6;
   }
-
+  else {
   //Link alpha rane tree to corresonding variables
-  int i_eta=-99, j_eta=-99;
+
   double alphaMin=0, alphaMax=0, sigmaMin=0, sigmaMax=0;
   treeChiMatrixRanges->SetBranchStatus( "*", 1);
   treeChiMatrixRanges->SetBranchAddress( "i_eta", &i_eta);
@@ -226,7 +232,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     m_chiMatrix[i_eta][j_eta]->SetSigmaMax( sigmaMax );
 
   }
-
+  }
   //Perform test on the structure on m_chiMatrix and load templates
   for ( i_eta = 0; i_eta < (int) m_chiMatrix.size(); i_eta++ ) {
     for ( j_eta = 0; j_eta < (int) m_chiMatrix[i_eta].size(); j_eta++ ) {
@@ -252,7 +258,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
 	m_vectHist[iVar][iHist] = (TH1*) inFile->Get( CreateHistMatName( m_histNames[iHist], iVar ).c_str() );
 	if ( !m_vectHist[iVar][iHist] ) {
 	  cout << "Histogram not found : " << CreateHistMatName( m_histNames[iHist], iVar ) << endl;
-	  return 4;
+	  //	  return 4;
 	}
       }
       //Load Matrices
@@ -324,8 +330,8 @@ int Template::Save( string outFileName, bool justTemplate ) {
 	sigmaMax = m_chiMatrix[i_eta][j_eta]->GetSigmaMax();
 	treeChiMatrixRanges->Fill();
       }}}
-  if ( justTemplate )  treeChiMatrixRanges->Write( "", TObject::kOverwrite );
-  else 
+  treeChiMatrixRanges->Write( "", TObject::kOverwrite );
+  if ( !justTemplate ) {
     //Saving properties of TemplateClass
     for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
       for ( unsigned int iHist = 0; iHist < m_vectHist[0].size(); iHist++ ) 
@@ -333,7 +339,7 @@ int Template::Save( string outFileName, bool justTemplate ) {
       for ( unsigned int iMat = 0; iMat < m_vectMatrix[0].size(); iMat++ ) 
 	if ( m_vectMatrix[iVar][iMat] ) m_vectMatrix[iVar][iMat]->Write( CreateHistMatName( m_matrixNames[iMat], iVar ).c_str(), TObject::kOverwrite );
     }
-
+  }
   //Save Setting variables
   err = m_setting.Save( outFile );
   if ( err ) {
@@ -492,8 +498,8 @@ int Template::ExtractFactors() {
       TMatrixD resultMatrix( eta1Max, 1 );
       TMatrixD resultErrMatrix( eta1Max, 1 );
 
-
-      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, m_setting.GetInversionMethod() );
+      cout << "inversion method : " << (iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10) << endl;
+      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10 );
 
       string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
       m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
@@ -537,13 +543,13 @@ void Template::FillDistrib( bool isData ) {
       if ( nEntry && counterEntry== nEntry ) return;
 
       inputTree->GetEntry( iEvent );
-      if ( isData ) cout << m_mapVar1["PT"] << endl;
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       TLorentzVector e1, e2;  
       e1.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
       e2.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
       m_mapVarEvent["WEIGHT"] *= ( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile];
-      //      if ( !m_mapVarEvent["WEIGHT"] ) m_mapVarEvent["WEIGHT"] = 1;
+      if ( m_setting.GetDoWeight() && !m_setting.GetDoPileup() ) SetWeightNoPileup();
+
       //##############################
       //For special cases, one can perform an additional selection here
       switch ( m_setting.GetSelection() ) {
@@ -610,7 +616,8 @@ void Template::CreateDistordedTree( string outFileName ) {
   }
   TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
   TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent() );
-  bootTree->Write();
+  distordedFile.cd();
+  bootTree->Write( "", TObject::kOverwrite );
   m_MCFileNames.clear();
   m_MCFileNames.push_back( distordedFile.GetName() );
   m_MCTreeNames.clear();
@@ -726,6 +733,8 @@ void Template::MakePlot( string path, string latexFileName ) {
   latex << "nUseEl : " << m_setting.GetNUseEl() << "\\newline" << endl;
   latex << "nEventCut : " << m_setting.GetNEventCut() << "\\newline" << endl;
   latex << "Selection : " << m_setting.GetSelection() << "\\newline" << endl;
+  latex << "doWeight : " << m_setting.GetDoWeight() << "\\newline" << endl;
+  latex << "doPileup : " << m_setting.GetDoPileup() << "\\newline" << endl;
   latex << "\\tableofcontents\\clearpage" << endl;
 
   latex << "\\section{Results}" << endl;
@@ -1087,7 +1096,12 @@ int Template::LinkTree( TTree *inTree ) {
   inTree->SetBranchAddress( "eta_2" , &m_mapVar2["ETA_TRK"] );
   inTree->SetBranchAddress( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
   inTree->SetBranchAddress( "phi_2" , &m_mapVar2["PHI"] );
-  inTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
+  inTree->SetBranchAddress( "puWeight", &m_mapVarEvent["PUWEIGHT"] );
+  inTree->SetBranchAddress( "vertexWeight", &m_mapVarEvent["VERTEXWEIGHT"] );
+  if ( !m_setting.GetDoWeight() ) inTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
+  inTree->SetBranchAddress( "SFWeight_1", &m_mapVar1["SFWEIGHT"] );
+  inTree->SetBranchAddress( "SFWeight_2", &m_mapVar2["SFWEIGHT"] );
+  
   inTree->SetBranchAddress( "m12"   , &m_mapVarEvent["MASS"] );
   inTree->SetBranchAddress( "eventNumber"   , &m_mapVarNumber["EVENTNUMBER"] );
   inTree->SetBranchAddress( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
@@ -1172,4 +1186,9 @@ void Template::CleanMatrixVect( int jVar) {
 //###############################################
 string Template::CreateHistMatName( string objName, unsigned int iVar ) {
   return objName + ( iVar ? "_c" : "_alpha" );
+}
+
+//#############################
+void Template::SetWeightNoPileup() {
+  m_mapVarEvent["WEIGHT"] = m_mapVarEvent["VERTEXWEIGHT"]*(m_mapVar1["SFWEIGHT"]+m_mapVar2["SFWEIGHT"])/2.;
 }

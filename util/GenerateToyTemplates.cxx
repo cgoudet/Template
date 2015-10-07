@@ -28,7 +28,7 @@ int main( int argc, char* argv[] ) {
   vector<string> dataFileNames, MCTreeNames, MCFileNames, dataTreeNames;
   vector<double> dataWeights, MCWeights;
   string  outFileName, configFile;
-  bool indepDistorded, indepTemplates;
+  bool indepDistorded, indepTemplates, bootstrap;
   //define all options in the program
   desc.add_options()
     ("help", "Display this help message")
@@ -46,6 +46,7 @@ int main( int argc, char* argv[] ) {
     ("nUseEl", po::value<unsigned int>(&nUseEl)->default_value( 1 ), "" )
     ("indepDistorded", po::value<bool>(&indepDistorded)->default_value(0)->implicit_value(1), "" )
     ("indepTemplates", po::value<bool>(&indepTemplates)->default_value(0)->implicit_value(1), "" )
+    ("bootstrap", po::value<bool>(&bootstrap)->default_value(0)->implicit_value(1), "" )
    ;
 
 
@@ -81,6 +82,7 @@ int main( int argc, char* argv[] ) {
   outTree->Branch( "runNumber", &runNumber );
   outTree->Branch( "nBins", &nBins );
   outTree->Branch( "nOptim", &nOptim );
+  outTree->Branch( "bootstrap", &bootstrap );
 
   TTree *scalesTree = new TTree( "scalesTree", "scalesTree" );
   scalesTree->SetDirectory( 0 );
@@ -95,6 +97,7 @@ int main( int argc, char* argv[] ) {
   scalesTree->Branch( "runNumber", &runNumber );
   scalesTree->Branch( "nBins", &nBins );
   scalesTree->Branch( "nOptim", &nOptim );
+  scalesTree->Branch( "bootstrap", &bootstrap );
 
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
@@ -156,10 +159,11 @@ int main( int argc, char* argv[] ) {
 
 	nBins = settingMeasure.GetEtaBins().size()-1;
 	nOptim = settingMeasure.GetOptimizeRanges();
+	bootstrap = settingMeasure.GetBootstrap();
+
 	cout << "filling confTree" << endl;
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
 	  for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
-	    cout << "coord : " << i1 << " " << i2 << endl;
 	    sigma = (*combinSigma)(i1, i2);
 	    errSigma = (*combinErrSigma)(i1,i2);
 	    if ( errSigma == 100 ) continue;
@@ -178,7 +182,6 @@ int main( int argc, char* argv[] ) {
 	cout << "filling binTree" << endl;
 	TH1D* sigmaResult = (TH1D*) TempMeasure.GetResults( "sigma" );
 	for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
-	  cout << "iBin ; " << iBin << endl;
 	  iConf = iBin;
 	  sigma = sigmaResult->GetBinContent(iBin+1);
 	  if ( sigma < 0 ) { 
@@ -190,7 +193,8 @@ int main( int argc, char* argv[] ) {
 	  errSigma = sigmaResult->GetBinError(iBin+1);
 	  scalesTree->Fill();
 	}
-	cout << "end loop" << endl;
+
+	cout << outFile << " " << outTree << " " << scalesTree << " " << endl;
 	outFile->cd();
 	outTree->Write("", TObject::kOverwrite);
 	scalesTree->Write("", TObject::kOverwrite);

@@ -22,7 +22,7 @@ Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin
 		     m_selection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
 		     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
 		     m_optimizeRanges( 10 ), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(500), m_thresholdMass( 70 ),
-		     m_indepDistorded( false ), m_indepTemplates( false ), m_inversionMethod(0), m_bootstrap( 0 )
+		     m_indepDistorded( false ), m_indepTemplates( false ), m_inversionMethod(0), m_bootstrap( 0 ), m_doPileup( true ), m_doWeight( true )
 {
   m_etaBins.clear();
   m_ptBins.clear();
@@ -79,6 +79,8 @@ int Setting::Configure( const string &configFile ) {
     ( "indepTemplates", po::value<bool>(&m_indepTemplates), "" )
     ( "inversionMethod", po::value<unsigned int>(&m_inversionMethod), "" )
     ( "bootstrap", po::value<bool>( &m_bootstrap ), "" )
+    ( "doPileup", po::value<bool>( &m_doPileup ), "" )
+    ( "doWeight", po::value<bool>( &m_doWeight ), "" )
     ;
   
   po::variables_map vm;
@@ -372,7 +374,9 @@ void Setting::Print() {
   cout << "m_thresholMass : " << m_thresholdMass << endl;
   cout << "m_indepDistorded : " << m_indepDistorded << endl;
   cout << "m_indepTemplates : " << m_indepTemplates << endl;
-  cout << "bootstrap : " << m_bootstrap << endl;
+  cout << "m_bootstrap : " << m_bootstrap << endl;
+  cout << "m_doPileup : " << m_doPileup << endl;
+  cout << "m_doWeight : " << m_doWeight << endl;
   cout << "m_etaBins : ";
   PrintVector( m_etaBins );
 

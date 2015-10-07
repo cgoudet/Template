@@ -5,15 +5,15 @@ import time;
 
 #One config file correspond to one job
 configFiles=[ 
-    ['Config6_Toys.boost', 4, 2, '']
+    ['Config6_Toys.boost', 'MC_13TeV_Zee_50ns_Lkh1_1', 'MC_13TeV_Zee_50ns_Lkh1_0', '']
     ]
 
 inputC = [ 0.01 ]
 inputStat = [ 100000 ]
-nIteration = 1000
+nIteration = 3
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
-nUseEl=3
+nUseEl=1
 fitPerJob= 5
 
 plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
@@ -31,9 +31,9 @@ for vInput in  inputC  :
             
             configFiles[0][3] = outName + str( counter ) + '.root'
             optionLine = ' --inputC ' + str( vInput ) + ' --inputStat ' + str( vStat ) + ' --nIteration ' + str( min( nIteration-iIteration, fitPerJob ) ) \
-                + ' --nUseEl ' + str( nUseEl ) + " --indepTemplates 1 --indepDistorded 1 "
+                + ' --nUseEl ' + str( nUseEl ) + " --indepTemplates 1 --indepDistorded 1 --bootstrap 1"
             logPath="Log/"
-            launcherFile=CreateLauncher( configFiles[0], 1, optionLine, 0 )
+            launcherFile=CreateLauncher( configFiles[0], 1, optionLine )
             launchLine='~/sub28.sh ' + StripName( configFiles[0][3] ) + ' ' \
                 + plotPath + logPath  + StripName( configFiles[0][3] ) + '.log ' \
                 + plotPath + logPath  + StripName( configFiles[0][3] ) + '.err ' \
