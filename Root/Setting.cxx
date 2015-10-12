@@ -190,8 +190,8 @@ int Setting::Save( TFile *outFile ) {
   infoTree->Branch( "nUseEl", &m_nUseEl );
   infoTree->Branch( "selection", &m_selection );
   infoTree->Branch( "inversionMethod", &m_inversionMethod );
-  // infoTree->Branch( "nEventMC", &m_nEventMC );
-  // infoTree->Branch( "nEventData", &m_nEventData );
+  infoTree->Branch( "nEventMC", &m_nEventMC );
+  infoTree->Branch( "nEventData", &m_nEventData );
   infoTree->Branch( "nEventCut", &m_nEventCut );
   infoTree->Branch( "thresholdMass", &m_thresholdMass );
   infoTree->Fill();

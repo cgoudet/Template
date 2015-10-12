@@ -179,7 +179,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     cout << "Input file not found : " << inFileName << endl; 
     return 1;
   }
-  inFile->ls();
+  //  inFile->ls();
   
   //Get the proper information from saved configuration file
   int err = m_setting.Load( inFileName, justTemplate );
@@ -193,7 +193,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
   vector<double> ptBins = m_setting.GetPtBins();
   
   //Clean m_chiMatrix if not empty
-  ClearChiMatrix();
+  //ClearChiMatrix();
 
   //Open the tree into which alpha ranges values for each chiMatrix are stored
   int i_eta=-99, j_eta=-99;
@@ -215,7 +215,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
   treeChiMatrixRanges->SetBranchAddress( "sigmaMax", &sigmaMax );
 
   //Make sure m_ChiMtrix is empty before loading
-  ClearChiMatrix();
+  // ClearChiMatrix();
 
   for ( int entry = 0; entry < treeChiMatrixRanges->GetEntries() ; entry++ ) {
     treeChiMatrixRanges->GetEntry( entry );
@@ -225,7 +225,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     while ( j_eta >= (int) m_chiMatrix[i_eta].size() ) m_chiMatrix[i_eta].push_back( 0 );
 
     //Create a new chiMatrix at the right coordinates which the loaded ranges values
-    m_chiMatrix[i_eta][j_eta] = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
+    if ( !m_chiMatrix[i_eta][j_eta] ) m_chiMatrix[i_eta][j_eta] = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
     m_chiMatrix[i_eta][j_eta]->SetAlphaMin( alphaMin );
     m_chiMatrix[i_eta][j_eta]->SetAlphaMax( alphaMax );
     m_chiMatrix[i_eta][j_eta]->SetSigmaMin( sigmaMin );
@@ -250,14 +250,15 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     }}
 
   //If pointers factors are not empty, reset them to 0 after a cleaning  
-  if ( justTemplate ) CleanHistVect();
+  if ( justTemplate ) cout << endl;//CleanHistVect();
   else {
     //Load histograms
     for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
       for ( unsigned int iHist = 0; iHist < m_vectHist[0].size(); iHist++ ) {
-	m_vectHist[iVar][iHist] = (TH1*) inFile->Get( CreateHistMatName( m_histNames[iHist], iVar ).c_str() );
+	string titleHist = CreateHistMatName( m_histNames[iHist], iVar );
+	m_vectHist[iVar][iHist] = (TH1*) inFile->Get( titleHist.c_str() );
 	if ( !m_vectHist[iVar][iHist] ) {
-	  cout << "Histogram not found : " << CreateHistMatName( m_histNames[iHist], iVar ) << endl;
+	  cout << "Histogram not found : " << titleHist << endl;
 	  //	  return 4;
 	}
       }
@@ -432,6 +433,7 @@ int Template::ExtractFactors() {
   vector<double> sigmaSimPt  = m_setting.GetSigmaSimPt();
 
   bool isChi2Done = false;
+  cout << "iVar : " << m_vectHist.size() << endl;
   for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
     
     bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
@@ -470,9 +472,11 @@ int Template::ExtractFactors() {
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
     
     //Run over all chiMatrices
+    cout << "eta1Max : " << eta1Max << endl;
     for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
       eta2Max = ( m_setting.GetMode() == "1VAR" ) ? (int) i_eta+1 : (int) ptBins.size(); 
-      
+      cout << "eta2Max : " << eta2Max << endl;
+
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
 	
 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
@@ -766,12 +770,12 @@ void Template::MakePlot( string path, string latexFileName ) {
     vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
     vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();    
 
+    cout << "etaBins : " << etaBins.size() << endl;
     //fill the tabuilar with measured values
     for ( int i_bin = 0; i_bin < (int) etaBins.size()-1; i_bin++ ) {
       
       //Deal with bin description
       latex  << "$] " << etaBins[i_bin] << " , " << etaBins[i_bin+1] << " ]$ & " << i_bin ;
-            
       if ( isClosure ) {
 	string color = "";
 	if ( m_setting.GetDoScale() ) {
@@ -1066,12 +1070,22 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
     TFile *distorded = new TFile( dumString.c_str(), "RECREATE" );
     dumTree->Write( "", TObject::kOverwrite );
 
-    m_dataFileNames.clear();    
-    m_dataFileNames.push_back( distorded->GetName() );
-    m_dataTreeNames.clear();
-    m_dataTreeNames.push_back( dumTree->GetName() );
-    m_dataWeights.clear();
-    m_dataWeights.push_back( 1 );
+    if ( iCorrection ) {
+      m_MCFileNames.clear();    
+      m_MCFileNames.push_back( distorded->GetName() );
+      m_MCTreeNames.clear();
+      m_MCTreeNames.push_back( dumTree->GetName() );
+      m_MCWeights.clear();
+      m_MCWeights.push_back( 1 );
+    }
+    else {
+      m_dataFileNames.clear();    
+      m_dataFileNames.push_back( distorded->GetName() );
+      m_dataTreeNames.clear();
+      m_dataTreeNames.push_back( dumTree->GetName() );
+      m_dataWeights.clear();
+      m_dataWeights.push_back( 1 );
+    }
 
     delete dumTree; dumTree = 0;          
     distorded->Close("R");
@@ -1087,6 +1101,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 //############################################
 int Template::LinkTree( TTree *inTree ) {
   if ( m_setting.GetDebug() ) cout << "Template::LinkTree" << endl;
+  //  inTree->Print();
   inTree->SetBranchStatus( "*", 1);
   inTree->SetBranchAddress( "pt_1"  , &m_mapVar1["PT"] );
   inTree->SetBranchAddress( "eta_1" , &m_mapVar1["ETA_TRK"] );

@@ -79,6 +79,7 @@ int main( int argc, char* argv[] ) {
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
+
   if ( vm.count("loadFull") ) {
     err = Temp.Load( loadFullFileName, false);
     if ( err ) {
@@ -86,13 +87,13 @@ int main( int argc, char* argv[] ) {
       return 3;
     }}
 
-  else  if ( vm.count( "loadTemplate" ) ) {
+  if ( vm.count( "loadTemplate" ) ) {
     err = Temp.Load( loadTemplateFileName, true );
     if ( err ) {
       cout << "Template::LoadTemplate failed : " << err << endl;
       return 4;
     }} 
-
+  
   else {
     cout << "create Templates" << endl;
     err = Temp.CreateTemplate();
@@ -110,7 +111,6 @@ int main( int argc, char* argv[] ) {
   cout << endl;
 
   if ( !vm.count( "noExtraction" ) )  {
-    cout << "extraction" << endl;
     err = Temp.ExtractFactors();
     if ( err ) {
       cout << "Template::Extraction failed : " << err << endl;

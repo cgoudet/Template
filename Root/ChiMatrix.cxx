@@ -103,33 +103,34 @@ int ChiMatrix::Load( TFile *inFile, bool justTemplate ) {
   int alphaMaxBin = ( m_setting->GetDoScale() ) ? m_setting->GetAlphaNBins() : 0;
   int sigmaMaxBin = ( m_setting->GetDoSmearing() ) ? m_setting->GetSigmaNBins() : 0;
 
-
-  for ( int i_alpha = 0; i_alpha <= alphaMaxBin; i_alpha++ ) {
-    m_MCZMass.push_back( vector< TH1D* > () );
-    for ( int i_sigma = 0; i_sigma <= sigmaMaxBin; i_sigma++ ) {
-      TString histName = TString::Format("%s_MCZMass_sc%i_sm%i", m_name.c_str(), (int) (m_scaleValues[i_alpha]*1e6),  (int) (m_sigmaValues[i_sigma]*1e6));
-      m_MCZMass.back().push_back( 0 );
-      m_MCZMass.back().back() = (TH1D* ) inFile->Get( histName );
-      if ( ! m_MCZMass[i_alpha][i_sigma] ) {
-	m_quality.set( 1, 1 );
-	cout << "Bad configuration : " << histName << endl;
-	return 0;
-      }
-      m_MCZMass.back().back()->SetDirectory(0);   
-    }}
+  if ( justTemplate ) {
+    for ( int i_alpha = 0; i_alpha <= alphaMaxBin; i_alpha++ ) {
+      m_MCZMass.push_back( vector< TH1D* > () );
+      for ( int i_sigma = 0; i_sigma <= sigmaMaxBin; i_sigma++ ) {
+	TString histName = TString::Format("%s_MCZMass_sc%i_sm%i", m_name.c_str(), (int) (m_scaleValues[i_alpha]*1e6),  (int) (m_sigmaValues[i_sigma]*1e6));
+	m_MCZMass.back().push_back( 0 );
+	m_MCZMass.back().back() = (TH1D* ) inFile->Get( histName );
+	if ( ! m_MCZMass[i_alpha][i_sigma] ) {
+	  m_quality.set( 1, 1 );
+	  cout << "Bad configuration : " << histName << endl;
+	  return 0;
+	}
+	m_MCZMass.back().back()->SetDirectory(0);   
+      }}}
 
   if ( !justTemplate ) {
     
-    if ( m_chiMatrix ) delete m_chiMatrix;
+    cout << inFile->Get( TString( m_name + "_chiMatrix" ) ) << " " << m_chiMatrix << endl;
+    if ( m_chiMatrix && inFile->Get( TString( m_name + "_chiMatrix" ) ) ) delete m_chiMatrix;
     m_chiMatrix = (TH2D*) inFile->Get( TString( m_name + "_chiMatrix" ) );
 
-    if ( m_dataZMass ) delete m_dataZMass;
+    if ( m_dataZMass && inFile->Get( TString( m_name + "_dataZMass" )) ) delete m_dataZMass;
     m_dataZMass = (TH1D*) inFile->Get( TString( m_name + "_dataZMass" ) );
 
-    if ( m_chi2FitConstVar ) delete m_chi2FitConstVar;
+    if ( m_chi2FitConstVar && inFile->Get( TString( m_name + "_chi2FitConstVar" ) ) ) delete m_chi2FitConstVar;
     m_chi2FitConstVar = (TH1D*) inFile->Get( TString( m_name + "_chi2FitConstVar" ) );
 
-    if ( m_corAngle ) delete m_corAngle;
+    if ( m_corAngle && inFile->Get( TString( m_name + "_corAngle" ) ) ) delete m_corAngle;
     m_corAngle = (TH1D*) inFile->Get( TString( m_name + "_corAngle" ) );
 
     TTree *infoTree = (TTree*) inFile->Get( TString( m_name + "_infoTree" ) );
@@ -201,6 +202,15 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
        m_chi2FitNonConstVar[i]->Write( "", TObject::kOverwrite );
      }
     if ( m_dataZMass ) m_dataZMass->Write( "", TObject::kOverwrite );   
+
+    string titleTree = m_name + "_infoTree";
+    TTree *infoTree = new TTree( titleTree.c_str(), titleTree.c_str() );
+    infoTree->Branch( "alpha", &m_alpha );
+    infoTree->Branch( "sigma", &m_sigma );
+    infoTree->Branch( "errAlpha", &m_errAlpha );
+    infoTree->Branch( "errSigma", &m_errSigma );
+    infoTree->Fill();
+    infoTree->Write( "", TObject::kOverwrite );
   }
 
 
@@ -436,6 +446,7 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
   vector<string> plotNames, legends;
   string plotName;
 
+  cout << "m_chiMatrix : " << m_chiMatrix << endl;
   int bestAlpha = ( m_setting->GetDoScale() ) ? m_chiMatrix->GetXaxis()->FindFixBin( m_alpha )-1 : 0;
   int bestSigma = ( m_setting->GetDoSmearing() ) ?  m_chiMatrix->GetYaxis()->FindFixBin( m_sigma ) -1 : 0;
   if ( bestAlpha < 0 ) bestAlpha = 0;
@@ -450,8 +461,8 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
   latex << "\\section{" << dumName << "}" << endl;
 
   vector<double> etaBins(m_setting->GetEtaBins());
-  etaBins.push_back(2.47);
-  etaBins.insert( etaBins.begin(), -2.47 ); 
+  // etaBins.push_back(2.47);
+  // etaBins.insert( etaBins.begin(), -2.47 ); 
 
   //Compute the expected values for alpha and c
   double expAlpha=0, expC=0;
@@ -464,7 +475,7 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
   expC = ( m_setting->GetMode() == "1VAR" ) ? sqrt((sigmaSimEta[m_eta1Bin]*sigmaSimEta[m_eta1Bin] + sigmaSimEta[m_eta2Bin]*sigmaSimEta[m_eta2Bin])/2.) : sqrt((sigmaSimEta[m_eta1Bin]*sigmaSimEta[m_eta1Bin] + sigmaSimPt[m_eta2Bin]*sigmaSimPt[m_eta2Bin])/2.); 
   //if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) { 
   latex << "\\begin{minipage}{0.49\\linewidth} Results \\newline" << endl;
-  latex << "MCEvents : " << m_MCZMass.front().front()->GetEntries() << "\\newline" << endl;
+  if ( m_MCZMass.size() && m_MCZMass.front().size() )  latex << "MCEvents : " << m_MCZMass.front().front()->GetEntries() << "\\newline" << endl;
   latex << "DataEvents : " << m_dataZMass->GetEntries() <<" \\newline" << endl;
   latex << "ThresholdMass : " << 27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin+1]+etaBins[m_eta1Bin]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) << "\\\\" << endl;
   if ( m_setting->GetDoSimulation() || TString(m_setting->GetDataName()).Contains("distorded"))  latex << "$\\alpha_{ij}^{th}=" << expAlpha << "$     $c_{ij}^{th}=" << expC << "$" << endl;
@@ -473,20 +484,22 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
   latex << "\\end{minipage}\\hfill" << endl;
 
   plotName = path + m_name + "_chiMatrix";
-  plotNames.push_back( plotName );
+  //  plotNames.push_back( plotName );
   DrawPlot( {m_chiMatrix}, plotName );
+  WriteLatexMinipage( latex, {plotName}, 2 );
 
   //Comparison data and extrmal alpha templates
-  if ( m_setting->GetDoScale() ) {
-    legends.clear();
-    legends.push_back( "Data" );
-    legends.push_back( string(TString::Format("Template : alpha=%i",(int) ( m_scaleValues.front()*1e6)) ) );
-    legends.push_back( string(TString::Format("Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
-    plotName = TString( path + m_name + "_CompareAlpha" );
-    DrawPlot( { m_dataZMass, m_MCZMass[0][bestSigma],  m_MCZMass.back()[bestSigma]}, plotName, legends );
-    plotNames.push_back( plotName   );
-  }
-
+  if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
+    if ( m_setting->GetDoScale() ) {
+      legends.clear();
+      legends.push_back( "Data" );
+      legends.push_back( string(TString::Format("Template : alpha=%i",(int) ( m_scaleValues.front()*1e6)) ) );
+      legends.push_back( string(TString::Format("Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
+      plotName = TString( path + m_name + "_CompareAlpha" );
+      DrawPlot( { m_dataZMass, m_MCZMass[0][bestSigma],  m_MCZMass.back()[bestSigma]}, plotName, legends );
+      plotNames.push_back( plotName   );
+    }
+  
   if ( m_setting->GetDoSmearing() ) {
     legends.clear();
     legends.push_back( "Data" );
@@ -496,7 +509,8 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
     DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
     plotNames.push_back( plotName );
   }
-
+  }
+  
   plotName = path + m_name + "_chi2FitConstVar";
   DrawPlot( { m_chi2FitConstVar }, plotName );
   plotNames.push_back( plotName );
@@ -701,6 +715,8 @@ unsigned int ChiMatrix::IsGoodQuality() {
 
   vector< double > etaBins( m_setting->GetEtaBins());
 
+  cout << "MC entries : " << m_MCZMass.front().front()->GetEntries() << " " << m_MCTree->GetEntries() << endl;
+  cout << "data entries : " << m_dataZMass->GetEntries() << endl;
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
   if ( m_MCZMass.front().front()->GetEntries() < nentries ) m_quality.set( 4, 1 );
   if ( m_dataZMass->GetEntries() < nentries ) m_quality.set( 5, 1 );

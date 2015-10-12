@@ -1,37 +1,39 @@
 PREFIXPATH="/sps/atlas/c/cgoudet/Calibration/PreRec/"
-PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/"
+PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/DataxAOD/"
 
-# MCFILESETS=[
-#     [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ],
-#     [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root'], 
-#     [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ],
-#     [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root'],
-#     [ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1/MC_13TeV_Zee_50ns_Lkh1_0.root' ],
-#     [ PREFIXDATASETS + 'testKirill/150830/data/MC_stand.root' ],
-#     [ PREFIXDATASETS + 'testKirill/150830/data/MC_dw.root' ],
-#     ]
 MCFILESETS={}
-MCFILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ]
-MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled_0.root']
-MCFILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_1.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled_0.root']
-MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1_0.root' ]
-
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1/MC_13TeV_Zee_50ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1/MC_13TeV_Zee_50ns_Lkh1_1.root' ]
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled/MC_13TeV_Zee_50ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled/MC_13TeV_Zee_50ns_Lkh1_scaled_0.root']
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1_1.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh2/MC_13TeV_Zee_25ns_Lkh2_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh2/MC_13TeV_Zee_25ns_Lkh2_1.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/MC_13TeV_Zee_25ns_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/MC_13TeV_Zee_25ns_Lkh1_scaled_0.root']
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_1.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_1.root' ]
+MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
 MCWEIGHTSET={}
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1']       =[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1']       =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh2']       =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_0']     =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel']  =[ 1, 1] 
+
 
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 DATAFILESETS={}
-DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh1/Data_13TeV_Zee_50ns_Lkh1_0.root']
-DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh1_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root']
-DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'DataxAOD/Data13_25ns/Data_13TeV_Zee_25ns_Lkh1_0.root']
-DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'DataxAOD/Data13_25ns_scaled/Data_13TeV_Zee_25ns_Lkh1_scaled_0.root']
-DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_1']       =[ PREFIXDATASETS + 'DataxAOD/MC_13TeV_Zee_50ns_Lkh1_1.root' ]
-DATAFILESETS['Data_13TeV_Zee_50ns_Lkh2']       =[ PREFIXDATASETS + 'DataxAOD/Data_13TeV_Zee_50ns_Lkh2/Data_13TeV_Zee_50ns_Lkh2_0.root']
+DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1/Data_13TeV_Zee_50ns_Lkh1_0.root']
+DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1/Data_13TeV_Zee_25ns_Lkh1_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/Data_13TeV_Zee_25ns_Lkh1_pt30_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt35/Data_13TeV_Zee_25ns_Lkh1_pt35_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled/Data_13TeV_Zee_25ns_Lkh1_scaled_0.root']
+DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ]
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh2/Data_13TeV_Zee_25ns_Lkh2_0.root']
+DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root']
 
 DATAWEIGHTSET={}
 DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1']       =[ 1 ]
@@ -39,8 +41,10 @@ DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1']       =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ 1 ]
 DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_1']       =[ 1 ]
-DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh2']       =[ 1 ]
-
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh2']       =[ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ 1 ]
 
 def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
@@ -94,13 +98,13 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 #copy the data files to the server and prepare the command line
         dataLine=""
         for iFile in range( 0, len( dataFiles ) ) :
-            batch.write( 'cp ' + dataFiles[iFile] + ' . \n' )
+            batch.write( 'cp -v ' + dataFiles[iFile] + ' . \n' )
             dataLine+=" --dataFileName " + StripName( dataFiles[iFile], 1, 0 ) + ' --dataWeight ' + str( dataWeights[iFile] ) 
         
 #copy the MC files to the server and prepare command line
         MCLine=""
         for iFile in range( 0, len( MCFiles ) ) :
-            batch.write( 'cp ' + MCFiles[iFile] + ' . \n' )
+            batch.write( 'cp -v ' + MCFiles[iFile] + ' . \n' )
             MCLine+=" --MCFileName " + StripName( MCFiles[iFile], 1, 0 ) + ' --MCWeight ' + str( MCWeights[iFile] )
 
 #If correction Alpha
@@ -108,13 +112,13 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 #copy the file on the server
 #prepare the command line
         correctionLine=""
-        if len( inVector ) >= 6 and inVector[4] != "" and inVector[5] != "" :
-            correctionLine +=' --correctAlphaFileName ' + inVector[4] + ' --correctAlphaHistName ' + inVector[5]
-            batch.write( 'cp ' + PREFIXPATH + inVector[4] + ' . \n')
+        if len( inVector ) > 6 and inVector[5] != "" and inVector[6] != "" :
+            correctionLine +=' --correctAlphaFileName ' + inVector[5] + ' --correctAlphaHistName ' + inVector[6]
+            batch.write( 'cp ' + PREFIXPATH + inVector[5] + ' . \n')
 
-        if len( inVector ) >= 8 and inVector[6] != "" and inVector[7] != "" :
-            correctionLine +=' --correctSigmaFileName ' + inVector[6] + ' --correctSigmaHistName ' + inVector[7]
-            batch.write( 'cp ' + PREFIXPATH + inVector[6] + ' . \n')
+        if len( inVector ) > 8 and inVector[7] != "" and inVector[8] != "" :
+            correctionLine +=' --correctSigmaFileName ' + inVector[7] + ' --correctSigmaHistName ' + inVector[8]
+            batch.write( 'cp ' + PREFIXPATH + inVector[7] + ' . \n')
 
 #Create an outName
         if outNameFile != "" :
@@ -134,6 +138,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
                 batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                batch.write( 'cp *.tex ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
                 
