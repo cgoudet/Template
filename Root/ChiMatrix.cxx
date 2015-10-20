@@ -392,8 +392,7 @@ void ChiMatrix::FitChi2() {
   // Create a bool which will be used several times
   // Is sigma the variable into constVarFit?
   bool isSigmaConstVar = m_setting->GetDoSmearing() && ( !m_setting->GetDoScale() || (m_setting->GetDoScale() && m_setting->GetConstVarFit() == "SIGMA" ) );
-
-  int mode = 1;//(m_chi2FitConstVar->GetBinContent(1) - m_chi2FitConstVar->GetMinimum() < 1) ? 0 : 1;
+  auto mode = (m_setting->GetConstVarFit() == "SIGMA") ? 0 : 2;
   fitResult = FitHist( m_chi2FitConstVar , mode, 0, 0 );
   DrawPlot( { m_chi2FitConstVar }, "chi2FitConstVar" );
   if ( !fitResult->Status() ) {  
@@ -607,7 +606,7 @@ void ChiMatrix::OptimizeRanges( ) {
 
   for ( unsigned int iScale = 0; iScale < 2; iScale++ ) {
     if ( (!m_setting->GetDoScale() && !iScale) || (!m_setting->GetDoSmearing() && iScale) ) continue;
-    //    cout << "iScale : " << iScale << endl;
+    cout << "iScale : " << iScale << endl;
     double &rangeMin = iScale ? m_sigmaMin : m_alphaMin;
     double &rangeMax = iScale ? m_sigmaMax : m_alphaMax;
     double allowedRangeMin = iScale ? max( 0., m_setting->GetSigmaMin()) : m_setting->GetAlphaMin();
@@ -665,41 +664,36 @@ void ChiMatrix::OptimizeRanges( ) {
 	  }
 	
 	
-	reachedPrecision = true;
-	//Dealing with low range too far
-	if ( histScale->GetBinContent(1) - histScale->GetBinContent( minBin ) > m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges() ) {
-	  int bin = 1;
-	  while ( bin<minBin-1 && histScale->GetBinContent( bin ) - histScale->GetBinContent(minBin) > m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges()  ) bin++;
-	  rangeMin = histScale->GetXaxis()->GetBinCenter( bin );
-	  reachedPrecision = false;
-	}
-	
-	//Dealing with high range too far
-	if ( histScale->GetBinContent(histScale->GetNbinsX()) - histScale->GetBinContent( minBin ) > m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges() ) {
-	  int bin = histScale->GetNbinsX();
-	  while ( bin>minBin+1 && histScale->GetBinContent( bin ) - histScale->GetBinContent(minBin) > m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges()  ) bin--;
-	  rangeMax = histScale->GetXaxis()->GetBinCenter( bin );
-	  reachedPrecision = false;
+	if ( m_setting->GetDebug() ) {
+	  cout << "iteration : " << counter << " ";
+	  for ( auto i = 1; i<histScale->GetNbinsX()+1; i++ ) cout << histScale->GetBinContent( i ) << " ";
+	  cout << endl;
 	}
 
+	  reachedPrecision = true;
+	  double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetBinContent( minBin ));
+	  double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetBinContent( minBin ));
+	  double sigmaMax = sqrt( (m_setting->GetOptimizeRanges() +1/2.)*(m_setting->GetOptimizeRanges() +1/2.)+1./4 );
+	  double sigmaMin = sqrt( (m_setting->GetOptimizeRanges() -1/2.)*(m_setting->GetOptimizeRanges() -1/2.)+1./4 );
 
-	//Dealing with low range too close
-	if ( histScale->GetBinContent(1) - histScale->GetBinContent( minBin ) < m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges()/2 && rangeMin != allowedRangeMin ) {
-	  rangeMin = max( allowedRangeMin, rangeMin - histScale->GetXaxis()->GetBinWidth(minBin)/2.);
-	  reachedPrecision = false;
-	}
-	
-	//Dealing with high range too close
-	if ( histScale->GetBinContent(histScale->GetNbinsX()) - histScale->GetBinContent( minBin ) < m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges()/2 && rangeMax != allowedRangeMax ) {
-	  rangeMax = min( allowedRangeMax, rangeMax + histScale->GetXaxis()->GetBinWidth(minBin)/2. );
-	  reachedPrecision = false;
-	}
+	  cout << "sigma : " << sigmaUp << " " << sigmaDown << " " << sigmaMax << " " << sigmaMin << endl;
+	  double scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
+
+	  if ( sigmaUp > sigmaMax || ( rangeMax != allowedRangeMax &&  sigmaUp < sigmaMin ) ) {
+	    rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	    reachedPrecision = false;
+	  }
+
+	  if ( ( rangeMin != allowedRangeMin && sigmaDown < sigmaMin  ) || sigmaDown > sigmaMax )  {
+	    rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+	    reachedPrecision = false;
+	  }
 
 	cout << "optimize : " << iScale << " " << histScale->GetXaxis()->GetXmin() << " " << histScale->GetBinContent(1) << " " << histScale->GetXaxis()->GetXmax() << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
       }//end else
-	counter++;
-	if ( counter == 100 ) exit( 0);
-	if ( histScale ) delete histScale;    
+      counter++;
+      if ( counter == 100 ) exit( 0);
+      if ( histScale ) delete histScale;    
     }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
   }
@@ -792,6 +786,9 @@ TFitResultPtr ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLo
   case 1 :
     fittingFunction = cubicFit;
     break;
+  case 2 :
+    fittingFunction = cubicFit;
+    break;
   }
 
 
@@ -829,6 +826,20 @@ TFitResultPtr ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLo
     }
     while ( fitResult->Status() && nFits );
       }
+
+
+  if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
+      double minVal = fittingFunction->GetParameter(2);
+      double width = 0.1;
+      double currentValue = minVal+width/2.;
+
+      while ( width < fabs( currentValue - minVal )/1e3 ) {
+	width/=2.;
+	currentValue += ( (*fittingFunction)(currentValue) - (*fittingFunction)(minVal) < 1 ) ? width : -width;
+      }
+      fittingFunction->SetParameter( 1, currentValue-minVal );
+  }
+  
   delete quadraticFit; quadraticFit=0;
   delete cubicFit; cubicFit=0;
  return fitResult;

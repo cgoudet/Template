@@ -61,7 +61,7 @@ int main( int argc, char* argv[] ) {
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
-  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins;
+  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod;
   double nOptim;
 
   cout << "Opening " << outFileName << endl;
@@ -83,6 +83,7 @@ int main( int argc, char* argv[] ) {
   outTree->Branch( "nBins", &nBins );
   outTree->Branch( "nOptim", &nOptim );
   outTree->Branch( "bootstrap", &bootstrap );
+  outTree->Branch( "fitMethod", &fitMethod );
 
   TTree *scalesTree = new TTree( "scalesTree", "scalesTree" );
   scalesTree->SetDirectory( 0 );
@@ -98,6 +99,7 @@ int main( int argc, char* argv[] ) {
   scalesTree->Branch( "nBins", &nBins );
   scalesTree->Branch( "nOptim", &nOptim );
   scalesTree->Branch( "bootstrap", &bootstrap );
+  scalesTree->Branch( "fitMethod", &fitMethod );
 
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
@@ -160,6 +162,7 @@ int main( int argc, char* argv[] ) {
 	nBins = settingMeasure.GetEtaBins().size()-1;
 	nOptim = settingMeasure.GetOptimizeRanges();
 	bootstrap = settingMeasure.GetBootstrap();
+	fitMethod = settingMeasure.GetFitMethod();
 
 	cout << "filling confTree" << endl;
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
