@@ -5,7 +5,7 @@ from Functions_MeasureAlphaSigma import *
 
 #One config file correspond to one job
 configFiles=[]
-fullSyst=1
+fullSyst=0
 
 if fullSyst :
         configFiles=[ 
@@ -28,10 +28,10 @@ if fullSyst :
 	
 else :
 	if 1 :
-		# configFiles.append( ['Config1.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns.root', 0] )
-		# configFiles.append( ['Config1_noSigma.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noSigma.root', 0] )
+		configFiles.append( ['Config1.boost', 'MC_distordedRejPair', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC1_PairEvents.root', 0] )
+		configFiles.append( ['Config1_noSigma.boost', 'MC_distordedRejPair', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel','MC1_PairEvents_noSigma.root', 0] )
 #		configFiles.append( ['Config1_noAlpha.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noAlpha.root', 0, '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noSigma.root', 'measScale_alpha'] )
-		configFiles.append( ['Config1_noSigma.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noSigma_it2.root', 0, '', '', '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noAlpha.root', 'measScale_c'] )
+#		configFiles.append( ['Config1_noSigma.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noSigma_it2.root', 0, '', '', '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noAlpha.root', 'measScale_c'] )
 #		configFiles.append( ['Config1_noSigma.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noSigma_itTest.root', 0, '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noSigma.root', 'measScale_alpha', '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noAlpha.root', 'measScale_c'] )
 
 					

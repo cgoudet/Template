@@ -203,35 +203,36 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     return 6;
   }
   else {
-  //Link alpha rane tree to corresonding variables
+    //Link alpha rane tree to corresonding variables
 
-  double alphaMin=0, alphaMax=0, sigmaMin=0, sigmaMax=0;
-  treeChiMatrixRanges->SetBranchStatus( "*", 1);
-  treeChiMatrixRanges->SetBranchAddress( "i_eta", &i_eta);
-  treeChiMatrixRanges->SetBranchAddress( "j_eta", &j_eta );
-  treeChiMatrixRanges->SetBranchAddress( "alphaMin" , &alphaMin );
-  treeChiMatrixRanges->SetBranchAddress( "sigmaMin", &sigmaMin );
-  treeChiMatrixRanges->SetBranchAddress( "alphaMax", &alphaMax );
-  treeChiMatrixRanges->SetBranchAddress( "sigmaMax", &sigmaMax );
+    double alphaMin=0, alphaMax=0, sigmaMin=0, sigmaMax=0;
+    treeChiMatrixRanges->SetBranchStatus( "*", 1);
+    treeChiMatrixRanges->SetBranchAddress( "i_eta", &i_eta);
+    treeChiMatrixRanges->SetBranchAddress( "j_eta", &j_eta );
+    treeChiMatrixRanges->SetBranchAddress( "alphaMin" , &alphaMin );
+    treeChiMatrixRanges->SetBranchAddress( "sigmaMin", &sigmaMin );
+    treeChiMatrixRanges->SetBranchAddress( "alphaMax", &alphaMax );
+    treeChiMatrixRanges->SetBranchAddress( "sigmaMax", &sigmaMax );
 
-  //Make sure m_ChiMtrix is empty before loading
-  // ClearChiMatrix();
+    //Make sure m_ChiMtrix is empty before loading
+    // ClearChiMatrix();
 
-  for ( int entry = 0; entry < treeChiMatrixRanges->GetEntries() ; entry++ ) {
-    treeChiMatrixRanges->GetEntry( entry );
+    for ( int entry = 0; entry < treeChiMatrixRanges->GetEntries() ; entry++ ) {
+      treeChiMatrixRanges->GetEntry( entry );
 
-    //If the coordinates of the loaded chiMatrix are off the vector, extend the vector
-    while ( i_eta >= (int) m_chiMatrix.size() )  m_chiMatrix.push_back( vector< ChiMatrix * >() );
-    while ( j_eta >= (int) m_chiMatrix[i_eta].size() ) m_chiMatrix[i_eta].push_back( 0 );
+      //If the coordinates of the loaded chiMatrix are off the vector, extend the vector
+      while ( i_eta >= (int) m_chiMatrix.size() )  m_chiMatrix.push_back( vector< ChiMatrix * >() );
+      while ( j_eta >= (int) m_chiMatrix[i_eta].size() ) m_chiMatrix[i_eta].push_back( 0 );
 
-    //Create a new chiMatrix at the right coordinates which the loaded ranges values
-    if ( !m_chiMatrix[i_eta][j_eta] ) m_chiMatrix[i_eta][j_eta] = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
-    m_chiMatrix[i_eta][j_eta]->SetAlphaMin( alphaMin );
-    m_chiMatrix[i_eta][j_eta]->SetAlphaMax( alphaMax );
-    m_chiMatrix[i_eta][j_eta]->SetSigmaMin( sigmaMin );
-    m_chiMatrix[i_eta][j_eta]->SetSigmaMax( sigmaMax );
+      //Create a new chiMatrix at the right coordinates which the loaded ranges values
+      if ( !m_chiMatrix[i_eta][j_eta] ) m_chiMatrix[i_eta][j_eta] = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
+      m_chiMatrix[i_eta][j_eta]->SetAlphaMin( alphaMin );
+      m_chiMatrix[i_eta][j_eta]->SetAlphaMax( alphaMax );
+      m_chiMatrix[i_eta][j_eta]->SetSigmaMin( sigmaMin );
+      m_chiMatrix[i_eta][j_eta]->SetSigmaMax( sigmaMax );
 
-  }
+    }
+    delete treeChiMatrixRanges; treeChiMatrixRanges=0;
   }
   //Perform test on the structure on m_chiMatrix and load templates
   for ( i_eta = 0; i_eta < (int) m_chiMatrix.size(); i_eta++ ) {
@@ -273,7 +274,8 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
     }
   }
 
-
+  inFile->Close("R");
+  delete inFile; inFile=0;
   if ( m_setting.GetDebug() ) cout << "Template::LoadTemplate Done" << endl;
   return 0;
 }
@@ -332,6 +334,8 @@ int Template::Save( string outFileName, bool justTemplate ) {
 	treeChiMatrixRanges->Fill();
       }}}
   treeChiMatrixRanges->Write( "", TObject::kOverwrite );
+  delete treeChiMatrixRanges; treeChiMatrixRanges=0;
+
   if ( !justTemplate ) {
     //Saving properties of TemplateClass
     for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
@@ -467,10 +471,13 @@ int Template::ExtractFactors() {
       }
     }
     
+
     //Create combined factor matrices
     for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
     
+    // m_chiMatrix[2][2]->FitChi2();
+    // exit(0);
     //Run over all chiMatrices
     cout << "eta1Max : " << eta1Max << endl;
     for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
@@ -617,7 +624,9 @@ void Template::CreateDistordedTree( string outFileName ) {
     MCTree->SetDirectory( 0 );
     vectorTree.push_back(0);
     vectorTree.back() = MCTree;
+    inFile.Close("R");
   }
+
   TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
   TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent() );
   distordedFile.cd();
@@ -627,6 +636,11 @@ void Template::CreateDistordedTree( string outFileName ) {
   m_MCTreeNames.clear();
   m_MCTreeNames.push_back( bootTree->GetName() );
   distordedFile.Close( "R" );
+  delete bootTree; bootTree=0;
+  while ( vectorTree.size() ) {
+    delete vectorTree.back();
+    vectorTree.pop_back();
+  }
   }
   
   
@@ -661,7 +675,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   int counterEvent=0;
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
-    cout << m_MCFileNames[iFile] << " " << m_MCTreeNames[iFile] << endl;
+    // cout << m_MCFileNames[iFile] << " " << m_MCTreeNames[iFile] << endl;
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
     LinkTree( MCTree );
@@ -1137,7 +1151,7 @@ string Template::FindDefaultTree( TFile* inFile ) {
     if (strcmp( "TTree",key->GetClassName())) continue;
     listTreeNames.push_back( key->GetName() );
   }
-  delete key;
+  if ( key ) delete key;
 
   if ( listTreeNames.size() == 1 ) return listTreeNames.front();
   if ( !listTreeNames.size() ) {

@@ -49,10 +49,10 @@ int main( int argc, char* argv[] ) {
     { "Data6_25ns_tight.root", "measScale_alpha", "tight" }
   };
   vector< vector<string> > systDifSigma = {
-    { "Data6_25ns_noPileup.root", "measScale_alpha", "pileUp" },
-    { "Data6_25ns_massWindow.root", "measScale_alpha", "massWindow" },
-    { "Data6_25ns_thresholdMass.root", "measScale_alpha", "thresholdMass" },
-    { "Data6_25ns_tight.root", "measScale_alpha", "tight" }
+    { "Data6_25ns_noPileup.root", "measScale_c", "pileUp" },
+    { "Data6_25ns_massWindow.root", "measScale_c", "massWindow" },
+    { "Data6_25ns_thresholdMass.root", "measScale_c", "thresholdMass" },
+    { "Data6_25ns_tight.root", "measScale_c", "tight" }
   };
 
   vector<string> systAloneAlpha = {
@@ -102,6 +102,7 @@ int main( int argc, char* argv[] ) {
       string systName = "syst_" + currentVector[iSyst][2] + "_" + (iVar ? "sigma" : "alpha" );
       vector< TH1* > &systHist = iVar ? systSigma : systAlpha;
       systHist.push_back(0);
+      cout << "systHistName : " << currentVector[iSyst][1] << endl;
       systHist.back() = ( TH1D*) fileSyst->Get( currentVector[iSyst][1].c_str() );
       systHist.back()->SetDirectory(0);
       systHist.back()->SetName( systName.c_str() );
@@ -113,8 +114,11 @@ int main( int argc, char* argv[] ) {
       cout << "alphaBaseName : " << alphaBase->GetName() << endl;
 
       for ( int iBin = 1; iBin <= alphaBase->GetNbinsX(); iBin++ ) {
-	cout << alphaBase->GetBinContent( iBin ) << " " << systHist.back()->GetBinContent(iBin) << endl;
       double syst = fabs( alphaBase->GetBinContent( iBin ) - systHist.back()->GetBinContent(iBin) );
+	if ( iVar ) {
+	  cout << alphaBase->GetBinContent( iBin ) << " " << systHist.back()->GetBinContent(iBin) << endl;
+	  cout << syst << endl;
+	}
       systHist.back()->SetBinContent( iBin, syst );
       }
            cout << "Systematic " << ( iVar ? "sigma" : "alpha" ) << " " << systDifAlpha[iSyst][2] << " done" << endl;
@@ -188,8 +192,7 @@ int main( int argc, char* argv[] ) {
   	fullSyst->SetBinContent( iBin, sqrt(systVal) );
       }
     }
-    cout << "test" << endl;
-    outFile->ls();
+
     cout << "writting" << endl;
     fullSyst->Write( "", TObject::kOverwrite );
   }
