@@ -131,7 +131,7 @@ Template::Template( const string &outFileName, const string &configFile,
     if ( m_setting.GetNUseEl() != 1 ) dummyOutFileName+=TString::Format("_NUseEl%d", (int) m_setting.GetNUseEl() );
     //    if ( m_setting.GetNEventCut() != 500 ) dummyOutFileName+=TString::Format("_NEventCut%d", (int) m_setting.GetNEventCut() );
     if ( m_setting.GetNUseEvent() != 0 ) dummyOutFileName+=TString::Format("_NUseEvent%dk", (int) m_setting.GetNUseEvent()/1000 );
-    if ( m_setting.GetSelection() != 0 ) dummyOutFileName+=TString::Format("_selection%d", (int) m_setting.GetSelection() );
+    //    if ( m_setting.GetSelection() != 0 ) dummyOutFileName+=TString::Format("_selection%d", (int) m_setting.GetSelection() );
     m_name = dummyOutFileName;
   }
   // cout << "m_name created" << endl;
@@ -546,10 +546,24 @@ void Template::FillDistrib( bool isData ) {
 
     inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
     inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
+
+    if ( m_setting.GetSelection() != "" && 
+	 ( !m_setting.GetApplySelection() 
+	   || ( m_setting.GetApplySelection()==1 &&  isData ) 
+	   || ( m_setting.GetApplySelection()==2 && !isData ) )
+	   ) {
+      TTree* dumTree = inputTree->CopyTree( m_setting.GetSelection().c_str() );
+      if ( !dumTree->GetEntries() ) {
+	cout << "selectionTree has no events." << endl;
+	exit(1);
+      }
+      delete inputTree;
+      inputTree = dumTree;
+    }
+
     //    inputTree->SetDirectory( 0 );
-    if ( m_setting.GetDebug() ) cout << "inputTree : " << inputTree << endl;
+    if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     LinkTree( inputTree );
-    cout << "inputEntries : " << inputTree->GetEntries() << endl;
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) return;
 
@@ -561,15 +575,6 @@ void Template::FillDistrib( bool isData ) {
       m_mapVarEvent["WEIGHT"] *= ( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile];
       if ( m_setting.GetDoWeight() && !m_setting.GetDoPileup() ) SetWeightNoPileup();
 
-      //##############################
-      //For special cases, one can perform an additional selection here
-      switch ( m_setting.GetSelection() ) {
-      case 1 :
-	if ( 27*sqrt(2*(TMath::CosH( e1.Eta() - e2.Eta() )+1)) > 80 ) continue;
-	break;
-      default : 
-	break;
-      }
 
       //##############################
       if ( isData ) m_setting.SetNEventData();
@@ -609,6 +614,19 @@ void Template::FillDistrib( bool isData ) {
 void Template::CreateDistordedTree( string outFileName ) {
   cout << "Template : CreateDistordedTree" << endl;
 
+  vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
+  vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
+  vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();
+  vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();
+
+  if ( alphaSimEta.size()!= sigmaSimEta.size() 
+       || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
+       || alphaSimPt.size() != sigmaSimPt.size()
+       || ( m_setting.GetPtBins().size() && (sigmaSimPt.size() !=  m_setting.GetPtBins().size()-1) )
+       ) {
+    cout << "simulation vector sizes not ok" << endl;
+    exit(0);
+  }
 
   if ( m_setting.GetIndepDistorded() ) {
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
@@ -629,6 +647,7 @@ void Template::CreateDistordedTree( string outFileName ) {
 
   TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
   TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent() );
+  cout << "bootstrap name : " << bootTree->GetName() << endl;
   distordedFile.cd();
   bootTree->Write( "", TObject::kOverwrite );
   m_MCFileNames.clear();
@@ -667,10 +686,6 @@ void Template::CreateDistordedTree( string outFileName ) {
   dataTree->Branch( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
 
 
-  vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
-  vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
-  vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();
-  vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();
 
   int counterEvent=0;
 
@@ -679,11 +694,11 @@ void Template::CreateDistordedTree( string outFileName ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
     LinkTree( MCTree );
-    
+
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
       //      if ( m_setting.GetNUseEvent() && counterEvent == m_setting.GetNUseEvent() ) break; 
       MCTree->GetEntry( iEvent );
-	
+
       unsigned int i_eta = 0, j_eta = 0;
       if ( FindBin( i_eta, j_eta ) ) continue;
 
@@ -746,7 +761,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   latex << "Data : " << dumName << "\\newline" << endl;
   latex << "Events : " << m_setting.GetNEventData() << "\\newline" << endl;
   latex << "Variable1 : $" << m_setting.GetVar1() << "$ \\newline" << endl;
-  //  if ( m_setting.GetMode() != "1VAR" )  latex << "Variable1 : " << m_setting.GetVar1() << endl;
+  if ( m_setting.GetMode() != "1VAR" )  latex << "Variable1 : " << m_setting.GetVar1() << endl;
   latex << "Fit Method : " << m_setting.GetFitMethod() << "\\newline" << endl;
   latex << "nUseEl : " << m_setting.GetNUseEl() << "\\newline" << endl;
   latex << "nEventCut : " << m_setting.GetNEventCut() << "\\newline" << endl;
@@ -853,111 +868,6 @@ void Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
 //#################################################=
-
-// int Template::InvertMatrix() {
-//   if ( m_setting.GetDebug() )  cout << "Template::InvertMatrix" << endl;
-//   //Clean
-//   if ( m_alpha ) { delete m_alpha; m_alpha = 0;}
-//   if ( m_vectHist[1][histMeasBin] ) { delete m_sigma; m_sigma = 0; }
-
-//   if ( m_setting.GetMode() == "1VAR" ) {
-//     vector<double> etaBins= m_setting.GetEtaBins();
-
-    
-//     m_alpha = new TH1D( "alpha", "alpha", etaBins.size()-1, (double*) &etaBins[0] ); 
-//     m_alpha->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-//     m_alpha->GetYaxis()->SetTitle( "#alpha" );
-//     m_sigma = new TH1D( "sigma", "sigma", etaBins.size()-1, (double*) &etaBins[0] ); 
-//     m_sigma->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-//     m_sigma->GetYaxis()->SetTitle( "C" );
-
-//     //Create the B matrix for alpha
-//     TMatrixD *bAlpha = new TMatrixD( m_alpha->GetNbinsX(), 1);
-//     m_covarianceAlpha = new TMatrixD( m_alpha->GetNbinsX(), m_alpha->GetNbinsX() );  
-//     TMatrixD *bSigma = new TMatrixD( m_sigma->GetNbinsX(), 1);
-//     m_covarianceSigma = new TMatrixD( m_sigma->GetNbinsX(), m_sigma->GetNbinsX() );  
-
-
-
-//     for ( int line = 0; line < bAlpha->GetNrows(); line++ ) {
-//       for ( int col = 0; col < bAlpha->GetNrows(); col++ ) {
-
-// 	if ( m_combinAlpha ) {
-// 	  (*bAlpha)(line, 0 ) += (*m_combinAlpha)(line, col ) /  (*m_combinErrAlpha)( line, col) / (*m_combinErrAlpha)( line, col) * ( 1 + Dirac( col, line ) ); 
-// 	  (*m_covarianceAlpha)( line, col ) += 1. / 2 / (*m_combinErrAlpha)( line, col ) / (*m_combinErrAlpha)( line, col ) * ( 1 +Dirac( line, col ) );
-// 	  (*m_covarianceAlpha)( line, line ) += 1. / 2 / (*m_combinErrAlpha)( line, col ) / (*m_combinErrAlpha)( line, col ) * ( 1 +  Dirac( line, col ) );
-// 	}
-
-// 	if ( m_combinSigma ) {
-// 	  (*bSigma)( line, 0)    += ( 1. + Dirac( col, line ) ) * (*m_combinSigma)( line, col ) * (*m_combinSigma)( line, col )  / Power( 2 * (*m_combinErrSigma)( line, col) * (*m_combinSigma)( line, col) + Power( (*m_combinErrSigma)( line, col), 2 ), 2 ) ;
-// 	  (*m_covarianceSigma)( line, col)  += (1+Dirac( col, line )) / 2. / Power( 2 * (*m_combinErrSigma)( line, col) * (*m_combinSigma)( line, col) + Power( (*m_combinErrSigma)( line, col), 2 ), 2 );
-// 	  (*m_covarianceSigma)( line, line) += ( 1. + Dirac( col, line ) ) / 2. / Power( 2 * (*m_combinErrSigma)( line, col) * (*m_combinSigma)( line, col) + Power( (*m_combinErrSigma)( line, col), 2 ), 2 );
-// 	}
-
-//       }}
-
-//     if ( m_combinAlpha ) {
-//       // cout << "combinAlpha" << endl;
-//       // m_combinAlpha->Print();
-//       // cout << "combinErrAlpha" << endl;
-//       // m_combinErrAlpha->Print();
-//       // cout << "bAlpha" << endl;
-//       // bAlpha->Print();
-//       // cout << "m_covarianceAlpha" << endl;
-//       // m_covarianceAlpha->Print();
-//       m_covarianceAlpha->Invert();
-//       // cout << "inverted m_covarianceAlpha" << endl;
-//       // m_covarianceAlpha->Print();    
-//       //aAlpha contains the extracted scale factor
-//       TMatrixD *aAlpha = new TMatrixD( m_alpha->GetNbinsX(), 1);
-//       *aAlpha = (*m_covarianceAlpha) * (*bAlpha);
-//       cout << "aAlpha" << endl;
-//       aAlpha->Print();
-//       //Fill the histogram for final values
-//       for ( int i = 0; i< m_alpha->GetNbinsX(); i++ ) {
-// 	m_alpha->SetBinContent( i+1, (*aAlpha)(i, 0) );
-// 	m_alpha->SetBinError(i+1, sqrt( 2 * (*m_covarianceAlpha)(i, i) ) );
-//       }
-//       delete aAlpha; aAlpha=0;
-//     }
-//     else {
-//       delete m_alpha;
-//       m_alpha = 0;
-//       delete m_covarianceAlpha;
-//       m_covarianceAlpha=0;
-//     }
-
-//     if ( m_combinSigma ) {
-//       m_covarianceSigma->Invert();
-//       TMatrixD *aSigma = new TMatrixD( m_sigma->GetNbinsX(), 1);
-//       *aSigma = (*m_covarianceSigma) * (*bSigma);
-//       cout << "aSigma" << endl;
-//       aSigma->Print();        
-//       //Fill the histogram for final values
-//       for ( int i = 0; i< m_sigma->GetNbinsX(); i++ ) {
-// 	m_sigma->SetBinContent( i+1, ( (*aSigma)(i,0)>0 ) ?  sqrt( (*aSigma)( i, 0 ) ) : -sqrt( -(*aSigma)( i, 0 ) ) );
-// 	m_sigma->SetBinError( i+1, sqrt( m_sigma->GetBinContent( i+1 )*m_sigma->GetBinContent( i+1 )  + sqrt( 2 * (*m_covarianceSigma)(i,i) ) ) - fabs( m_sigma->GetBinContent( i+1 )  ));
-//       }
-//       delete aSigma; aSigma=0;
-//     }
-//     else {
-//       delete m_sigma;
-//       m_sigma = 0;
-//       delete m_covarianceSigma;
-//       m_covarianceSigma=0;
-//     }
-
-//     delete bAlpha; bAlpha = 0;
-//     delete bSigma; bSigma = 0;
-
-
-//   }//1VAR mode
-
-//   if ( m_setting.GetDebug() )  cout << "Template::InvertMatrix Done " << endl;
-//   return 0;
-// }
-
-//#################################################=
 int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
@@ -989,6 +899,7 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
     if ( eta2 <= ptBins[0] || eta2 > ptBins.back() ) return 1;
     while ( j_eta <  ptBins.size() && eta2 >  ptBins[j_eta+1] )  j_eta++;  
   }
+
   return 0;
 }
 

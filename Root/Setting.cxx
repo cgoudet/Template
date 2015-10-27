@@ -19,7 +19,7 @@ using std::stringstream;
 Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),
 		     m_doScale(false), m_alphaMin(-1e-2), m_alphaMax(1e-2), m_alphaNBins(10),
 		     m_doSmearing(false), m_sigmaMin(0), m_sigmaMax(0.1), m_sigmaNBins(10),
-		     m_selection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
+		     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
 		     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
 		     m_optimizeRanges( 10 ), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(500), m_thresholdMass( 70 ),
 		     m_indepDistorded( false ), m_indepTemplates( false ), m_inversionMethod(0), m_bootstrap( 0 ), m_doPileup( true ), m_doWeight( true )
@@ -60,7 +60,7 @@ int Setting::Configure( const string &configFile ) {
     ( "sigmaNBins", po::value<int>(&m_sigmaNBins), "" )
     ( "debug", po::value<int>(&debug), "" )
     ( "constVarFit", po::value<string>(&m_constVarFit), "" )
-    ( "selection", po::value<int>(&m_selection), "" )
+    ( "selection", po::value<string>(&m_selection), "" )
     ( "doSimulation", po::value<bool>(&m_doSimulation), "" )
     ( "optimizeRanges", po::value<double>(&m_optimizeRanges), "" )
     ( "etaBins", po::value<string>(&etaBins), "" )
@@ -81,6 +81,7 @@ int Setting::Configure( const string &configFile ) {
     ( "bootstrap", po::value<bool>( &m_bootstrap ), "" )
     ( "doPileup", po::value<bool>( &m_doPileup ), "" )
     ( "doWeight", po::value<bool>( &m_doWeight ), "" )
+    ( "applySelection", po::value<unsigned int>( &m_applySelection ), "" )
     ;
   
   po::variables_map vm;
@@ -188,7 +189,7 @@ int Setting::Save( TFile *outFile ) {
 
   infoTree->Branch( "constVarFit", &m_constVarFit );
   infoTree->Branch( "nUseEl", &m_nUseEl );
-  infoTree->Branch( "selection", &m_selection );
+  //  infoTree->Branch( "selection", &m_selection );
   infoTree->Branch( "inversionMethod", &m_inversionMethod );
   infoTree->Branch( "nEventMC", &m_nEventMC );
   infoTree->Branch( "nEventData", &m_nEventData );
@@ -234,7 +235,7 @@ int Setting::Load( const string &inFileName, bool justTemplate ) {
   infoTree->SetBranchAddress( "ZMassMin", &m_ZMassMin );
   infoTree->SetBranchAddress( "ZMassMax", &m_ZMassMax );
 
-  infoTree->SetBranchAddress( "selection", &m_selection );
+  //  infoTree->SetBranchAddress( "selection", &m_selection );
   infoTree->SetBranchAddress( "nEventMC", &m_nEventMC );
   infoTree->SetBranchAddress( "nEventCut", &m_nEventCut );
   infoTree->SetBranchAddress( "thresholdMass", &m_thresholdMass );
@@ -379,6 +380,8 @@ void Setting::Print() {
   cout << "m_doWeight : " << m_doWeight << endl;
   cout << "m_etaBins : ";
   PrintVector( m_etaBins );
+  cout << "m_sigmaSimEta : ";
+  PrintVector( m_sigmaSimEta );
 
   cout << "m_ptBins";
   PrintVector( m_ptBins );

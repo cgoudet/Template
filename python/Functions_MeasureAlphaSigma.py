@@ -64,12 +64,12 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         exit(1)
 
 
-    configFile=inVector[0]
+    configOptions=inVector[3]
     dataFiles=DATAFILESETS[ inVector[1] ]
     dataWeights=DATAWEIGHTSET[ inVector[1] ]  
     MCFiles=MCFILESETS[ inVector[2] ]
     MCWeights=MCWEIGHTSET[ inVector[2] ]
-    outNameFile=inVector[3]
+    outNameFile=inVector[0]
     doDistorded = 0
     if  len( inVector ) > 4 :
         doDistorded = inVector[4]
@@ -79,6 +79,10 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
     batchPath="Batch/"
     resultPath="Results/"
     plotPath="Plots/"
+
+    configName = PREFIXPATH + configPath + StripName( outNameFile ) + '.boost' 
+    CreateConfig( configName, configOptions )
+
     fileName = PREFIXPATH + batchPath + StripName( outNameFile ) + '.sh'
 
 
@@ -95,7 +99,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                     )
         
 #Copy the configuration file to the server
-        batch.write( 'cp ' + PREFIXPATH + configPath + configFile + ' . \n' )
+        batch.write( 'cp ' + configName + ' . \n' )
         
 #copy the data files to the server and prepare the command line
         dataLine=""
@@ -129,27 +133,26 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 #Fill the command line
             if mode==0 :
                 if doDistorded==0 :
-                        batch.write( 'MeasureScale --configFile ' + StripName(configFile, 1, 0)
+                        batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0)
                                  + dataLine + MCLine + correctionLine + outNameFile + ' --makePlot\n')
                 else : 
-                    batch.write( 'MeasureScale --configFile ' + StripName(configFile, 1, 0) 
+                    batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0) 
                                  + dataLine.replace( '--dataFileName', '--MCFileName' ) +  correctionLine + outNameFile + ' --createDistorded MC_distorded.root \n')
-                    batch.write( 'MeasureScale --configFile ' + StripName(configFile, 1, 0 )
+                    batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0 )
                                  + ' --dataFileName MC_distorded.root ' + MCLine + correctionLine + outNameFile + ' --makePlot\n')
 
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp *.tex ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
+                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
                 
 
             else :
-                batch.write( 'GenerateToyTemplates --configFile ' + StripName(configFile, 1, 0)
+                batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
                              + dataLine + MCLine + optionLine + outNameFile +' \n' )
 #                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp -v ' + inVector[3] + ' ' + PREFIXPATH + resultPath + '. \n' )
+                batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
                 # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
@@ -168,3 +171,67 @@ def StripName( line, doPrefix = 1, doSuffix = 1 ) :
         line = line[line.rfind( '/' )+1:len( line )]
 
     return line
+
+
+def CreateConfig( configName, inOptions = [] ) :
+
+    defaultBinning={}
+    defaultBinning['ETA1']='-2.47 2.47'
+    defaultBinning['ETA6']='-2.47 -1.55 -1.37 0 1.37 1.55 2.47'
+    defaultBinning['SIMSIGMAETA6']='0.007 0.007 0.007 0.007 0.007 0.007'
+    defaultBinning['ETA24']='-2.47 -2.3 -2 -1.80 -1.55 -1.37 -1.2 -1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1 1.2 1.37 1.55 1.8 2 2.3 2.47'
+
+    options = {}
+    options['ZMassMin'] = 80
+    options['ZMassMax'] = 100
+    options['ZMassNBins'] = 20
+    options['mode'] = "1VAR"
+    options['var1'] = "ETA_CALO"
+    options['var2'] = ""
+    options['doScale'] = 1
+    options['alphaMin']=-0.1
+    options['alphaMax']=0.1
+    options['alphaNBins']=20
+    options['doSmearing']=1
+    options['sigmaMin']=0
+    options['sigmaMax']=0.1
+    options['sigmaNBins']=20
+    options['debug']=0
+    options['constVarFit']="SIGMA"
+    options['selection']=''
+    options['doSimulation']=0
+    options['optimizeRanges']=5
+    options['alphaSimEta']=''
+    options['alphaSimPt']=''
+    options['sigmaSimEta']=''
+    options['sigmaSimPt']=''
+    options['symBin']=0
+    options['fitMethod']=1
+    options['nUseEl']=1
+    options['nUseEvent']=0
+    options['nEventCut']=10
+    options['thresholdMass']=70
+    options['indepDistorded']=0
+    options['indepTemplates']=0
+    options['inversionMethod']=1
+    options['bootstrap']=0
+    options['doPileup']=1
+    options['doWeight']=1
+    options['etaBins']=defaultBinning['ETA24']
+    options['ptBins']=''
+    options['applySelection']=0
+
+    for inOpt in inOptions :
+        optKey = inOpt.split('=')[0]
+        optValue= inOpt[inOpt.find('=')+1:]
+
+        if optKey in options.keys() :
+            options[optKey]=optValue
+
+        if ( optKey=='ptBins' and 'PT' in optValue ) or ( optKey=='etaBins' and 'ETA' in optValue ) :
+            options[optKey]=defaultBinning[optValue]
+
+    with open( configName, 'w' ) as batch:
+        for iLabel in options.keys() :
+            batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
+        

@@ -21,14 +21,13 @@ int main( int argc, char* argv[] ) {
   po::options_description desc("LikelihoodProfiel Usage");
 
 
-  unsigned int nIteration, nUseEl;
+  unsigned int nIteration;
   vector< double > inputValues;
   vector< unsigned int > inputStat;
 
   vector<string> dataFileNames, MCTreeNames, MCFileNames, dataTreeNames;
   vector<double> dataWeights, MCWeights;
   string  outFileName, configFile;
-  bool indepDistorded, indepTemplates, bootstrap;
   //define all options in the program
   desc.add_options()
     ("help", "Display this help message")
@@ -43,10 +42,6 @@ int main( int argc, char* argv[] ) {
     ("nIteration", po::value<unsigned int>(&nIteration)->default_value(1), "" )   
     ("inputC", po::value<vector<double>>(&inputValues)->multitoken(), "" )
     ("inputStat", po::value<vector<unsigned int>>(&inputStat)->multitoken(), "" )
-    ("nUseEl", po::value<unsigned int>(&nUseEl)->default_value( 1 ), "" )
-    ("indepDistorded", po::value<bool>(&indepDistorded)->default_value(0)->implicit_value(1), "" )
-    ("indepTemplates", po::value<bool>(&indepTemplates)->default_value(0)->implicit_value(1), "" )
-    ("bootstrap", po::value<bool>(&bootstrap)->default_value(0)->implicit_value(1), "" )
    ;
 
 
@@ -61,7 +56,7 @@ int main( int argc, char* argv[] ) {
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
-  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod;
+  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, nUseEl;
   double nOptim;
 
   cout << "Opening " << outFileName << endl;
@@ -112,15 +107,8 @@ int main( int argc, char* argv[] ) {
 	  Template TempDistorded( "", configFile, {}, {}, {}, dataFileNames, dataTreeNames, dataWeights );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
 	  settingDistorded.SetDebug( 0 );
-	  settingDistorded.SetNUseEvent( inputStat[iStat] );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
-	  settingDistorded.SetIndepDistorded( indepDistorded );
-	  vector<double> dumVect = settingDistorded.GetSigmaSimEta();
-	  for ( unsigned int iDum = 0; iDum < dumVect.size(); iDum++ ) {
-	    cout << dumVect[iDum] << " " ;
-	  }
-	  cout << endl;
 	  inputC = inputValues[iInput];
 	  //	  statTree = inputStat[iStat];
 
@@ -136,9 +124,8 @@ int main( int argc, char* argv[] ) {
 	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
 
 	settingMeasure.SetNUseEvent( inputStat[iStat] );
-	settingMeasure.SetNUseEl( nUseEl );
-	settingMeasure.SetIndepTemplates( indepTemplates );
 	settingMeasure.Print();
+
 	err = TempMeasure.CreateTemplate();
 	if ( err ) {
 	  cout << "Template::CreateTemplate failed : " << err << endl;
@@ -163,6 +150,9 @@ int main( int argc, char* argv[] ) {
 	nOptim = settingMeasure.GetOptimizeRanges();
 	bootstrap = settingMeasure.GetBootstrap();
 	fitMethod = settingMeasure.GetFitMethod();
+	indepDistorded = settingMeasure.GetIndepDistorded();
+	indepTemplates = settingMeasure.GetIndepTemplates();
+	nUseEl = settingMeasure.GetNUseEl();
 
 	cout << "filling confTree" << endl;
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {

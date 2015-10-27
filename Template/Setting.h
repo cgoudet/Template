@@ -52,7 +52,7 @@ class Setting
   bool   GetDoScale()         const { return m_doScale;        };
   bool   GetDoSimulation()    const { return m_doSimulation;   };
   string GetConstVarFit()     const { return m_constVarFit;    };
-  int    GetSelection()       const { return m_selection;      };
+  string    GetSelection()       const { return m_selection;      };
   string GetMCName()          const { return m_MCName;         };
   string GetDataName()        const { return m_dataName;       };
   bool   GetDoSymBin()        const { return m_symBin;         };
@@ -68,7 +68,8 @@ class Setting
   bool GetBootstrap() const { return m_bootstrap; }
   bool GetDoPileup() const { return m_doPileup;}
   bool GetDoWeight() const { return m_doWeight; }
-
+  unsigned int GetApplySelection() const { return m_applySelection; }
+ 
   double GetOptimizeRanges()  const { return m_optimizeRanges; };
   vector< double > const &GetEtaBins()     const { return m_etaBins;     };
   vector< double > const &GetPtBins()      const { return m_ptBins;      };
@@ -81,14 +82,14 @@ class Setting
   void SetDebug( bool debug )               { m_debug = debug; };
   void SetDoSmearing( bool smearing )       { m_doSmearing = smearing; };
   void SetDoScale( bool scale )             { m_doScale = scale; };
-  void SetSelection( int selection )        { m_selection = selection; };
+  void SetSelection( string selection )        { m_selection = selection; };
   void SetNEventMC(  long int nEventMC = -1 )     { ( nEventMC != -1 ) ?  m_nEventMC = (unsigned long int ) nEventMC : m_nEventMC++; };
   void SetNEventData( long int nEventData = -1 ) { ( nEventData != -1 ) ? m_nEventData = (unsigned long int ) nEventData : m_nEventData++;};
   void SetMCName( string MCName )           { m_MCName = MCName; };
   void SetDataName( string DataName )       { m_dataName = DataName; };
   void SetConstVarFit( string constVarFit = "SIGMA" );
-  void SetSigmaSimEta( vector<double> sigmaSimEta ) { if ( sigmaSimEta.size() == m_sigmaSimEta.size() ) m_sigmaSimEta = sigmaSimEta; }
-  void SetAlphaSimEta( vector<double> alphaSimEta ) { if ( alphaSimEta.size() == m_alphaSimEta.size() ) m_alphaSimEta = alphaSimEta; }
+  void SetSigmaSimEta( vector<double> sigmaSimEta ) { if ( sigmaSimEta.size() == m_etaBins.size()-1 ) m_sigmaSimEta = sigmaSimEta; }
+  void SetAlphaSimEta( vector<double> alphaSimEta ) { if ( alphaSimEta.size() == m_etaBins.size()-1 ) m_alphaSimEta = alphaSimEta; }
   void SetNUseEvent( unsigned int nUseEvent ) { m_nUseEvent = nUseEvent; }
   void SetNUseEl( unsigned int nUseEl ) { m_nUseEl = nUseEl; }
   void SetIndepDistorded( bool indepDistorded ) { m_indepDistorded = indepDistorded; }
@@ -222,8 +223,8 @@ class Setting
 
 
 
-  int m_selection;
-
+  string m_selection;
+  unsigned int m_applySelection;//0 both, 1 data only, 2 MC only
   unsigned long int m_nEventMC;
   unsigned long int m_nEventData;
   unsigned int m_nUseEvent;

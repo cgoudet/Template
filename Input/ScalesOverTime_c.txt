@@ -1,0 +1,3 @@
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns.root		measScale_c	27
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_pt30.root	measScale_c	30
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_pt35.root	measScale_c	35

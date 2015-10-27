@@ -392,7 +392,7 @@ void ChiMatrix::FitChi2() {
   // Create a bool which will be used several times
   // Is sigma the variable into constVarFit?
   bool isSigmaConstVar = m_setting->GetDoSmearing() && ( !m_setting->GetDoScale() || (m_setting->GetDoScale() && m_setting->GetConstVarFit() == "SIGMA" ) );
-  auto mode = (m_setting->GetConstVarFit() == "SIGMA") ? 0 : 2;
+  auto mode = (m_setting->GetConstVarFit() == "SIGMA") ?  m_setting->GetFitMethod() : 0;
   fitResult = FitHist( m_chi2FitConstVar , mode, 0, 0 );
   DrawPlot( { m_chi2FitConstVar }, "chi2FitConstVar" );
   if ( !fitResult->Status() ) {  
@@ -680,19 +680,24 @@ void ChiMatrix::OptimizeRanges( ) {
 	  double scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
 
 	  if ( sigmaUp > sigmaMax || ( rangeMax != allowedRangeMax &&  sigmaUp < sigmaMin ) ) {
-	    rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	    cout << "rangeMax : " << scaleMin  << " " << rangeMax << " " << scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp << endl;
+	    rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*( sigmaUp>sigmaMax ? sigmaMax : sigmaMin )/sigmaUp );
 	    reachedPrecision = false;
 	  }
 
 	  if ( ( rangeMin != allowedRangeMin && sigmaDown < sigmaMin  ) || sigmaDown > sigmaMax )  {
-	    rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+	    cout << "rangeMin : " << scaleMin  << " " << rangeMin << " " << scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown << endl;
+	    rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*( sigmaDown>sigmaMax ? sigmaMax : sigmaMin )/sigmaDown );
 	    reachedPrecision = false;
 	  }
 
 	cout << "optimize : " << iScale << " " << histScale->GetXaxis()->GetXmin() << " " << histScale->GetBinContent(1) << " " << histScale->GetXaxis()->GetXmax() << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
       }//end else
       counter++;
-      if ( counter == 100 ) exit( 0);
+      if ( counter == 30 ) {
+	cout << "too much steps for optimization" << endl;
+	exit( 0);
+      }
       if ( histScale ) delete histScale;    
     }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
@@ -733,7 +738,7 @@ unsigned int ChiMatrix::IsGoodQuality() {
     if (  mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
   }
 
-  if ( m_setting->GetDebug() ) cout << "m_quality : " << m_quality << endl;
+  //  if ( m_setting->GetDebug() ) cout << "m_quality : " << m_quality << endl;
   return m_quality.to_ulong();
 }
 
@@ -780,15 +785,15 @@ TFitResultPtr ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLo
   if ( FindFitBestRange( hist, minBin, maxBin, chiMinLow, chiMinUp ) ) return 1;
 
   switch ( mode ) {
-  case 0 : //Fit alpha optimization
-    fittingFunction = quadraticFit;
-    break;
   case 1 :
     fittingFunction = cubicFit;
     break;
   case 2 :
     fittingFunction = cubicFit;
     break;
+  default : //Fit alpha optimization
+    fittingFunction = quadraticFit;
+    
   }
 
 
@@ -829,6 +834,7 @@ TFitResultPtr ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLo
 
 
   if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
+    cout << "dichotomy" << endl;
       double minVal = fittingFunction->GetParameter(2);
       double width = 0.1;
       double currentValue = minVal+width/2.;

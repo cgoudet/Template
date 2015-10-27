@@ -72,7 +72,6 @@ int main( int argc, char* argv[] ) {
   }
 
 
-
   Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, dataWeights, MCFileNames, MCTreeNames, MCWeights  );
   Temp.ApplyCorrection( correctAlphaHist, correctSigmaHist );
   if ( vm.count("createDistorded") ) { 
