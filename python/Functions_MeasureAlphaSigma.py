@@ -150,13 +150,14 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
             else :
                 batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                             + dataLine + MCLine + optionLine + outNameFile +' \n' )
-#                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                             + dataLine + MCLine + optionLine + outNameFile +' --makePlot \n' )
+                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
                 # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
-        batch.write( 'ls -lh \n' ) 
+#        batch.write( 'ls -lh \n' ) 
         return fileName
 
 
@@ -180,6 +181,8 @@ def CreateConfig( configName, inOptions = [] ) :
     defaultBinning['ETA6']='-2.47 -1.55 -1.37 0 1.37 1.55 2.47'
     defaultBinning['SIMSIGMAETA6']='0.007 0.007 0.007 0.007 0.007 0.007'
     defaultBinning['ETA24']='-2.47 -2.3 -2 -1.80 -1.55 -1.37 -1.2 -1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1 1.2 1.37 1.55 1.8 2 2.3 2.47'
+    defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
+    defaultBinning['SIMSIGMAETA24']='2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2'
 
     options = {}
     options['ZMassMin'] = 80
@@ -206,14 +209,14 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaSimEta']=''
     options['sigmaSimPt']=''
     options['symBin']=0
-    options['fitMethod']=1
+    options['fitMethod']=2
     options['nUseEl']=1
     options['nUseEvent']=0
     options['nEventCut']=10
     options['thresholdMass']=70
     options['indepDistorded']=0
     options['indepTemplates']=0
-    options['inversionMethod']=1
+    options['inversionMethod']=11
     options['bootstrap']=0
     options['doPileup']=1
     options['doWeight']=1

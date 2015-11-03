@@ -31,13 +31,12 @@ int main( int argc, char* argv[] ) {
   if (vm.count("help")) {cout << desc; return 0;}
   //########################################
   //  Style_Christophe();
-  string outFileName = "/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/EnergyScaleFactors.root";
-  DiffSystematics( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/systematics_alpha.txt", outFileName, "totSyst_alpha", 0 );
-  DiffSystematics( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/systematics_c.txt", outFileName, "totSyst_c", 1 );
+  //  string outFileName = "/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/151028/EnergyScaleFactors.root";
+  DiffSystematics( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/systematics_alpha.txt", 0 );
+  DiffSystematics( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/systematics_c.txt", 1 );
 
-  VarOverTime( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/ScalesOverTime_alpha.txt", outFileName, 1);
-  VarOverTime( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/ScalesOverTime_c.txt", outFileName, 1);
+  // VarOverTime( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/ScalesOverTime_alpha.txt", outFileName, 1);
+  // VarOverTime( "/afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/Input/ScalesOverTime_c.txt", outFileName, 1);
 
-  cout << "outFileName : " << outFileName << endl;
   return 0;
 }

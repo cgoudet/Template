@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 #include "TFile.h"
+#include <map>
 
+using std::map;
 using std::vector;
 using std::string;
 
@@ -77,6 +79,9 @@ class Setting
   vector< double > const &GetSigmaSimEta() const { return m_sigmaSimEta; }; 
   vector< double > const &GetAlphaSimPt()  const { return m_alphaSimPt;  }; 
   vector< double > const &GetSigmaSimPt()  const { return m_sigmaSimPt;  };
+  vector< string > const &GetDataBranchWeightNames() const { return m_dataBranchWeightNames; }
+  vector< string > const &GetMCBranchWeightNames() const { return m_MCBranchWeightNames; }
+  map< string, string> const &GetBranchVarNames() const { return m_branchVarNames;}
 
   void SetInversionMethod( unsigned int inversionMethod ) { m_inversionMethod = inversionMethod; }
   void SetDebug( bool debug )               { m_debug = debug; };
@@ -252,6 +257,9 @@ class Setting
   bool m_bootstrap;
   bool m_doPileup;
   bool m_doWeight;
+  map<string,string> m_branchVarNames;
+  vector< string > m_dataBranchWeightNames;
+  vector< string > m_MCBranchWeightNames;
 };
 
 

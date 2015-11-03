@@ -21,7 +21,7 @@ int main( int argc, char* argv[] ) {
   po::options_description desc("LikelihoodProfiel Usage");
 
 
-  unsigned int nIteration;
+  unsigned int nIteration, makePlot;
   vector< double > inputValues;
   vector< unsigned int > inputStat;
 
@@ -42,6 +42,7 @@ int main( int argc, char* argv[] ) {
     ("nIteration", po::value<unsigned int>(&nIteration)->default_value(1), "" )   
     ("inputC", po::value<vector<double>>(&inputValues)->multitoken(), "" )
     ("inputStat", po::value<vector<unsigned int>>(&inputStat)->multitoken(), "" )
+    ("makePlot", po::value<unsigned int>(&makePlot)->default_value(0)->implicit_value(1), "" ) 
    ;
 
 
@@ -137,6 +138,8 @@ int main( int argc, char* argv[] ) {
 	  cout << "Template::Extraction failed : " << err << endl;
 	  return 1;
 	}
+
+	if ( makePlot ) TempMeasure.MakePlot();
 	statTree=settingMeasure.GetNEventData();
 	string dumString = outFileName.substr( 0, outFileName.find_last_of( "." ) );
 	dumString = dumString.substr( dumString.find_last_of( "/" )+1 );

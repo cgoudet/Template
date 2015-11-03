@@ -1,3 +1,3 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns.root		measScale_alpha	27
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_pt30.root	measScale_alpha	30
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_pt35.root	measScale_alpha	35
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns.root		measScale_alpha	27
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_pt30.root	measScale_alpha	30
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_pt35.root	measScale_alpha	35

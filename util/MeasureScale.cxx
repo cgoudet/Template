@@ -93,7 +93,7 @@ int main( int argc, char* argv[] ) {
       return 4;
     }} 
   
-  else {
+  else if ( !vm.count( "noExtraction" ) ) {
     cout << "create Templates" << endl;
     err = Temp.CreateTemplate();
     if ( err ) {

@@ -173,6 +173,7 @@ class Template
    */
   void CreateDistordedTree( string outFileName = "");
 
+
  private :
 
   /**\brief Properly delete 2D vectors of pointers to ChiMatrix
@@ -243,8 +244,7 @@ class Template
        */
   void FillDistrib( bool isData );
   
-  void SetWeightNoPileup();
-  
+  double GetWeight( bool isData );  
   /**\brief Class containing all configuration attributes
    */
   Setting m_setting;
@@ -267,10 +267,12 @@ class Template
    */
   TRandom3 m_rand;
 
+  map<string, double> m_mapDouble;
   map< string, double > m_mapVar1;
   map< string, double > m_mapVar2;
   map< string, double > m_mapVarEvent;
   map< string, long long int  > m_mapVarNumber;
+  map< string, long long int  > m_mapLongLong;
   string m_name;
 
   /**\brief 2D vector containing usefull histograms for alpha and c

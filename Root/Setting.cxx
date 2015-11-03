@@ -39,8 +39,9 @@ void Setting::SetConstVarFit( string constVarFit ) {
 //############METHODS
 int Setting::Configure( const string &configFile ) {
   if ( m_debug )  cout << "Setting : Configure( " << configFile << " )" << endl;
-  string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt;
+  string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, dataBranchWeightName, MCBranchWeightName;
   int debug, doSmearing, doScale,  symBin;
+  vector< string > branchVarNames;
 
   po::options_description configOptions("configOptions");
   configOptions.add_options()
@@ -82,6 +83,9 @@ int Setting::Configure( const string &configFile ) {
     ( "doPileup", po::value<bool>( &m_doPileup ), "" )
     ( "doWeight", po::value<bool>( &m_doWeight ), "" )
     ( "applySelection", po::value<unsigned int>( &m_applySelection ), "" )
+    ( "branchVarNames", po::value< vector< string > >( &branchVarNames )->multitoken(), "" )
+    ( "dataBranchWeightName", po::value< string >( &dataBranchWeightName ), "" )
+    ( "MCBranchWeightName", po::value< string >( &MCBranchWeightName ), "" )
     ;
   
   po::variables_map vm;
@@ -116,6 +120,18 @@ int Setting::Configure( const string &configFile ) {
   std::sort( m_ptBins.begin(), m_ptBins.end() );
   m_ptBins.erase( unique( m_ptBins.begin(), m_ptBins.end() ), m_ptBins.end() );  
 
+  for ( auto branchVarName : branchVarNames ) {
+    vector< string > dumVect;
+    ParseVector( branchVarName, dumVect );
+    if ( dumVect.size() !=2 ) {
+      cout << "wrong string in branchVarNames : " << branchVarName << endl;
+      exit(0);
+    }
+    m_branchVarNames[dumVect[0]] = dumVect[1];
+  }
+
+  ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
+  ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
   //=====
   if ( !m_nUseEl ) m_nUseEl=1;
   if ( m_mode != "1VAR" && m_mode != "2VAR" ) return 1;

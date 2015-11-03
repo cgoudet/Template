@@ -36,23 +36,23 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_MCTreeNames.clear();
   m_MCWeights.clear();
 
-  m_mapVar1["PT"] = 0;
-  m_mapVar1["ETA_TRK"] = 0;
-  m_mapVar1["ETA_CALO"] = 0;
-  m_mapVar1["PHI"] = 0;
-  m_mapVar2["PT"] = 0;
-  m_mapVar2["ETA_TRK"] = 0;
-  m_mapVar2["ETA_CALO"] = 0;
-  m_mapVar2["PHI"] = 0;
-  m_mapVarEvent["WEIGHT"]=1;
-  m_mapVar1["SFWEIGHT"]=1;
-  m_mapVar2["SFWEIGHT"]=1;
-  m_mapVarEvent["PUWEIGHT"]=1;
-  m_mapVarEvent["VERTEXWEIGHT"]=1;
-  m_mapVarEvent["MASS"]=0;
-  m_mapVarNumber["EVENTNUMBER"]=0;
-  m_mapVarNumber["RUNNUMBER"]=0;
-
+  // m_mapVar1["PT"] = 0;
+  // m_mapVar1["ETA_TRK"] = 0;
+  // m_mapVar1["ETA_CALO"] = 0;
+  // m_mapVar1["PHI"] = 0;
+  // m_mapVar2["PT"] = 0;
+  // m_mapVar2["ETA_TRK"] = 0;
+  // m_mapVar2["ETA_CALO"] = 0;
+  // m_mapVar2["PHI"] = 0;
+  // m_mapVarEvent["WEIGHT"]=1;
+  // m_mapVar1["SFWEIGHT"]=1;
+  // m_mapVar2["SFWEIGHT"]=1;
+  // m_mapVarEvent["PUWEIGHT"]=1;
+  // m_mapVarEvent["VERTEXWEIGHT"]=1;
+  // m_mapVarEvent["MASS"]=0;
+  // m_mapVarNumber["EVENTNUMBER"]=0;
+  // m_mapVarNumber["RUNNUMBER"]=0;
+  m_mapDouble["WEIGHT"]=1;
   m_histNames = { "measScale", "inputScale", "deviation" };
   m_vectHist.resize( extents[2][m_histNames.size()] );
 
@@ -148,7 +148,6 @@ Template::Template( const string &outFileName, const string &configFile,
 }
 
 Template::~Template() {
-
   //Clear the ChiMatrix vector
   ClearChiMatrix();
   CleanHistVect();  
@@ -249,7 +248,6 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
 	return 3;}
 
     }}
-
   //If pointers factors are not empty, reset them to 0 after a cleaning  
   if ( justTemplate ) cout << endl;//CleanHistVect();
   else {
@@ -258,10 +256,12 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
       for ( unsigned int iHist = 0; iHist < m_vectHist[0].size(); iHist++ ) {
 	string titleHist = CreateHistMatName( m_histNames[iHist], iVar );
 	m_vectHist[iVar][iHist] = (TH1*) inFile->Get( titleHist.c_str() );
+
 	if ( !m_vectHist[iVar][iHist] ) {
 	  cout << "Histogram not found : " << titleHist << endl;
 	  //	  return 4;
 	}
+	else m_vectHist[iVar][iHist]->SetDirectory(0);
       }
       //Load Matrices
       for ( unsigned int iMat = 0; iMat < m_vectMatrix[0].size(); iMat++ ) {
@@ -271,6 +271,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
 	  return 4;
 	}
       }
+
     }
   }
 
@@ -530,7 +531,7 @@ int Template::ExtractFactors() {
     
 //###########################################==
 void Template::FillDistrib( bool isData ) {
-  if ( m_setting.GetDebug() )  cout << "Template : FillDistrib" << endl;
+  if ( m_setting.GetDebug() )  cout << "Template : FillDistrib " << isData << endl;
   clock_t tStart = clock(); 
 
   if ( isData ) m_setting.SetNEventData(0);
@@ -563,17 +564,20 @@ void Template::FillDistrib( bool isData ) {
 
     //    inputTree->SetDirectory( 0 );
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
-    LinkTree( inputTree );
+    LinkTreeBranches( inputTree, 0, m_mapDouble, m_mapLongLong );
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) return;
 
       inputTree->GetEntry( iEvent );
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       TLorentzVector e1, e2;  
-      e1.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
-      e2.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
-      m_mapVarEvent["WEIGHT"] *= ( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile];
-      if ( m_setting.GetDoWeight() && !m_setting.GetDoPileup() ) SetWeightNoPileup();
+      // e1.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
+        // e2.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
+      
+      e1.SetPtEtaPhiM( m_mapDouble["PT_1"], m_mapDouble["ETA_TRK_1"], m_mapDouble["PHI_1"], 0.511 );
+      e2.SetPtEtaPhiM( m_mapDouble["PT_2"], m_mapDouble["ETA_TRK_2"], m_mapDouble["PHI_2"], 0.511 );
+
+      m_mapDouble["WEIGHT"] = GetWeight(isData) * (( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile] );
 
 
       //##############################
@@ -587,15 +591,15 @@ void Template::FillDistrib( bool isData ) {
 	if ( !foundBin ) {
 	  // if ( i_eta==1 && j_eta==1 && isData ) 
 	  //   cout << m_mapVarNumber["RUNNUMBER"] << " " << m_mapVarNumber["EVENTNUMBER"] << " " << m_mapVar1["PT"] << " " << m_mapVar2["PT"] << " " << m_mapVar1["ETA_TRK"] << " " << m_mapVar2["ETA_TRK"] << " " << m_mapVar1["PHI"] << " " << m_mapVar2["PHI"] << " " << m_mapVar1["ETA_CALO"] << " " << m_mapVar2["ETA_CALO"] << endl;
-	  m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapVarEvent["WEIGHT"] );
+	  m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
 	}
       }
       else {
 	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapVarEvent["WEIGHT"] );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapVarEvent["WEIGHT"] );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
       }
       
       counterEntry++;
@@ -618,6 +622,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
   vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();
   vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();
+  map< string, string > mapVarNames = m_setting.GetBranchVarNames();
 
   if ( alphaSimEta.size()!= sigmaSimEta.size() 
        || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
@@ -668,35 +673,22 @@ void Template::CreateDistordedTree( string outFileName ) {
   string treeName = outFileName;
   StripString( treeName );
 
-  //Make MC distriution
   TTree *dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
   dataTree->SetDirectory(0);
-  dataTree->Branch( "pt_1"  , &m_mapVar1["PT"] );
-  dataTree->Branch( "eta_1" , &m_mapVar1["ETA_TRK"] );
-  dataTree->Branch( "eta_calo_1" , &m_mapVar1["ETA_CALO"] );
-  dataTree->Branch( "phi_1" , &m_mapVar1["PHI"] );
-  dataTree->Branch( "pt_2"  , &m_mapVar2["PT"] );
-  dataTree->Branch( "eta_2" , &m_mapVar2["ETA_TRK"] );
-  dataTree->Branch( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
-  dataTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
-  dataTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
-  dataTree->Branch( "m12"   , &m_mapVarEvent["MASS"] );
-  dataTree->Branch( "eventNumber"   , &m_mapVarNumber["EVENTNUMBER"] );
-  dataTree->Branch( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
-
-
-
+  double weightTree=1;
+  dataTree->Branch( "weightTree", weightTree );
   int counterEvent=0;
 
+  map<string, double> mapDouble;
+  map<string, long long int> mapLongLong;
+
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
-    // cout << m_MCFileNames[iFile] << " " << m_MCTreeNames[iFile] << endl;
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
-    LinkTree( MCTree );
+    LinkTreeBranches( MCTree, dataTree, mapDouble, mapLongLong );
 
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
-      //      if ( m_setting.GetNUseEvent() && counterEvent == m_setting.GetNUseEvent() ) break; 
       MCTree->GetEntry( iEvent );
 
       unsigned int i_eta = 0, j_eta = 0;
@@ -705,10 +697,10 @@ void Template::CreateDistordedTree( string outFileName ) {
       if ( m_setting.GetMode() == "1VAR" ) {
 	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
-	m_mapVarEvent["WEIGHT"] *= m_MCWeights[iFile];
-	m_mapVar1["PT"] *= factor1;
-	m_mapVar2["PT"] *= factor2;
-	m_mapVarEvent["MASS"] *= sqrt( factor1*factor2 );
+	mapDouble["weightTree"] = m_MCWeights[iFile];
+	mapDouble[mapVarNames["PT_1"]] *= factor1;
+	mapDouble[mapVarNames["PT_2"]] *= factor2;
+	mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
 	dataTree->Fill();
 	counterEvent++;
       }
@@ -733,13 +725,14 @@ void Template::CreateDistordedTree( string outFileName ) {
   delete dataTree; dataTree = 0;
   distorded->Close("R");
   delete distorded; distorded = 0;
-  if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done" << endl;
+  if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }
 
 //####################################################==
 void Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot" << endl;
   if ( path.back() != '/' && path != "" ) path += "/";
+
 
   if ( latexFileName == "" ) latexFileName = m_name + ".tex";
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
@@ -799,7 +792,6 @@ void Template::MakePlot( string path, string latexFileName ) {
     vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
     vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();    
 
-    cout << "etaBins : " << etaBins.size() << endl;
     //fill the tabuilar with measured values
     for ( int i_bin = 0; i_bin < (int) etaBins.size()-1; i_bin++ ) {
       
@@ -824,6 +816,7 @@ void Template::MakePlot( string path, string latexFileName ) {
       }
       latex << "\\\\" << endl;
     }
+    cout << "tabular done" << endl;
     latex << "\\hline";
     latex << "\\end{tabular}" << endl;    
     latex << "\\end{center}" << endl;
@@ -878,8 +871,8 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
   double eta1 = 0;
   double eta2 = 0;
 
-  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapVar1[m_setting.GetVar1()] ) : m_mapVar1[m_setting.GetVar1()];
-  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapVar2[m_setting.GetVar1()] ) : m_mapVar2[m_setting.GetVar1()];
+  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ string( m_setting.GetVar1() + "_1" ).c_str() ] ) : m_mapDouble[ string( m_setting.GetVar1() + "_1" ).c_str() ];
+  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ string( m_setting.GetVar1() + "_2" ).c_str() ] ) : m_mapDouble[ string( m_setting.GetVar1() + "_2" ).c_str() ];
   // cout << m_setting.GetVar1() << " " << m_mapVar1[m_setting.GetVar1()] << " " << m_mapVar1["ETA_TRK"]  << endl;
   // cout << "eta : " << eta1 << " " << eta2 << endl;  
   if ( m_setting.GetMode() == "1VAR" && eta1 < eta2 ) {
@@ -941,16 +934,16 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
     string dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
     TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
     dumTree->SetDirectory(0);
-    dumTree->Branch( "pt_1"  , &m_mapVar1["PT"] );
-    dumTree->Branch( "eta_1" , &m_mapVar1["ETA_TRK"] );
-    dumTree->Branch( "eta_calo_1" , &m_mapVar1["ETA_CALO"] );
-    dumTree->Branch( "phi_1" , &m_mapVar1["PHI"] );
-    dumTree->Branch( "pt_2"  , &m_mapVar2["PT"] );
-    dumTree->Branch( "eta_2" , &m_mapVar2["ETA_TRK"] );
-    dumTree->Branch( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
-    dumTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
-    dumTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
-    dumTree->Branch( "m12"   , &m_mapVarEvent["MASS"] );
+    // dumTree->Branch( "pt_1"  , &m_mapVar1["PT"] );
+    // dumTree->Branch( "eta_1" , &m_mapVar1["ETA_TRK"] );
+    // dumTree->Branch( "eta_calo_1" , &m_mapVar1["ETA_CALO"] );
+    // dumTree->Branch( "phi_1" , &m_mapVar1["PHI"] );
+    // dumTree->Branch( "pt_2"  , &m_mapVar2["PT"] );
+    // dumTree->Branch( "eta_2" , &m_mapVar2["ETA_TRK"] );
+    // dumTree->Branch( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
+    // dumTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
+    // dumTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
+    // dumTree->Branch( "m12"   , &m_mapVarEvent["MASS"] );
 
     
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
@@ -962,7 +955,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
       
       dumString = ( iCorrection ) ? m_MCTreeNames[iFile] : m_dataTreeNames[iFile];
       TTree *dataTree = (TTree*) dataFile->Get( dumString.c_str() );
-      LinkTree( dataTree );
+      LinkTreeBranches( dataTree, dumTree, m_mapDouble, m_mapLongLong );
       
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
 	dataTree->GetEntry( iEvent );
@@ -976,12 +969,12 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapVar2[correctionAlpha->GetXaxis()->GetTitle() ] ) ) );
 	
 	
-	m_mapVar1["PT"] *= factor1;
-	m_mapVar2["PT"] *= factor2;
+	m_mapDouble["PT_1"] *= factor1;
+	m_mapDouble["PT_2"] *= factor2;
 	
-	e3.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
-	e4.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
-	m_mapVarEvent["MASS"] = (e3+e4).M()*1e-3;
+	e3.SetPtEtaPhiM( m_mapDouble["PT_1"], m_mapDouble["ETA_TRK_1"], m_mapDouble["PHI_1"], 0.511 );
+	e4.SetPtEtaPhiM( m_mapDouble["PT_2"], m_mapDouble["ETA_TRK_2"], m_mapDouble["PHI_2"], 0.511 );
+	m_mapDouble["MASS"] = (e3+e4).M()*1e-3;
 	
 	m_mapVarEvent["WEIGHT"] *= ( iCorrection ) ? m_MCWeights[iFile] : m_dataWeights[iFile];
 	dumTree->Fill();
@@ -1129,6 +1122,13 @@ string Template::CreateHistMatName( string objName, unsigned int iVar ) {
 }
 
 //#############################
-void Template::SetWeightNoPileup() {
-  m_mapVarEvent["WEIGHT"] = m_mapVarEvent["VERTEXWEIGHT"]*(m_mapVar1["SFWEIGHT"]+m_mapVar2["SFWEIGHT"])/2.;
+double Template::GetWeight( bool isData ) {
+  double weight=1;
+
+  vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
+
+  for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {
+    weight *= m_mapDouble[dumVect[iName]];
+  }
+  return weight;
 }

@@ -151,7 +151,7 @@ class ChiMatrix
      - 0 : quadratic fit
      - 1 : cubic fit
    */
-  TFitResultPtr FitHist( TH1D* hist, unsigned int mode, double chiMinLow=0, double chiMinUp=0 );
+  TF1* FitHist( TH1D* hist, unsigned int mode, double chiMinLow=0, double chiMinUp=0 );
 
   /**\brief Create a local TTree to hold MC events of the configuration
    */

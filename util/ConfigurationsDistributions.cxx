@@ -338,7 +338,7 @@ int main( int argc, char* argv[] ) {
       for ( auto it = histVec.begin(); it != histVec.end(); it++) {
 	unsigned int doNorm = ( it->first == "profileCompareInput" || it->first=="profileRmsCompareInput") ? 0 : 1;
 	if ( !histVec[it->first].size() ) continue;
-	DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
+	//	DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
 	dumVec.push_back( latexStringVec[it->first] );
        }
       if ( dumVec.size() ) {
@@ -386,7 +386,7 @@ int main( int argc, char* argv[] ) {
     vector<string> dumVec;
     for ( auto it = histVec.begin(); it != histVec.end(); it++) {
       unsigned int doNorm = ( false ) ? 0 : 1;
-      DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
+      //      DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
       dumVec.push_back( latexStringVec[it->first] );
     }
       WriteLatexMinipage( latex, dumVec, 2 );
@@ -427,7 +427,7 @@ int main( int argc, char* argv[] ) {
     vector<string> dumVec;
     for ( auto it = histVec.begin(); it != histVec.end(); it++) {
       unsigned int doNorm = ( false ) ? 0 : 1;
-      DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
+      //      DrawPlot( histVec[it->first], latexStringVec[it->first], legendStringVec[it->first], 0, doNorm, 0, 1, vector<double>(), {0.1, 0.8, 0.4, 0.95} );
       dumVec.push_back( latexStringVec[it->first] );
     }
       WriteLatexMinipage( latex, dumVec, 2 );

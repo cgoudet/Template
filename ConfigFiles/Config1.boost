@@ -42,7 +42,7 @@ sigmaSimEta  = 0.013
 sigmaSimPt   = 0
 
 #Switch debug mode
-debug = 1
+debug = 0
 
 #Decide which variable remains constant for the first round of fit
 #SIGMA = smearing factor

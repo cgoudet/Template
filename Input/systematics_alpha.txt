@@ -1,5 +1,6 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns.root			measScale_alpha alphaOff_alpha	
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_noPileup.root 		measScale_alpha pileUp_alpha 
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_massWindow.root 	measScale_alpha massWindow_alpha 
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_thresholdMass.root 	measScale_alpha thresholdMass_alpha 
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/24Bins/DataOff_25ns_tight.root 		measScale_alpha tight_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/EnergyScaleFactors.root				totSyst_alpha	dum
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns.root			measScale_alpha alphaOff_alpha	
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_noPileup.root 		measScale_alpha pileUp_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_massWindow.root 	measScale_alpha massWindow_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_thresholdMass.root 	measScale_alpha thresholdMass_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/280614/1510284/DataOff_25ns_tight.root 		measScale_alpha tight_alpha 
