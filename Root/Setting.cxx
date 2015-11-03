@@ -120,6 +120,14 @@ int Setting::Configure( const string &configFile ) {
   std::sort( m_ptBins.begin(), m_ptBins.end() );
   m_ptBins.erase( unique( m_ptBins.begin(), m_ptBins.end() ), m_ptBins.end() );  
 
+  vector<string> minVarNames = { "ETA_TRK_1", "ETA_TRK_2", "PHI_1", "PHI_2", "MASS", "PT_1", "PT_2", m_var1 + "_1", m_var1 + "_2" };
+  if ( m_var2 != "" ) {
+    minVarNames.push_back( m_var2 + "_1" );
+    minVarNames.push_back( m_var2 + "_2" );
+  }
+  map< string, bool > mapDefinedVar;
+  for ( unsigned int iVar=0; iVar<minVarNames.size(); iVar++ ) mapDefinedVar[minVarNames[iVar]]=false;
+
   for ( auto branchVarName : branchVarNames ) {
     vector< string > dumVect;
     ParseVector( branchVarName, dumVect );
@@ -128,10 +136,19 @@ int Setting::Configure( const string &configFile ) {
       exit(0);
     }
     m_branchVarNames[dumVect[0]] = dumVect[1];
+    unsigned int bin=SearchVectorBin( dumVect[0], minVarNames );
+    if ( bin != minVarNames.size() ) mapDefinedVar[minVarNames[bin]]=true;
   }
+
+    for (map<string, bool>::iterator it = mapDefinedVar.begin(); it != mapDefinedVar.end(); it++) {
+      if ( it->second ) continue;
+      cout << it->first << " needed and not linked to any branch" << endl;
+      exit(0);
+    }
 
   ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
   ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
+
   //=====
   if ( !m_nUseEl ) m_nUseEl=1;
   if ( m_mode != "1VAR" && m_mode != "2VAR" ) return 1;
