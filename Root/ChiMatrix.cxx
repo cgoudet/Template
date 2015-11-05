@@ -253,10 +253,10 @@ int ChiMatrix::FillChiMatrix(  ) {
 
   //Normalize data distribution
   //  m_dataZMass->Sumw2();
-  if ( !m_dataZMass->Integral() ) m_dataZMass->Scale( 1/ m_dataZMass->Integral() );
+  if ( m_dataZMass->Integral() !=0 ) m_dataZMass->Scale( 1/ m_dataZMass->Integral() );
   else {
     cout << "null integral for dataZMass in fillChiMatrix " << endl;
-    cout << "entries : " << m_dataZMass->GetEntries() << endl;
+    cout << "entries : " << m_dataZMass->GetEntries() << " " << m_dataZMass->Integral() << endl;
     exit(0);
   }
   
@@ -289,8 +289,11 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
     m_rand.SetSeed( t1.time_since_epoch().count() );
   }
   
-  if ( isData ) m_dataZMass->Fill( (e1+e2).M() / 1000., weight );
+  if ( isData ) {
+    m_dataZMass->Fill( (e1+e2).M() / 1000., weight );
+  }
   else {
+
     if ( !m_MCTree ) CreateMCTree();
     m_mapVar1["PT"] = e1.Pt();
     m_mapVar1["ETA_TRK"] = e1.Eta();
@@ -466,7 +469,9 @@ void ChiMatrix::FitChi2() {
 //====================================================
 void ChiMatrix::MakePlot( string path, string latexFileName ) {
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot " << m_name << endl;
+  cout <<  "quality : " << m_quality.to_ulong() << endl;
   if ( m_quality.to_ulong() ) return;
+
   vector<string> plotNames, legends;
   string plotName;
 
@@ -641,7 +646,11 @@ void ChiMatrix::OptimizeRanges( ) {
       
 
       FillTemplates( );
-      IsGoodQuality();
+      if ( IsGoodQuality() ) {
+	ClearTemplates();
+	return ;
+      }
+
       FillChiMatrix();
 
       histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )
@@ -678,7 +687,10 @@ void ChiMatrix::OptimizeRanges( ) {
 	
 	counter++;
 
-	if ( histScale->GetMinimum() > chiMin ) return;
+	if ( histScale->GetMinimum() > chiMin ) {
+	  delete histScale; histScale=0;
+	  break;
+	}
 
 	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
 	chiMin = histScale->GetMinimum();
@@ -701,12 +713,6 @@ void ChiMatrix::OptimizeRanges( ) {
 
 
       }//end else
-
-      if ( counter == 30 ) {
-	cout << "too much steps for optimization" << endl;
-	DrawPlot( { histScale}, "UnoptimizedHist" );
-	exit( 0);
-      }
 
       if ( histScale ) delete histScale; histScale=0;
 
@@ -742,6 +748,7 @@ unsigned int ChiMatrix::IsGoodQuality() {
   // cout << "MC entries : " << m_MCZMass.front().front()->GetEntries() << " " << m_MCTree->GetEntries() << endl;
   // cout << "data entries : " << m_dataZMass->GetEntries() << endl;
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
+  //  cout << "MCZmass entries : " << m_MCZMass.front().front()->GetEntries() << endl;
   if ( m_MCZMass.front().front()->GetEntries() < nentries ) m_quality.set( 4, 1 );
   if ( m_dataZMass->GetEntries() < nentries ) m_quality.set( 5, 1 );
   if ( m_setting->GetVar1() == "ETA_TRK" || m_setting->GetVar1() == "ETA_CALO" || m_setting->GetVar1() == "ETA_CLUSTER" ) {

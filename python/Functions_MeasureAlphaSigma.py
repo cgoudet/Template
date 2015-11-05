@@ -150,7 +150,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
             else :
                 batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                             + dataLine + MCLine + optionLine + outNameFile +' --makePlot \n' )
+                             + dataLine + MCLine + optionLine + outNameFile +' \n' )
                 batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
                 batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
@@ -223,18 +223,42 @@ def CreateConfig( configName, inOptions = [] ) :
     options['etaBins']=defaultBinning['ETA24']
     options['ptBins']=''
     options['applySelection']=0
+    options['branchVarNames']={}
+    options['branchVarNames']['ETA_CALO_1']='eta_calo_1'
+    options['branchVarNames']['ETA_CALO_2']='eta_calo_2' 
+    options['branchVarNames']['PHI_1']='phi_1' 
+    options['branchVarNames']['PHI_2']='phi_2' 
+    options['branchVarNames']['ETA_TRK_1']='eta_1'
+    options['branchVarNames']['ETA_TRK_2']='eta_2'
+    options['branchVarNames']['PT_1']='pt_1'
+    options['branchVarNames']['PT_2']='pt_2'
+    options['branchVarNames']['MASS']='m12'
+    options['dataBranchWeightName']=''
+    options['MCBranchWeightName']=''
+
 
     for inOpt in inOptions :
         optKey = inOpt.split('=')[0]
         optValue= inOpt[inOpt.find('=')+1:]
 
         if optKey in options.keys() :
-            options[optKey]=optValue
+            if optKey == 'branchVarNames' :
+                optValue.split( ' ' )
+                options[optKey][optValue[0]] = optValue[1]
+                pass
+            else : options[optKey]=optValue
 
+#select a predefined binnin
         if ( optKey=='ptBins' and 'PT' in optValue ) or ( optKey=='etaBins' and 'ETA' in optValue ) :
             options[optKey]=defaultBinning[optValue]
+            pass
 
     with open( configName, 'w' ) as batch:
         for iLabel in options.keys() :
-            batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
+            if iLabel == 'branchVarNames' :
+                for var in options[iLabel].keys() :
+                    batch.write( iLabel + '=' + var + ' ' + options[iLabel][var] + '\n' )
+                    pass
+                pass
+            else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         

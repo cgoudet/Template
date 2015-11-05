@@ -12,7 +12,9 @@
 #include "PlotFunctions/InvertMatrix.h"
 #include <chrono>
 #include "PlotFunctions/DrawPlot.h"
+#include <algorithm>
 
+using std::swap;
 using boost::extents;
 using std::cout;
 using std::endl;
@@ -543,6 +545,8 @@ void Template::FillDistrib( bool isData ) {
   unsigned long int counterEntry = 0;
   TFile *inputFile = 0;
   TTree *inputTree = 0;
+  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
+
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
@@ -566,16 +570,14 @@ void Template::FillDistrib( bool isData ) {
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     LinkTreeBranches( inputTree, 0, m_mapDouble, m_mapLongLong );
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-      if ( nEntry && counterEntry== nEntry ) return;
+      if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       TLorentzVector e1, e2;  
-      // e1.SetPtEtaPhiM( m_mapVar1["PT"], m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
-        // e2.SetPtEtaPhiM( m_mapVar2["PT"], m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
-      
-      e1.SetPtEtaPhiM( m_mapDouble["PT_1"], m_mapDouble["ETA_TRK_1"], m_mapDouble["PHI_1"], 0.511 );
-      e2.SetPtEtaPhiM( m_mapDouble["PT_2"], m_mapDouble["ETA_TRK_2"], m_mapDouble["PHI_2"], 0.511 );
+
+      e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+      e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 
       m_mapDouble["WEIGHT"] = GetWeight(isData) * (( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile] );
 
@@ -588,6 +590,11 @@ void Template::FillDistrib( bool isData ) {
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
 	int foundBin = FindBin( i_eta, j_eta );
+	// if ( isData && iEvent< 10 ) {
+	//   cout << "foundBin : " << foundBin << " " << i_eta << " " << j_eta << endl; 
+	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_1"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_1"]] << endl;
+	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_2"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_2"]] << endl;
+	// }
 	if ( !foundBin ) {
 	  // if ( i_eta==1 && j_eta==1 && isData ) 
 	  //   cout << m_mapVarNumber["RUNNUMBER"] << " " << m_mapVarNumber["EVENTNUMBER"] << " " << m_mapVar1["PT"] << " " << m_mapVar2["PT"] << " " << m_mapVar1["ETA_TRK"] << " " << m_mapVar2["ETA_TRK"] << " " << m_mapVar1["PHI"] << " " << m_mapVar2["PHI"] << " " << m_mapVar1["ETA_CALO"] << " " << m_mapVar2["ETA_CALO"] << endl;
@@ -603,11 +610,11 @@ void Template::FillDistrib( bool isData ) {
       }
       
       counterEntry++;
-    }
-    delete inputTree; inputTree = 0;
+    }//end loop iEvent
+     delete inputTree; inputTree = 0;
     inputFile->Close("R");
     delete inputFile; inputFile = 0;
-  }
+  }//end loop iFile
   cout << "entries filled : " << counterEntry << endl;
   cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
 
@@ -680,13 +687,10 @@ void Template::CreateDistordedTree( string outFileName ) {
   dataTree->Branch( "weightTree", weightTree );
   int counterEvent=0;
 
-  map<string, double> mapDouble;
-  map<string, long long int> mapLongLong;
-
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
-    LinkTreeBranches( MCTree, dataTree, mapDouble, mapLongLong );
+    LinkTreeBranches( MCTree, dataTree, m_mapDouble, m_mapLongLong );
 
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
       MCTree->GetEntry( iEvent );
@@ -697,10 +701,10 @@ void Template::CreateDistordedTree( string outFileName ) {
       if ( m_setting.GetMode() == "1VAR" ) {
 	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
-	mapDouble["weightTree"] = m_MCWeights[iFile];
-	mapDouble[mapVarNames["PT_1"]] *= factor1;
-	mapDouble[mapVarNames["PT_2"]] *= factor2;
-	mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
+	m_mapDouble["weightTree"] = m_MCWeights[iFile];
+	m_mapDouble[mapVarNames["PT_1"]] *= factor1;
+	m_mapDouble[mapVarNames["PT_2"]] *= factor2;
+	m_mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
 	dataTree->Fill();
 	counterEvent++;
       }
@@ -864,22 +868,19 @@ void Template::MakePlot( string path, string latexFileName ) {
 int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
+  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
   i_eta = 0;
   j_eta = 0;
 
   double eta1 = 0;
   double eta2 = 0;
-
-  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ string( m_setting.GetVar1() + "_1" ).c_str() ] ) : m_mapDouble[ string( m_setting.GetVar1() + "_1" ).c_str() ];
-  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ string( m_setting.GetVar1() + "_2" ).c_str() ] ) : m_mapDouble[ string( m_setting.GetVar1() + "_2" ).c_str() ];
+  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str() ]] ) : m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str()] ];
+  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
   // cout << m_setting.GetVar1() << " " << m_mapVar1[m_setting.GetVar1()] << " " << m_mapVar1["ETA_TRK"]  << endl;
   // cout << "eta : " << eta1 << " " << eta2 << endl;  
-  if ( m_setting.GetMode() == "1VAR" && eta1 < eta2 ) {
-    double dumEta = eta1;
-    eta1 = eta2;
-    eta2 = dumEta;
-  }
+  if ( m_setting.GetMode() == "1VAR" && eta1 < eta2 ) swap( eta1, eta2 );
+
 
   if ( eta1 <= etaBins[0] || eta1 > etaBins.back() ) return 1;
   while ( i_eta <  etaBins.size()-1 && eta1 > etaBins[i_eta+1] ) i_eta++;  

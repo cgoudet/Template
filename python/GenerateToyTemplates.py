@@ -5,12 +5,12 @@ import time;
 
 #One config file correspond to one job
 configFiles=[ 
-    ['', 'MC_13TeV_Zee_50ns_Lkh1_1', 'MC_13TeV_Zee_50ns_Lkh1_0', ['indepDistorded=0', 'indepTemplates=0', 'bootstrap=1', 'etaBins=ETA6', 'debug=0', 'inversionMethod=11']]
+    ['', 'MC_13TeV_Zee_50ns_Lkh1_1', 'MC_13TeV_Zee_50ns_Lkh1_0', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=1', 'etaBins=ETA6', 'debug=0', 'inversionMethod=12']]
     ]
 
 inputC = [ 0.01 ]
 inputStat = [ 1000000 ]
-nIteration = 100
+nIteration = 1000
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl=1
@@ -32,7 +32,7 @@ for vInput in  inputC  :
                 configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
             logPath="Log/"
             launcherFile=CreateLauncher( configFiles[0], 1, optionLine )
-            launchLine='~/sub1.sh ' + StripName( configFiles[0][0] ) + ' ' \
+            launchLine='~/sub28.sh ' + StripName( configFiles[0][0] ) + ' ' \
                 + plotPath + logPath  + StripName( configFiles[0][0] ) + '.log ' \
                 + plotPath + logPath  + StripName( configFiles[0][0] ) + '.err ' \
                 + launcherFile

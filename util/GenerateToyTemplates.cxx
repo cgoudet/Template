@@ -125,7 +125,6 @@ int main( int argc, char* argv[] ) {
 	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
 
 	settingMeasure.SetNUseEvent( inputStat[iStat] );
-	settingMeasure.Print();
 
 	err = TempMeasure.CreateTemplate();
 	if ( err ) {
