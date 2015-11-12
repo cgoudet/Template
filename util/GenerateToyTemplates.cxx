@@ -57,7 +57,7 @@ int main( int argc, char* argv[] ) {
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
-  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, nUseEl;
+  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
 
   cout << "Opening " << outFileName << endl;
@@ -96,6 +96,7 @@ int main( int argc, char* argv[] ) {
   scalesTree->Branch( "nOptim", &nOptim );
   scalesTree->Branch( "bootstrap", &bootstrap );
   scalesTree->Branch( "fitMethod", &fitMethod );
+  scalesTree->Branch( "inversionMethod", &inversionMethod );
 
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
@@ -154,7 +155,7 @@ int main( int argc, char* argv[] ) {
 	fitMethod = settingMeasure.GetFitMethod();
 	indepDistorded = settingMeasure.GetIndepDistorded();
 	indepTemplates = settingMeasure.GetIndepTemplates();
-	nUseEl = settingMeasure.GetNUseEl();
+	inversionMethod = settingMeasure.GetInversionMethod();
 
 	cout << "filling confTree" << endl;
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {

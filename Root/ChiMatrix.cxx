@@ -398,11 +398,9 @@ void ChiMatrix::FitChi2() {
 	
 	m_corAngle->SetBinContent( iConstVarBin, alphaMin );
 	m_corAngle->SetBinError( iConstVarBin, alphaErr);
-	// cout << "deleting var" << endl;
-	// delete var; var = 0;
-	// cout << "done" << endl;
       }
-      delete fittingFunction; fittingFunction=0;
+      else cout << "fitHist failed" << endl;
+      if ( fittingFunction ) delete fittingFunction; fittingFunction=0;
     }//End loop on constVar bins
   }//end if doScale && doSmearing
   else m_chi2FitConstVar =  ( m_setting->GetDoScale() ) ? m_chiMatrix->ProjectionX( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o") : m_chiMatrix->ProjectionY( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o");
@@ -412,7 +410,7 @@ void ChiMatrix::FitChi2() {
   bool isSigmaConstVar = m_setting->GetDoSmearing() && ( !m_setting->GetDoScale() || (m_setting->GetDoScale() && m_setting->GetConstVarFit() == "SIGMA" ) );
   auto mode = (m_setting->GetConstVarFit() == "SIGMA") ?  m_setting->GetFitMethod() : 0;
   fittingFunction = FitHist( m_chi2FitConstVar , mode, 0, 0 );
-  DrawPlot( { m_chi2FitConstVar }, "chi2FitConstVar" );
+
   if ( fittingFunction ) {  
     if ( isSigmaConstVar ) {
       m_sigma = max( fittingFunction->GetParameter(2), 0.); 
@@ -432,9 +430,7 @@ void ChiMatrix::FitChi2() {
       m_alpha = fittingFunction->GetParameter(2);
       m_errAlpha = fittingFunction->GetParameter(1);
     }
-    // cout << "deleting var" << endl;
-    // delete var;
-    // cout << "done" << endl;
+
     delete fittingFunction; fittingFunction=0;
   }
   else m_quality.set( 0, 1 );
@@ -840,8 +836,6 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
       nFits = 3;
       do {
 	cout << "fit failed 3 times : try with another range" << endl;
-	// minBin = max( hist->GetMinimumBin() - 5, 1 ) ;
-	// maxBin = min( hist->GetMinimumBin()+5, hist->GetNbinsX() );
 	fittingFunction->SetParameter( 0, hist->GetMinimum() );
 	fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
@@ -860,23 +854,20 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
 
   if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
-    cout << "dichotomy" << endl;
     double minVal = fittingFunction->GetParameter(2);
     double currentValue = hist->GetXaxis()->GetXmax();
     double width = currentValue-minVal;
-    cout << "width : " << width << " " << currentValue << " " << minVal << endl;
     double precision = 1e-3;
     while ( width > precision*(currentValue-minVal) ) {
       width/=2.;
       currentValue += ( (*fittingFunction)(currentValue) - (*fittingFunction)(minVal) < 1 ) ? width : -width;
     }
-    cout << "uncertainty : " << currentValue-minVal << endl;
-    cout << "initial value : " << fittingFunction->GetParameter( 1 ) << endl;
     fittingFunction->SetParameter( 1, currentValue-minVal );
-    cout << "finalValue : " << fittingFunction->GetParameter( 1 ) << endl;
+
   }
 
   TF1* result = (TF1*) fittingFunction->Clone();
+  result->SetName( "fittingFunction" );
   delete quadraticFit; quadraticFit=0;
   delete cubicFit; cubicFit=0;
 

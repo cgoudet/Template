@@ -11,6 +11,7 @@ MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'MC_13TeV_Zee_50n
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_1.root' ]
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_1.root' ]
 MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
+MCFILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 MCWEIGHTSET={}
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1']       =[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ 1, 1] 
@@ -21,7 +22,7 @@ MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_0']     =[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel']  =[ 1, 1] 
-
+MCWEIGHTSET['ClosureMC'] = [1]
 
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 DATAFILESETS={}
@@ -35,6 +36,7 @@ DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee
 DATAFILESETS['Data_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh2/Data_13TeV_Zee_25ns_Lkh2_0.root']
 DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root']
 DATAFILESETS['MC_distordedRejPair']       =[ PREFIXDATASETS + '../Test/MC_distordedRejPair.root' ]
+DATAFILESETS['ClosureData'] = ['/sps/atlas/c/cgoudet/Calibration/Closure/MC24_PassSel_distorded.root' ]
 
 DATAWEIGHTSET={}
 DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1']       =[ 1 ]
@@ -47,6 +49,7 @@ DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh2']       =[ 1 ]
 DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ 1 ]
 DATAWEIGHTSET['MC_distordedRejPair'] = [ 1 ]
+DATAWEIGHTSET['ClosureData'] = [1]
 
 def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
@@ -91,11 +94,11 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         batch.write('server=`pwd`\n' 
                     + 'cd ${server} \n'
                     + 'ulimit -S -s 100000 \n'
-                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
-                    + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/ \n'
+                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
+                    + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/ \n'
                     + 'source local_setup.sh \n'
                     + 'cd ${server} \n'
-                    + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Codes/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+                    + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
                     )
         
 #Copy the configuration file to the server
@@ -143,21 +146,22 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+#                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
                 
 
             else :
                 batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                             + dataLine + MCLine + optionLine + outNameFile +' \n' )
-                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                             + dataLine + MCLine + optionLine + outNameFile +' --makePlot \n' )
+#                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+ #               batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
                 batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
+                batch.write( 'ls -lh \n ' ) 
                 # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
-#        batch.write( 'ls -lh \n' ) 
         return fileName
 
 
@@ -233,8 +237,8 @@ def CreateConfig( configName, inOptions = [] ) :
     options['branchVarNames']['PT_1']='pt_1'
     options['branchVarNames']['PT_2']='pt_2'
     options['branchVarNames']['MASS']='m12'
-    options['dataBranchWeightName']=''
-    options['MCBranchWeightName']=''
+    options['dataBranchWeightName']='weight'
+    options['MCBranchWeightName']='weight'
 
 
     for inOpt in inOptions :

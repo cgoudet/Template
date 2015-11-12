@@ -9,7 +9,7 @@ for option in sys.argv:
     dumFile = '/sps/atlas/c/cgoudet/dum/'
     os.system( 'mkdir ' + dumFile )
     os.chdir( dumFile  )
-    commandLine = ( 'MeasureScale --config /afs/in2p3.fr/home/c/cgoudet/private/Codes/Template/ConfigFiles/Config1.boost '
+    commandLine = ( 'MeasureScale --config /sps/atlas/c/cgoudet/Calibration/Closure/Config24.boost '
                     + ' --loadFull ' + option 
                     + ' --noExtraction '
                     + ' --outFileName ' + StripName( option, 1, 0 )

@@ -10,20 +10,21 @@ switch=0
 if switch==0 :
         configFiles=[ 
 		#Mesure des scales
-		['DataOff_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', [] ],
-		['DataOff_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', [] ],
+		['DataOff_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
+		['DataOff_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
 		#mesure avec electron tight
-		['DataOff_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', [] ],
+		['DataOff_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', ['nUseEl=2'] ],
 		#mesure sans pileup
-		['DataOff_25ns_noPileup.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',[] ],
+		['DataOff_25ns_noPileup.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['MCBranchWeightName=vertexWeight SFWeight_1 SFWeight_2','nUseEl=2'] ],
 		#mesure avec masse sueil Off0
-		['DataOff_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', []],
+		['DataOff_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2','thresholdMass=75']],
 		#mesure avec fenetre masse plus faible
-		['DataOff_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', [] ],
+		['DataOff_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'ZMassMin=82.5', 'ZMassMax=97.5'] ],
 		#mesure globale avec pt seuil
-#		['Data1_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6'] ],
-		['DataOff_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', [] ],
-		['DataOff_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', []],
+		['Data6_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6','nUseEl=2'] ],
+		['Data6_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=2'] ],
+		['Data6_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=2'] ],
+		['Data6_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2']],
 		]
 	
 elif switch == 1 :
@@ -47,13 +48,11 @@ elif switch == 1 :
 #		configFiles.append( ['Config1_noSigma.boost', 'Data_13TeV_Zee_50ns_Lkh1', 'MC_13TeV_Zee_50ns_Lkh1', 'Data1_50ns_noSigma_itTest.root', 0, '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noSigma.root', 'measScale_alpha', '/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Data1_50ns_noAlpha.root', 'measScale_c'] )
 
 elif switch == 2 :
-	# configFiles.append(['DataOff_25ns_invC_noDich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=1", 'inversionMethod=11'] ] )
-	# configFiles.append(['DataOff_25ns_invC2_noDich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=1", 'inversionMethod=12'] ] )
-	# configFiles.append(['DataOff_25ns_invMat_noDich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=1", 'inversionMethod=1'] ] )
-	# configFiles.append(['DataOff_25ns_invC_dich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=2", 'inversionMethod=11'] ] )
-	# configFiles.append(['DataOff_25ns_invC2_dich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=2", 'inversionMethod=12'] ] )
-	# configFiles.append(['DataOff_25ns_invMat_dich.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ["fitMethod=2", 'inversionMethod=1'] ] )
-	configFiles.append( ['Closure.root', 'MC_distordedRejPair', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel','MC1_PairEvents_noSigma.root', 0] )
+	# configFiles.append( ['MC6_nUseEl15.root', 'ClosureData', 'ClosureMC', ['nUseEl=15', 'etaBins=ETA6' ]] )
+	# configFiles.append( ['MC6_nUseEl15_fit1.root', 'ClosureData', 'ClosureMC', ['nUseEl=15', 'etaBins=ETA6', 'fitMethod1' ]] )
+	# configFiles.append( ['MC6_nUseEl10.root', 'ClosureData', 'ClosureMC', ['nUseEl=10', 'etaBins=ETA6' ]] )
+	configFiles.append( ['MC6_nUseEl5.root', 'ClosureData', 'ClosureMC', ['nUseEl=5', 'etaBins=ETA6' ]] )
+	configFiles.append( ['MC6_nUseEl1.root',  'ClosureData', 'ClosureMC', ['nUseEl=1', 'etaBins=ETA6' ]] )
 
 spsPath="/sps/atlas/c/cgoudet/Calibration/PreRec/"
 logPath="Log/"

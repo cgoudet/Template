@@ -38,22 +38,6 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_MCTreeNames.clear();
   m_MCWeights.clear();
 
-  // m_mapVar1["PT"] = 0;
-  // m_mapVar1["ETA_TRK"] = 0;
-  // m_mapVar1["ETA_CALO"] = 0;
-  // m_mapVar1["PHI"] = 0;
-  // m_mapVar2["PT"] = 0;
-  // m_mapVar2["ETA_TRK"] = 0;
-  // m_mapVar2["ETA_CALO"] = 0;
-  // m_mapVar2["PHI"] = 0;
-  // m_mapVarEvent["WEIGHT"]=1;
-  // m_mapVar1["SFWEIGHT"]=1;
-  // m_mapVar2["SFWEIGHT"]=1;
-  // m_mapVarEvent["PUWEIGHT"]=1;
-  // m_mapVarEvent["VERTEXWEIGHT"]=1;
-  // m_mapVarEvent["MASS"]=0;
-  // m_mapVarNumber["EVENTNUMBER"]=0;
-  // m_mapVarNumber["RUNNUMBER"]=0;
   m_mapDouble["WEIGHT"]=1;
   m_histNames = { "measScale", "inputScale", "deviation" };
   m_vectHist.resize( extents[2][m_histNames.size()] );
@@ -701,6 +685,8 @@ void Template::CreateDistordedTree( string outFileName ) {
       if ( m_setting.GetMode() == "1VAR" ) {
 	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
+
+	if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
 	m_mapDouble["weightTree"] = m_MCWeights[iFile];
 	m_mapDouble[mapVarNames["PT_1"]] *= factor1;
 	m_mapDouble[mapVarNames["PT_2"]] *= factor2;
@@ -924,6 +910,7 @@ string Template::GetColorTabular( double inputVal, double measVal, double uncert
 int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
   if ( !correctionAlpha && !correctionSigma ) return 0;
+  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
   TLorentzVector e3, e4;
 
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {
@@ -935,17 +922,6 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
     string dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
     TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
     dumTree->SetDirectory(0);
-    // dumTree->Branch( "pt_1"  , &m_mapVar1["PT"] );
-    // dumTree->Branch( "eta_1" , &m_mapVar1["ETA_TRK"] );
-    // dumTree->Branch( "eta_calo_1" , &m_mapVar1["ETA_CALO"] );
-    // dumTree->Branch( "phi_1" , &m_mapVar1["PHI"] );
-    // dumTree->Branch( "pt_2"  , &m_mapVar2["PT"] );
-    // dumTree->Branch( "eta_2" , &m_mapVar2["ETA_TRK"] );
-    // dumTree->Branch( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
-    // dumTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
-    // dumTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
-    // dumTree->Branch( "m12"   , &m_mapVarEvent["MASS"] );
-
     
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
@@ -961,23 +937,26 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
 	dataTree->GetEntry( iEvent );
 	
-	
 	double factor1 = ( iCorrection ) ? 
-	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapVar1[correctionSigma->GetXaxis()->GetTitle() ] ) ))
-	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapVar1[correctionAlpha->GetXaxis()->GetTitle() ] ) ) );
+	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_1" ]] ) ))
+	    : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_1" ]] ) ) );
 	double factor2 = ( iCorrection ) ? 
-	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapVar2[correctionSigma->GetXaxis()->GetTitle() ] ) ))
-	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapVar2[correctionAlpha->GetXaxis()->GetTitle() ] ) ) );
+	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_2" ]] ) ))
+	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_2" ]] ) ) );
 	
 	
-	m_mapDouble["PT_1"] *= factor1;
-	m_mapDouble["PT_2"] *= factor2;
+	m_mapDouble[mapBranchNames["PT_1"]] *= factor1;
+	m_mapDouble[mapBranchNames["PT_2"]] *= factor2;
 	
-	e3.SetPtEtaPhiM( m_mapDouble["PT_1"], m_mapDouble["ETA_TRK_1"], m_mapDouble["PHI_1"], 0.511 );
-	e4.SetPtEtaPhiM( m_mapDouble["PT_2"], m_mapDouble["ETA_TRK_2"], m_mapDouble["PHI_2"], 0.511 );
-	m_mapDouble["MASS"] = (e3+e4).M()*1e-3;
+	if ( !iEvent ) { 
+	  cout << factor1-1 << " " << factor2-1 << endl;
+	}
+
+	e3.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+	e4.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
+	m_mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
 	
-	m_mapVarEvent["WEIGHT"] *= ( iCorrection ) ? m_MCWeights[iFile] : m_dataWeights[iFile];
+	m_mapDouble[mapBranchNames["WEIGHT"]] *= ( iCorrection ) ? m_MCWeights[iFile] : m_dataWeights[iFile];
 	dumTree->Fill();
       }
       delete dataTree;
@@ -1018,33 +997,6 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 }
 
 //############################################
-int Template::LinkTree( TTree *inTree ) {
-  if ( m_setting.GetDebug() ) cout << "Template::LinkTree" << endl;
-  //  inTree->Print();
-  inTree->SetBranchStatus( "*", 1);
-  inTree->SetBranchAddress( "pt_1"  , &m_mapVar1["PT"] );
-  inTree->SetBranchAddress( "eta_1" , &m_mapVar1["ETA_TRK"] );
-  inTree->SetBranchAddress( "eta_calo_1" , &m_mapVar1["ETA_CALO"] );
-  inTree->SetBranchAddress( "phi_1" , &m_mapVar1["PHI"] );
-  inTree->SetBranchAddress( "pt_2"  , &m_mapVar2["PT"] );
-  inTree->SetBranchAddress( "eta_2" , &m_mapVar2["ETA_TRK"] );
-  inTree->SetBranchAddress( "eta_calo_2" , &m_mapVar2["ETA_CALO"] );
-  inTree->SetBranchAddress( "phi_2" , &m_mapVar2["PHI"] );
-  inTree->SetBranchAddress( "puWeight", &m_mapVarEvent["PUWEIGHT"] );
-  inTree->SetBranchAddress( "vertexWeight", &m_mapVarEvent["VERTEXWEIGHT"] );
-  if ( !m_setting.GetDoWeight() ) inTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
-  inTree->SetBranchAddress( "SFWeight_1", &m_mapVar1["SFWEIGHT"] );
-  inTree->SetBranchAddress( "SFWeight_2", &m_mapVar2["SFWEIGHT"] );
-  
-  inTree->SetBranchAddress( "m12"   , &m_mapVarEvent["MASS"] );
-  inTree->SetBranchAddress( "eventNumber"   , &m_mapVarNumber["EVENTNUMBER"] );
-  inTree->SetBranchAddress( "runNumber"   , &m_mapVarNumber["RUNNUMBER"] );
-
-  if ( m_setting.GetDebug() ) cout << "Template::LinkTree done" << endl;  
-  return 0;
-}
-
-//#############################################
 string Template::FindDefaultTree( TFile* inFile ) { 
   if ( !inFile ) return "";
 
@@ -1127,7 +1079,6 @@ double Template::GetWeight( bool isData ) {
   double weight=1;
 
   vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
-
   for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {
     weight *= m_mapDouble[dumVect[iName]];
   }

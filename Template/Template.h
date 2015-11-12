@@ -222,17 +222,6 @@ class Template
   */
   int FindBin( unsigned int &i_eta, unsigned int &j_eta );
 
-  /** Set branch addresses of input Ntuple to mapVar
-      \param inTree tree to link
-
-      The procedure uses a middle variable so user just need to change this function if branch names are different.
-
-      Adding variables is more trikky and the user will have to get into the code : adding keys to maps m_mapVar1(2) and m_mapVarEvent in Template constructor and in LinkTree.
-      If the variable is to be used for binning, the user will just have to put the key of its new variable in the configuration file under var1.
-      Otherwise, variables are mostly used in Template.FillDistrib().
-   */
-  int LinkTree( TTree *inTree );
-  
   /**\brief Fill a ZMass distributions
      \param isData Tell wich role has the input tree
 
@@ -268,10 +257,10 @@ class Template
   TRandom3 m_rand;
 
   map<string, double> m_mapDouble;
-  map< string, double > m_mapVar1;
-  map< string, double > m_mapVar2;
-  map< string, double > m_mapVarEvent;
-  map< string, long long int  > m_mapVarNumber;
+  /* map< string, double > m_mapVar1; */
+  /* map< string, double > m_mapVar2; */
+  /* map< string, double > m_mapVarEvent; */
+  /*  map< string, long long int  > m_mapVarNumber; */
   map< string, long long int  > m_mapLongLong;
   string m_name;
 
