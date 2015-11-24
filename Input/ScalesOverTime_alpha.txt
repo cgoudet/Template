@@ -1,4 +1,5 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/282712/EnergyScaleFactors.root	linearity_alpha 0
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/282712/Data6_25ns.root		measScale_alpha	27
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/282712/Data6_25ns_pt30.root	measScale_alpha	30
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/282712/Data6_25ns_pt35.root	measScale_alpha	35
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/EnergyScaleFactors.root	linearity_alpha 0
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns.root		measScale_alpha	27
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns_pt20.root	measScale_alpha	20
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns_pt30.root	measScale_alpha	30
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns_pt35.root	measScale_alpha	35

@@ -23,7 +23,7 @@ int main( int argc, char* argv[] ) {
   //define all options in the program
   vector<string> dataFileNames, MCTreeNames, MCFileNames, dataTreeNames;
   vector<double> dataWeights, MCWeights;
-  string  outFileName , constVarFit, configFile, distordedTreeName;
+  string  outFileName, constVarFit, configFile, distordedTreeName;
   string loadTemplateFileName, saveTemplateFileName, loadFullFileName;
   string correctAlphaFileName, correctAlphaHistName, correctSigmaFileName, correctSigmaHistName;
 

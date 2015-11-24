@@ -10,7 +10,11 @@ MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25n
 MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root' ]
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt35/MC_13TeV_Zee_25ns_Lkh1_pt35_1.root' ]
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt30/MC_13TeV_Zee_25ns_Lkh1_pt30_1.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_1.root' ]
 MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
+MCFILESETS['MC_8TeV_Zee_Lkh1']     =[ PREFIXDATASETS + 'MC_8TeV_Zee_1Lepton_Lkh1/MC_8TeV_Zee_1Lepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_1.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_2.root' ]
+
+
 MCFILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 MCWEIGHTSET={}
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1']       =[ 1, 1]
@@ -21,7 +25,9 @@ MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_0']     =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ 1, 1] 
+MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ 1, 1] 
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel']  =[ 1, 1] 
+MCWEIGHTSET['MC_8TeV_Zee_Lkh1']     =[ 0.32194, 0.2923, 0.2923, 0.2923 ]
 MCWEIGHTSET['ClosureMC'] = [1]
 
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
@@ -30,6 +36,7 @@ DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Z
 DATAFILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1_scaled/Data_13TeV_Zee_50ns_Lkh1_scaled_0.root']
 DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1/Data_13TeV_Zee_25ns_Lkh1_0.root']
 DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/Data_13TeV_Zee_25ns_Lkh1_pt30_0.root']
+DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt20/Data_13TeV_Zee_25ns_Lkh1_pt20_0.root']
 DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt35/Data_13TeV_Zee_25ns_Lkh1_pt35_0.root']
 DATAFILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled/Data_13TeV_Zee_25ns_Lkh1_scaled_0.root']
 DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_1.root' ]
@@ -37,6 +44,8 @@ DATAFILESETS['Data_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'Data_13TeV_Z
 DATAFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root']
 DATAFILESETS['MC_distordedRejPair']       =[ PREFIXDATASETS + '../Test/MC_distordedRejPair.root' ]
 DATAFILESETS['ClosureData'] = ['/sps/atlas/c/cgoudet/Calibration/Closure/MC24_PassSel_distorded.root' ]
+DATAFILESETS['Data_8TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1/Data_8TeV_Zee_Lkh1_0.root', PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1/Data_8TeV_Zee_Lkh1_1.root' ]
+DATAFILESETS['Data_8TeV_Zee_Lkh1_scaled'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1_scaled/Data_8TeV_Zee_Lkh1_scaled_0.root', PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1_scaled/Data_8TeV_Zee_Lkh1_scaled_0.root' ]
 
 DATAWEIGHTSET={}
 DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1']       =[ 1 ]
@@ -45,12 +54,14 @@ DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1']       =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ 1 ]
 DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_1']       =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ 1 ]
+DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ 1 ]
 DATAWEIGHTSET['Data_13TeV_Zee_25ns_Lkh2']       =[ 1 ]
 DATAWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ 1 ]
 DATAWEIGHTSET['MC_distordedRejPair'] = [ 1 ]
 DATAWEIGHTSET['ClosureData'] = [1]
-
+DATAWEIGHTSET['Data_8TeV_Zee_Lkh1'] = [ 1, 1 ]
+DATAWEIGHTSET['Data_8TeV_Zee_Lkh1_scaled'] = [ 1, 1 ]
 def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
 #mode 
@@ -142,11 +153,11 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                     batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0) 
                                  + dataLine.replace( '--dataFileName', '--MCFileName' ) +  correctionLine + outNameFile + ' --createDistorded MC_distorded.root \n')
                     batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0 )
-                                 + ' --dataFileName MC_distorded.root ' + MCLine + correctionLine + outNameFile + ' --makePlot\n')
+                                 + ' --dataFileName MC_distorded.root ' + MCLine + correctionLine + outNameFile + ' --makePlot \n')
 
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
-#                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
                 
@@ -154,8 +165,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             else :
                 batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
                              + dataLine + MCLine + optionLine + outNameFile +' --makePlot \n' )
-#                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
- #               batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
                 batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
                 batch.write( 'ls -lh \n ' ) 
@@ -187,6 +198,7 @@ def CreateConfig( configName, inOptions = [] ) :
     defaultBinning['ETA24']='-2.47 -2.3 -2 -1.80 -1.55 -1.37 -1.2 -1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1 1.2 1.37 1.55 1.8 2 2.3 2.47'
     defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
     defaultBinning['SIMSIGMAETA24']='2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2'
+    defaultBinning['ETA68'] = '-2.47 -2.425 -2.4 -2.35 -2.3 -2.2 -2.1 -2.05 -2 -1.9 -1.8 -1.7625 -1.725 -1.6775 -1.63 -1.59 -1.55 -1.51 -1.47 -1.42 -1.37 -1.285 -1.2 -1.1 -1 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.285 1.37 1.42 1.47 1.51 1.55 1.59 1.63 1.6775 1.725 1.7625 1.8 1.9 2 2.05 2.1 2.2 2.3 2.35 2.4 2.435 2.47'
 
     options = {}
     options['ZMassMin'] = 80
@@ -196,8 +208,8 @@ def CreateConfig( configName, inOptions = [] ) :
     options['var1'] = "ETA_CALO"
     options['var2'] = ""
     options['doScale'] = 1
-    options['alphaMin']=-0.1
-    options['alphaMax']=0.1
+    options['alphaMin']=-0.08
+    options['alphaMax']=0.08
     options['alphaNBins']=20
     options['doSmearing']=1
     options['sigmaMin']=0

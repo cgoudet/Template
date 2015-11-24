@@ -29,6 +29,7 @@ using namespace std::chrono;
 //########## CONSTRUCTOR
 Template::Template() : m_setting(), m_rand(), m_name()
 {
+  TH1::AddDirectory( false );
   gErrorIgnoreLevel = kError;
   m_chiMatrix.clear();
   m_dataFileNames.clear();
@@ -686,7 +687,7 @@ void Template::CreateDistordedTree( string outFileName ) {
 	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
 
-	if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
+	//if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
 	m_mapDouble["weightTree"] = m_MCWeights[iFile];
 	m_mapDouble[mapVarNames["PT_1"]] *= factor1;
 	m_mapDouble[mapVarNames["PT_2"]] *= factor2;

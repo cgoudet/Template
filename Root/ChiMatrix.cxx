@@ -10,7 +10,7 @@
 #include <fstream>
 #include <chrono>
 #include "PlotFunctions/DrawPlot.h"
-
+#include "TAxis.h"
 
 using std::string;
 using std::cout;
@@ -447,7 +447,7 @@ void ChiMatrix::FitChi2() {
     linearFit->SetParLimits( 1, constVarVal, constVarVal ); 
     linearFit->SetParameter( 2, m_corAngle->GetBinContent( constVarBin ) );
     
-    m_corAngle->Fit( linearFit , "SQ", "SRQ",  m_corAngle->GetXaxis()->GetBinLowEdge( max( 1, constVarBin -2 ) ), m_corAngle->GetXaxis()->GetBinUpEdge( min( m_corAngle->GetNbinsX(), constVarBin+2 ) ));
+    m_corAngle->Fit( linearFit , "Q", "Q",  m_corAngle->GetXaxis()->GetBinLowEdge( max( 1, constVarBin -2 ) ), m_corAngle->GetXaxis()->GetBinUpEdge( min( m_corAngle->GetNbinsX(), constVarBin+2 ) ));
     
     if ( !isSigmaConstVar ) {
       m_sigma = max( 0., linearFit->GetParameter( 2 )); 
@@ -627,11 +627,12 @@ void ChiMatrix::OptimizeRanges( ) {
 
     bool reachedPrecision = false;
     int counter = 0;
-    while ( !reachedPrecision ) {    
-      if ( m_quality.to_ulong() ) return ;
+
+    while ( !reachedPrecision  ) {    
+      cout << "histscal : " << histScale  << endl;
+      //      if ( m_quality.to_ulong() ) return ;
 
       FillScaleValues( 10 );
-      ClearTemplates();
       for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); i_alpha++ ) {
 	m_MCZMass.push_back( vector< TH1D* > () );
 	for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); i_sigma++ ) {
@@ -648,36 +649,43 @@ void ChiMatrix::OptimizeRanges( ) {
       }
 
       FillChiMatrix();
-
       histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )
 	: m_chiMatrix->ProjectionX( m_name.c_str() + TString("histAlpha"), 1, 1, "o" );
+
+
+      // string name = string( TString::Format( "%s_Optim_%s_%i", m_name.c_str(), iScale ? "sigma" : "alpha", counter ) );
+      // DrawPlot( { histScale}, name );
 
       if ( counter==0 ) {
 	TF1* fittingFunction = FitHist( histScale, iScale );
 	if ( fittingFunction ) {
+	  cout << "fitVal : " <<  fittingFunction->GetParameter(2) << " " << fittingFunction->GetParameter(1) << " " ;
+	  cout << fittingFunction->GetParameter(2) + m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1) << endl;
 	  rangeMax = min( rangeMax, fittingFunction->GetParameter(2) + m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1) );
 	  double minVal =  fittingFunction->GetParameter(2) - m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1);
 	  rangeMin = max( rangeMin, (!iScale ? minVal : max( minVal, 0. )) );
-	  //	  if ( m_setting->GetDebug() ) cout << "range : " << rangeMin << " " << rangeMax << endl;
+	  delete fittingFunction; fittingFunction=0;
 	}
 	else {
 	  m_quality.set(2, 1);
+	  delete histScale; histScale=0;
 	  return;
 	}
 	counter++;
-	if ( fittingFunction ) delete fittingFunction; fittingFunction=0;
       }
       else {
 	int minBin = histScale->GetMinimumBin();
 	//Dealing with minimum bin too close to overflow
 	if ( minBin > histScale->GetNbinsX()-2 && allowedRangeMax != rangeMax ) {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
+	  delete histScale; histScale=0;
 	  continue;
 	}
 	
 	//Dealing with minimum bin too close to underflow
 	if ( minBin <= 2 && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
+	  delete histScale; histScale=0;
 	  continue;
 	}
 	
@@ -782,7 +790,7 @@ double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 
 //==============================
 TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
-
+  cout << "fitHistMode :" << mode << endl;
  //Create the fit
   TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);	
   //  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);	
@@ -795,15 +803,21 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
   int minBin = 1;
   int maxBin = hist->GetNbinsX();
   int centralBin = hist->GetMinimumBin();
-
-  if ( FindFitBestRange( hist, minBin, maxBin, chiMinLow, chiMinUp ) ) return 0;
+  double minCentral = hist->GetXaxis()->GetBinLowEdge( minBin );
+  if ( FindFitBestRange( hist, minBin, maxBin, chiMinLow, chiMinUp ) ) {
+    delete quadraticFit; quadraticFit=0;
+    delete cubicFit; cubicFit=0;
+    return 0;
+  }
 
   switch ( mode ) {
   case 1 :
     fittingFunction = cubicFit;
+    minCentral=0;
     break;
   case 2 :
     fittingFunction = cubicFit;
+    minCentral = 0;
     break;
   default : //Fit alpha optimization
     fittingFunction = quadraticFit;
@@ -814,7 +828,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
   fittingFunction->SetParLimits( 0, 0, 2*hist->GetMinimum() );    
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
 
-  fittingFunction->SetParLimits( 2, hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+  fittingFunction->SetParLimits( 2, minCentral, hist->GetXaxis()->GetBinUpEdge( maxBin ) );
   fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
 
   int &extrBin = ( maxBin == centralBin ) ? minBin : maxBin;
@@ -824,11 +838,13 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
   int nFits=5;
   do {
+    //    fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+    //    if ( fitResult.Get() ) delete fitResult.Get();
     fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
     nFits --;
   }
   while( fitResult->Status() && nFits );
-  
+
   if ( fitResult->Status() ) {
     while ( maxBin - minBin > 8 ) {
       minBin = min( minBin+1, hist->GetMinimumBin() );
@@ -840,7 +856,8 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 	fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
 	fittingFunction->SetParameter( 1, sigma );
-	fitResult =   hist->Fit( fittingFunction, "SQ", "S", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+	//	if ( fitResult.Get() ) delete fitResult.Get();
+	fitResult =   hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
 	nFits--;
       }
       while ( fitResult->Status() && nFits );
@@ -866,10 +883,12 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
   }
 
+
   TF1* result = (TF1*) fittingFunction->Clone();
   result->SetName( "fittingFunction" );
   delete quadraticFit; quadraticFit=0;
   delete cubicFit; cubicFit=0;
+
 
  return result;
 }

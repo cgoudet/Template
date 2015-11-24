@@ -15,7 +15,6 @@ namespace po = boost::program_options;
 using std::ifstream;
 
 string FindDefaultTree( TFile* inFile );
-void Style_Christophe();
 
 int main( int argc, char* argv[] ) {
   po::options_description desc("LikelihoodProfiel Usage");
@@ -53,7 +52,6 @@ int main( int argc, char* argv[] ) {
   
   if (vm.count("help")) {cout << desc; return 0;}
   //===================================================
-  Style_Christophe();
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
@@ -118,6 +116,7 @@ int main( int argc, char* argv[] ) {
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
 	}
 
+
 	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, {1}, MCFileNames, MCTreeNames, MCWeights  );
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
@@ -127,17 +126,13 @@ int main( int argc, char* argv[] ) {
 
 	settingMeasure.SetNUseEvent( inputStat[iStat] );
 
-	err = TempMeasure.CreateTemplate();
-	if ( err ) {
-	  cout << "Template::CreateTemplate failed : " << err << endl;
-	  return 6;
-	}
-	
+
 	err = TempMeasure.ExtractFactors( );
 	if ( err ) {
 	  cout << "Template::Extraction failed : " << err << endl;
 	  return 1;
 	}
+
 
 	if ( makePlot ) TempMeasure.MakePlot();
 	statTree=settingMeasure.GetNEventData();
@@ -161,16 +156,17 @@ int main( int argc, char* argv[] ) {
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
 	  for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
 	    sigma = (*combinSigma)(i1, i2);
+
 	    errSigma = (*combinErrSigma)(i1,i2);
 	    if ( errSigma == 100 ) continue;
 	    iConf = i1;
 	    jConf = i2;
 	    ChiMatrix *chiMatrix = TempMeasure.GetChiMatrix( i1, i2 );
 	    if ( !chiMatrix ) continue;
+	    cout << "sigma : " << sigma  << " " << chiMatrix->GetScale( 1) << endl;
 	    statConf = chiMatrix->GetStat();
 	    rms = chiMatrix->GetDataRMS();
 	    if ( !statConf ) continue;
-
 	    outTree->Fill();
 	  }
 	}
