@@ -164,7 +164,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
             else :
                 batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                             + dataLine + MCLine + optionLine + outNameFile +' --makePlot \n' )
+                             + dataLine + MCLine + optionLine + outNameFile + ' \n' )
                 batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
                 batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )

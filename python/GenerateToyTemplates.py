@@ -5,7 +5,7 @@ import time;
 
 #One config file correspond to one job
 configFiles=[ 
-    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=1', 'etaBins=ETA6', 'debug=1', 'inversionMethod=11', 'optimizeRanges=5', 'doScale=0']]
+    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=1', 'etaBins=ETA6', 'debug=0', 'inversionMethod=11', 'optimizeRanges=5', 'doScale=0']]
     ]
 
 inputC = [ 0.01 ]
