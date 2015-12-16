@@ -13,7 +13,12 @@ MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25n
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_1.root' ]
 MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
 MCFILESETS['MC_8TeV_Zee_Lkh1']     =[ PREFIXDATASETS + 'MC_8TeV_Zee_1Lepton_Lkh1/MC_8TeV_Zee_1Lepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_1.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_2.root' ]
-
+MCFILESETS['MC_13TeV_Zee_25ns_geo02_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo02_Lkh1/MC_13TeV_Zee_25ns_geo02_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_geo11_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo11_Lkh1/MC_13TeV_Zee_25ns_geo11_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_geo12_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo12_Lkh1/MC_13TeV_Zee_25ns_geo12_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo13_Lkh1/MC_13TeV_Zee_25ns_geo13_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1/MC_13TeV_Zee_25ns_geo14_Lkh1_0.root' ]
+MCFILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1/MC_13TeV_Zee_25ns_geo15_Lkh1_0.root' ]
 
 MCFILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 MCWEIGHTSET={}
@@ -29,6 +34,12 @@ MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel']  =[ 1, 1] 
 MCWEIGHTSET['MC_8TeV_Zee_Lkh1']     =[ 0.32194, 0.2923, 0.2923, 0.2923 ]
 MCWEIGHTSET['ClosureMC'] = [1]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo02_Lkh1'] = [ 1 ]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo11_Lkh1'] = [ 1 ]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo12_Lkh1'] = [ 1 ]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo13_Lkh1'] = [ 1 ]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo14_Lkh1'] = [ 1 ]
+MCWEIGHTSET['MC_13TeV_Zee_25ns_geo15_Lkh1'] = [ 1 ]
 
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 DATAFILESETS={}

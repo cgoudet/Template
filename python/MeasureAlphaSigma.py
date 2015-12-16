@@ -5,11 +5,11 @@ from Functions_MeasureAlphaSigma import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=3
+switch=0
 
 if switch==0 :
         configFiles=[ 
-		#Mesure des scales
+		# #Mesure des scales
 		# ['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
 		# ['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
 		# #mesure avec electron tight
@@ -18,13 +18,20 @@ if switch==0 :
 		# ['DataOff_13TeV_25ns_noPileup.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['MCBranchWeightName=vertexWeight SFWeight_1 SFWeight_2','nUseEl=2'] ],
 		# #mesure avec masse sueil Off0
 		# ['DataOff_13TeV_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2','thresholdMass=75']],
-		#mesure avec fenetre masse plus faible
-		['DataOff_13TeV_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'ZMassMin=82.5', 'ZMassMax=97.5'] ],
+		# #mesure avec fenetre masse plus faible
+		# ['DataOff_13TeV_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'ZMassMin=82.5', 'ZMassMax=97.5'] ],
 		# #mesure globale avec pt seuil
 		# ['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6','nUseEl=2'] ],
-#		['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=2'] ],
+		# ['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=2'] ],
 		# ['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=2'] ],
-#		['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2']],
+		# ['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2']],
+		#Mesure avec les geometries modifiees
+		['DataOff_13TeV_25ns_geo02.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo02_Lkh1', ['nUseEl=2'] ],
+		['DataOff_13TeV_25ns_geo11.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo11_Lkh1', ['nUseEl=2'] ],
+		['DataOff_13TeV_25ns_geo12.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo12_Lkh1', ['nUseEl=2'] ],
+		['DataOff_13TeV_25ns_geo13.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo13_Lkh1', ['nUseEl=2'] ],
+		['DataOff_13TeV_25ns_geo14.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo14_Lkh1', ['nUseEl=2'] ],
+		['DataOff_13TeV_25ns_geo15.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo15_Lkh1', ['nUseEl=2'] ],
 		]
 	
 elif switch == 1 :

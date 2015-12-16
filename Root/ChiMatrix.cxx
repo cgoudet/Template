@@ -685,7 +685,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	  continue;
 	}
 	
-	if ( histScale->GetMinimum() > chiMin && chiMin != -99 ) {
+	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
 	  delete histScale; histScale=0;
 	  break;
 	}
