@@ -47,6 +47,7 @@ class ChiMatrix
   void SetSigmaMin( double sigmaMin ) { m_sigmaMin = sigmaMin; }
   void SetSigmaMax( double sigmaMax ) { m_sigmaMax = sigmaMax; }
   void SetSetting( Setting& setting );
+  void SetMCTree( TTree *MCTree ) { m_MCTree = MCTree; }
 
   /**\brief Measure scales factors for the configuration
      \return 0 OK

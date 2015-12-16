@@ -71,7 +71,7 @@ class Template
   TH1 *GetResults( string resultName );
   ChiMatrix* GetChiMatrix( unsigned int iMatrix, unsigned int jMatrix );
   string GetName() const { return m_name; };
-
+  TTree* CreateMCConfTree( unsigned int i_eta, unsigned int j_eta );
   /**\brief Read a boost configuration file
      \param configFile Name of the configuration file
      \return 0 OK
@@ -231,7 +231,7 @@ class Template
      
      In case of binning in pt and eta, the event is used twice with a weight of 0.5 whith the selection on 1 electron
        */
-  void FillDistrib( bool isData );
+  TTree* FillDistrib( unsigned int i_eta, unsigned int j_eta );
   
   double GetWeight( bool isData );  
   /**\brief Class containing all configuration attributes
@@ -288,6 +288,8 @@ class Template
   */
   multi_array< TMatrixD*, 2> m_vectMatrix;
   vector<string> m_matrixNames;
+  TTree *m_MCTree;
+  TTree *m_dataTree;
 };
 
 //#########################################

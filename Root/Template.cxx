@@ -13,6 +13,7 @@
 #include <chrono>
 #include "PlotFunctions/DrawPlot.h"
 #include <algorithm>
+#include <TROOT.h>
 
 using std::swap;
 using boost::extents;
@@ -38,7 +39,8 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_MCFileNames.clear();
   m_MCTreeNames.clear();
   m_MCWeights.clear();
-
+  m_MCTree = 0;
+  m_dataTree = 0;
   m_mapDouble["WEIGHT"]=1;
   m_histNames = { "measScale", "inputScale", "deviation" };
   m_vectHist.resize( extents[2][m_histNames.size()] );
@@ -67,7 +69,8 @@ Template::Template( const string &outFileName, const string &configFile,
     
     vector<string> &fileNames = iType ? MCFileNames : dataFileNames;
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
-    vector<double> &weight = iType ? MCWeights : dataWeights;    
+    vector<double> &weight = iType ? MCWeights : dataWeights;
+    TList *list = new TList();
     for ( unsigned int iFile = 0; iFile < fileNames.size(); iFile++ ) {
       
       TFile *dumFile = new TFile( fileNames[iFile].c_str() );
@@ -85,23 +88,37 @@ Template::Template( const string &outFileName, const string &configFile,
 	exit( 0 );
       }
       cout << "tree checked : " << iType << endl;
-      delete dumTree; dumTree=0;
+      dumTree->SetDirectory(0);
+
+      if ( m_setting.GetSelection() != "" ) {
+	gROOT->cd();
+	TTree* selectedTree = dumTree->CopyTree( m_setting.GetSelection().c_str() );
+	delete dumTree;
+	dumTree = selectedTree;
+      }
+      list->Add( dumTree );
+      //      delete dumTree; dumTree=0;
       dumFile->Close("R");
       delete dumFile; dumFile=0;
-    }
+    }//end for iFile
+
     if ( !iType ) {
+      m_dataTree = new TTree( "dataTree", "dataTree" );
+      m_dataTree->Merge( list );
       m_setting.SetDataName( dataFileNames.front() );
       m_dataFileNames = dataFileNames;
       m_dataTreeNames = dataTreeNames;
       m_dataWeights = weight;
     }
     else {
+      m_MCTree = new TTree( "MCTree", "MCTree" );
+      m_MCTree->Merge( list );
       m_setting.SetMCName( MCFileNames.front() );
       m_MCFileNames = MCFileNames;
       m_MCTreeNames = MCTreeNames;
       m_MCWeights = MCWeights;
     }
-    //    cout << "names set : " << iType << endl;
+      delete list; list =0;    //    cout << "names set : " << iType << endl;
   }
 
   //  if ( m_setting.GetDebug() ) cout << "dealt with input Ntuples" << endl;
@@ -139,6 +156,8 @@ Template::~Template() {
   ClearChiMatrix();
   CleanHistVect();  
   CleanMatrixVect();
+  if ( m_MCTree ) delete m_MCTree;
+  if ( m_dataTree ) delete m_dataTree;
 }
 
 
@@ -353,47 +372,48 @@ int Template::Save( string outFileName, bool justTemplate ) {
 //######################=
 int Template::CreateTemplate() {
   if ( m_setting.GetDebug() ) cout << "Template::CreateTemplate" << endl;
-  //Decide which variables to extract and how to cut the detector
-  vector<double> etaBins = m_setting.GetEtaBins();
-  vector<double> ptBins = m_setting.GetPtBins();
-  //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
-  int eta1Max = (int) etaBins.size()-1;  
-  int eta2Max = 0;
+  cout << "Create template does nothing" << endl;
+  // //Decide which variables to extract and how to cut the detector
+  // vector<double> etaBins = m_setting.GetEtaBins();
+  // vector<double> ptBins = m_setting.GetPtBins();
+  // //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
+  // int eta1Max = (int) etaBins.size()-1;  
+  // int eta2Max = 0;
 
-  //Setup ChiMatrix
-  for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
-    m_chiMatrix.push_back( vector< ChiMatrix * >() );
+  // //Setup ChiMatrix
+  // for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
+  //   m_chiMatrix.push_back( vector< ChiMatrix * >() );
 
-    //If only eta binning : we do a tringular matrix 
-    //else we do a full matrix
-    eta2Max = ( m_setting.GetMode() == "1VAR" ) ? i_eta+1 : (int) ptBins.size()-1;     
+  //   //If only eta binning : we do a tringular matrix 
+  //   //else we do a full matrix
+  //   eta2Max = ( m_setting.GetMode() == "1VAR" ) ? i_eta+1 : (int) ptBins.size()-1;     
 
     
-    //Create default ChiMatrix object
-    for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-      m_chiMatrix.back().push_back( 0 );
-      m_chiMatrix.back().back() = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
-    }}
+  //   //Create default ChiMatrix object
+  //   for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
+  //     m_chiMatrix.back().push_back( 0 );
+  //     m_chiMatrix.back().back() = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
+  //   }}
 
-  //Fill MC events into templates and check execution time
-  FillDistrib( false );
-  //If there is no data input, create pseudo data
-  // Checks are made at the crettion of the Class : if there is no data, there MUST be a MC to create pseudo data
-  if ( !m_dataFileNames.size() ) {
-    if ( m_setting.GetDoSimulation() ) CreateDistordedTree();
-    else {
-      cout << "Error : No data and simulation off" << endl;
-      return 2;
-    }
-  }
-  //If data events haven't been filled
-  else  FillDistrib( true );  
+  // //Fill MC events into templates and check execution time
+  // FillDistrib( false );
+  // //If there is no data input, create pseudo data
+  // // Checks are made at the crettion of the Class : if there is no data, there MUST be a MC to create pseudo data
+  // if ( !m_dataFileNames.size() ) {
+  //   if ( m_setting.GetDoSimulation() ) CreateDistordedTree();
+  //   else {
+  //     cout << "Error : No data and simulation off" << endl;
+  //     return 2;
+  //   }
+  // }
+  // //If data events haven't been filled
+  // else  FillDistrib( true );  
 
-  //Create templates for each configuration
-  for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
-    for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
-      m_chiMatrix[i_eta][j_eta]->CreateTemplates();
-    }}  
+  // //Create templates for each configuration
+  // for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
+  //   for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
+  //     m_chiMatrix[i_eta][j_eta]->CreateTemplates();
+  //   }}  
 
   if ( m_setting.GetDebug() ) cout << "Template::CreateTemplate Done" << endl;
   return 0;
@@ -403,19 +423,6 @@ int Template::CreateTemplate() {
 int Template::ExtractFactors() {
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors" << endl;
 
-  if ( ! m_chiMatrix.size() ) { 
-    //Create templates if they haven't been loaded
-    if ( m_MCFileNames.size() ) CreateTemplate();
-    else {
-      cout << "Error : No MCNtuple and no loaded templates" << endl;
-      return 1;
-    }
-  }
-
-  if ( !m_setting.GetNEventData() ) FillDistrib( true );
-  //Checks that all factors matrices are empty
-  CleanMatrixVect();
-
   //Decide which variables to extract and how to cut the detector
   vector<double> etaBins = m_setting.GetEtaBins();
   vector<double> ptBins = m_setting.GetPtBins();
@@ -423,65 +430,64 @@ int Template::ExtractFactors() {
   vector<double> alphaSimPt  = m_setting.GetAlphaSimPt();
   vector<double> sigmaSimEta = m_setting.GetSigmaSimEta();
   vector<double> sigmaSimPt  = m_setting.GetSigmaSimPt();
+  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
-  bool isChi2Done = false;
-  cout << "iVar : " << m_vectHist.size() << endl;
-  for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
-    
-    bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
-    if ( !isMeasuredVar ) continue;
+  //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
+  int eta1Max = (int) etaBins.size()-1;  
+  int eta2Max = 0;
 
+  //Setup ChiMatrix
+  for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
+    //If only eta binning : we do a tringular matrix 
+    //else we do a full matrix
+    eta2Max = ( m_setting.GetMode() == "1VAR" ) ? i_eta+1 : (int) ptBins.size()-1;     
     
-    //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
-    int eta1Max = (int) etaBins.size() -1;
-    int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
-    
-    unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
-    unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
-    unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
-    unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
-    
-    //Create an histogram of inputs in case of closure
-    if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
-      if ( isMeasuredVar ) {
-	unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
-	string histName = CreateHistMatName( m_histNames[histBin], iVar );
-	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
-	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
-	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
-	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
-	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
-	}
+    //Create default ChiMatrix object
+    for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
+      
+      ChiMatrix *chiMatrix = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
+      chiMatrix->CreateTemplates();
+      chiMatrix->FitChi2();
+      
+      for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
 	
-	histName = CreateHistMatName( m_histNames[histDevBin], iVar );
-	m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
-      }
-    }
-    
-
-    //Create combined factor matrices
-    for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
-      m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
-    
-    // m_chiMatrix[2][2]->FitChi2();
-    // exit(0);
-    //Run over all chiMatrices
-    cout << "eta1Max : " << eta1Max << endl;
-    for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
-      eta2Max = ( m_setting.GetMode() == "1VAR" ) ? (int) i_eta+1 : (int) ptBins.size(); 
-      cout << "eta2Max : " << eta2Max << endl;
-
-      for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
+	bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
+	if ( !isMeasuredVar ) continue;
 	
-	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-       
+	unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
+	unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
+	unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
+	
+	if ( !i_eta && !j_eta ) {	  
+	  //Create an histogram of inputs in case of closure
+	  if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
+	    if ( isMeasuredVar ) {
+	      unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
+	      string histName = CreateHistMatName( m_histNames[histBin], iVar );
+	      m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
+	      m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
+	      m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
+	      for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
+		m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
+		m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
+	      }//end for i
+	      
+	      histName = CreateHistMatName( m_histNames[histDevBin], iVar );
+	      m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
+	    }//end if measuredVar
+	  }//end if 1var
+	  
+	  //Create combined factor matrices
+	  for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ )  m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
+	}//end if not cerated hist
+	  
+	
 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
 	(*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
 	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
 	(*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
-
+	
 	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
 	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
 	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
@@ -489,17 +495,23 @@ int Template::ExtractFactors() {
 	    : ( !iVar ? (alphaSimPt[i_eta] + alphaSimEta[j_eta])/2. 
 		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
 	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
-	}
-      }
-    } //end loop on chiMatrix
+	}//end if do theory
+      }//end ivar
+    }//end j_eta
+  } //end i_eta loop on chiMatrix
 
+  for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {  
+	bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
     if ( isMeasuredVar && m_setting.GetMode() == "1VAR"  ) {
+      unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
+      unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
+      unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
       TMatrixD resultMatrix( eta1Max, 1 );
       TMatrixD resultErrMatrix( eta1Max, 1 );
-
+      
       cout << "inversion method : " << (iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10) << endl;
       InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10 );
-
+      
       string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
       m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
       m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
@@ -507,9 +519,8 @@ int Template::ExtractFactors() {
       for ( int iBin = 1; iBin <= eta1Max; iBin++ ) {
 	m_vectHist[iVar][histMeasBin]->SetBinContent( iBin, resultMatrix(iBin-1,0) );
 	m_vectHist[iVar][histMeasBin]->SetBinError( iBin, resultErrMatrix(iBin-1,0) );
-      }
+      }//end for iBin
     }
-    isChi2Done = true; 
   }//end loop iVer
   
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors Done" << endl;
@@ -517,94 +528,101 @@ int Template::ExtractFactors() {
   }
     
 //###########################################==
-void Template::FillDistrib( bool isData ) {
-  if ( m_setting.GetDebug() )  cout << "Template : FillDistrib " << isData << endl;
-  clock_t tStart = clock(); 
+TTree* Template::FillDistrib( unsigned int i_eta, unsigned int j_eta ) {
+  //  if ( m_setting.GetDebug() )  cout << "Template : FillDistrib " << isData << endl;
+  cout << "Fill distrib does nothing" << endl;
+  // clock_t tStart = clock(); 
 
-  if ( isData ) m_setting.SetNEventData(0);
-  else m_setting.SetNEventMC(0);
-  
-  
-  unsigned int nEntry = ( isData && m_setting.GetNUseEvent() ) ? m_setting.GetNUseEvent() : 0;
-  unsigned int nFiles = ( isData ) ? m_dataFileNames.size() : m_MCFileNames.size();
-  unsigned long int counterEntry = 0;
-  TFile *inputFile = 0;
-  TTree *inputTree = 0;
-  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
+  // if ( isData ) m_setting.SetNEventData(0);
+  // else m_setting.SetNEventMC(0);
+  // gROOT->cd();
+  // string dumString = isData ? "dataTree" : "mcTree";
+  // TTree *outTree = 0;
 
-  for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
+  // map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
-    inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
-    inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
-
-    if ( m_setting.GetSelection() != "" && 
-	 ( !m_setting.GetApplySelection() 
-	   || ( m_setting.GetApplySelection()==1 &&  isData ) 
-	   || ( m_setting.GetApplySelection()==2 && !isData ) )
-	   ) {
-      TTree* dumTree = inputTree->CopyTree( m_setting.GetSelection().c_str() );
-      if ( !dumTree->GetEntries() ) {
-	cout << "selectionTree has no events." << endl;
-	exit(1);
-      }
-      delete inputTree;
-      inputTree = dumTree;
-    }
-
-    //    inputTree->SetDirectory( 0 );
-    if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
-    LinkTreeBranches( inputTree, 0, m_mapDouble, m_mapLongLong );
-    for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-      if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
-
-      inputTree->GetEntry( iEvent );
-      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
-      TLorentzVector e1, e2;  
-
-      e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
-      e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
-
-      m_mapDouble["WEIGHT"] = GetWeight(isData) * (( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile] );
+  // return outTree;  
+  // unsigned int nEntry = ( isData && m_setting.GetNUseEvent() ) ? m_setting.GetNUseEvent() : 0;
+  // unsigned int nFiles = ( isData ) ? m_dataFileNames.size() : m_MCFileNames.size();
+  // unsigned long int counterEntry = 0;
+  // TFile *inputFile = 0;
+  // TTree *inputTree = 0;
 
 
-      //##############################
-      if ( isData ) m_setting.SetNEventData();
-      else m_setting.SetNEventMC();
+  // for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
+
+  //   inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
+  //   inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
+
+  //   if ( m_setting.GetSelection() != "" && 
+  // 	 ( !m_setting.GetApplySelection() 
+  // 	   || ( m_setting.GetApplySelection()==1 &&  isData ) 
+  // 	   || ( m_setting.GetApplySelection()==2 && !isData ) )
+  // 	   ) {
+  //     TTree* dumTree = inputTree->CopyTree( m_setting.GetSelection().c_str() );
+  //     if ( !dumTree->GetEntries() ) {
+  // 	cout << "selectionTree has no events." << endl;
+  // 	exit(1);
+  //     }
+  //     delete inputTree;
+  //     inputTree = dumTree;
+  //   }
+
+  //   TString selection = TString::Format("eta_calo_1> %2.2f && eta_calo_1 < %2.2f && eta_calo_2> %2.2f && eta_calo_2 < %2.2f" );
+
+  //   if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
+  //   LinkTreeBranches( inputTree, 0, m_mapDouble, m_mapLongLong );
+  //   for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
+  //     if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
+
+  //     inputTree->GetEntry( iEvent );
+  //     if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
+  //     TLorentzVector e1, e2;  
+
+  //     e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+  //     e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
+
+  //     m_mapDouble["WEIGHT"] = GetWeight(isData) * (( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile] );
 
 
-      unsigned int i_eta = 0, j_eta = 0;
-      if ( m_setting.GetMode() == "1VAR" ) {    
-	int foundBin = FindBin( i_eta, j_eta );
-	// if ( isData && iEvent< 10 ) {
-	//   cout << "foundBin : " << foundBin << " " << i_eta << " " << j_eta << endl; 
-	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_1"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_1"]] << endl;
-	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_2"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_2"]] << endl;
-	// }
-	if ( !foundBin ) {
-	  // if ( i_eta==1 && j_eta==1 && isData ) 
-	  //   cout << m_mapVarNumber["RUNNUMBER"] << " " << m_mapVarNumber["EVENTNUMBER"] << " " << m_mapVar1["PT"] << " " << m_mapVar2["PT"] << " " << m_mapVar1["ETA_TRK"] << " " << m_mapVar2["ETA_TRK"] << " " << m_mapVar1["PHI"] << " " << m_mapVar2["PHI"] << " " << m_mapVar1["ETA_CALO"] << " " << m_mapVar2["ETA_CALO"] << endl;
-	  m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
-	}
-      }
-      else {
-	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
-	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
-	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
-      }
+  //     //##############################
+  //     if ( isData ) m_setting.SetNEventData();
+  //     else m_setting.SetNEventMC();
+
+
+  //     unsigned int i_eta = 0, j_eta = 0;
+  //     if ( m_setting.GetMode() == "1VAR" ) {    
+  // 	int foundBin = FindBin( i_eta, j_eta );
+  // 	// if ( isData && iEvent< 10 ) {
+  // 	//   cout << "foundBin : " << foundBin << " " << i_eta << " " << j_eta << endl; 
+  // 	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_1"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_1"]] << endl;
+  // 	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_2"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_2"]] << endl;
+  // 	// }
+  // 	if ( !foundBin ) {
+  // 	  // if ( i_eta==1 && j_eta==1 && isData ) 
+  // 	  //   cout << m_mapVarNumber["RUNNUMBER"] << " " << m_mapVarNumber["EVENTNUMBER"] << " " << m_mapVar1["PT"] << " " << m_mapVar2["PT"] << " " << m_mapVar1["ETA_TRK"] << " " << m_mapVar2["ETA_TRK"] << " " << m_mapVar1["PHI"] << " " << m_mapVar2["PHI"] << " " << m_mapVar1["ETA_CALO"] << " " << m_mapVar2["ETA_CALO"] << endl;
+  // 	  m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
+  // 	}
+  //     }
+  //     else {
+  // 	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
+  // 	FindBin( i_eta, j_eta );
+  // 	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
+  // 	FindBin( i_eta, j_eta );
+  // 	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
+  //     }
       
-      counterEntry++;
-    }//end loop iEvent
-     delete inputTree; inputTree = 0;
-    inputFile->Close("R");
-    delete inputFile; inputFile = 0;
-  }//end loop iFile
-  cout << "entries filled : " << counterEntry << endl;
-  cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
+  //     counterEntry++;
+  //   }//end loop iEvent
+  //    delete inputTree; inputTree = 0;
+  //   inputFile->Close("R");
+  //   delete inputFile; inputFile = 0;
+  // }//end loop iFile
+  // cout << "entries filled : " << counterEntry << endl;
+  // cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
 
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib Done" << endl;
-  
+  return 0;  
 }
 //###############################==
 void Template::CreateDistordedTree( string outFileName ) {
@@ -1084,4 +1102,29 @@ double Template::GetWeight( bool isData ) {
     weight *= m_mapDouble[dumVect[iName]];
   }
   return weight;
+}
+
+//######################################################
+TTree* Template::CreateMCConfTree( unsigned int i_eta, unsigned int j_eta ) {
+  if ( m_setting.GetDebug() ) cout << "CreateMCConfTree : " << i_eta << " " << j_eta << endl;
+
+  vector<double> etaBins = m_setting.GetEtaBins();
+  vector<double> ptBins = m_setting.GetPtBins();
+  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
+
+  gROOT->cd();
+  TTree *outTree = new TTree( "mcTree", "mcTree" );
+
+  LinkTreeBranches( m_MCTree, outTree, m_mapDouble, m_mapLongLong );
+  int nEntries = m_MCTree->GetEntries();
+  for ( int iEntry = 0; iEntry<nEntries; iEntry++ ) {
+    unsigned int i1, i2;
+    FindBin( i1, i2 );
+    if ( i1!= i_eta || i2!=j_eta ) continue;
+    double weight = ( m_setting.GetMode() == "1VAR" ) ? 1 : 0.5;
+    for ( auto weightName : m_setting.GetDataBranchWeightNames() ) weight *= m_mapDouble[weightName];
+    m_mapDouble["WEIGHT"] = weight;
+  }
+  if ( m_setting.GetDebug() ) cout << "CreateMCConfTree : " << i_eta << " " << j_eta << " done" << endl;
+  return outTree;  
 }
