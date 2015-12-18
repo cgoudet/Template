@@ -78,7 +78,7 @@ int main( int argc, char* argv[] ) {
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
-
+  Temp.SetSaveTemplateFileName( saveTemplateFileName );
   if ( vm.count("loadFull") ) {
     err = Temp.Load( loadFullFileName, false);
     if ( err ) {
@@ -103,23 +103,17 @@ int main( int argc, char* argv[] ) {
     cout << "created templates" << endl;
   }
   
-
-  if ( !vm.count("loadFull" ) )   Temp.Save( saveTemplateFileName, true );  
-
-
-  cout << endl;
-
   if ( !vm.count( "noExtraction" ) )  {
     err = Temp.ExtractFactors();
     if ( err ) {
       cout << "Template::Extraction failed : " << err << endl;
       return 1;
     }
-    err = Temp.Save("",false);
-    if ( err ) {
-      cout << "Template::Save failed : " << err << endl;
-      return 2;
-    }
+    //    err = Temp.Save(false);
+    // if ( err ) {
+    //   cout << "Template::Save failed : " << err << endl;
+    //   return 2;
+    // }
   }
   cout << "makePlot" << endl;
     if ( vm.count("makePlot") )  {

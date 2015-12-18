@@ -71,7 +71,8 @@ class Template
   TH1 *GetResults( string resultName );
   ChiMatrix* GetChiMatrix( unsigned int iMatrix, unsigned int jMatrix );
   string GetName() const { return m_name; };
-  TTree* CreateMCConfTree( unsigned int i_eta, unsigned int j_eta );
+  TObject* CreateConfObject( unsigned int i_eta, unsigned int j_eta, bool isData=0 );
+
   /**\brief Read a boost configuration file
      \param configFile Name of the configuration file
      \return 0 OK
@@ -140,7 +141,7 @@ class Template
 
      Do not save informations from bad configurations.
    */
-  int Save( string outFileName = "", bool justTemplate = false );
+  int Save( );
 
 
   /**\brief Create a pdf note with all the fits (may be heavy in case of high configuration number
@@ -173,6 +174,7 @@ class Template
    */
   void CreateDistordedTree( string outFileName = "");
 
+  void SetSaveTemplateFileName( string name ) { m_saveTemplateFileName = name; }
 
  private :
 
@@ -220,7 +222,7 @@ class Template
 
      Bin numbers of the configuration are put into i_eta and j_eta.
   */
-  int FindBin( unsigned int &i_eta, unsigned int &j_eta );
+  int FindBin( unsigned int &i_eta, unsigned int &j_eta, unsigned int iEl=0 );
 
   /**\brief Fill a ZMass distributions
      \param isData Tell wich role has the input tree
@@ -231,7 +233,7 @@ class Template
      
      In case of binning in pt and eta, the event is used twice with a weight of 0.5 whith the selection on 1 electron
        */
-  TTree* FillDistrib( unsigned int i_eta, unsigned int j_eta );
+  //  TTree* FillDistrib( unsigned int i_eta, unsigned int j_eta );
   
   double GetWeight( bool isData );  
   /**\brief Class containing all configuration attributes
@@ -290,6 +292,8 @@ class Template
   vector<string> m_matrixNames;
   TTree *m_MCTree;
   TTree *m_dataTree;
+  string m_saveTemplateFileName;
+  string m_saveFileName;
 };
 
 //#########################################

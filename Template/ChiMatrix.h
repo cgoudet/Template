@@ -48,7 +48,7 @@ class ChiMatrix
   void SetSigmaMax( double sigmaMax ) { m_sigmaMax = sigmaMax; }
   void SetSetting( Setting& setting );
   void SetMCTree( TTree *MCTree ) { m_MCTree = MCTree; }
-
+  void SetDataHist( TH1D *dataHist ) { m_dataZMass = dataHist; }
   /**\brief Measure scales factors for the configuration
      \return 0 OK
      \return 1 1VAR extraction with a 2D template which do not contains alpha=0. (sigma=0 always exists)
@@ -94,7 +94,7 @@ class ChiMatrix
 
      - Variables not templates-related : m_chiMatrix, m_dataZMass, chi2FitConstVar, chi2FitNonConstVar
    */
-  int Save( TFile *outFile , bool justTemplate = false );
+  int Save( string outFileName , bool justTemplate = false );
 
 
   /**\brief Create the content of the note for a configuration

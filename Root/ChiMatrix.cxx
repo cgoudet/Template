@@ -59,8 +59,8 @@ ChiMatrix::ChiMatrix( string name, Setting &configSetting ) : ChiMatrix( name )
   m_sigmaMin  = ( m_setting->GetDoSmearing() ) ? m_setting->GetSigmaMin() : -0.5;
   m_sigmaMax  = ( m_setting->GetDoSmearing() ) ? m_setting->GetSigmaMax() : 0.5;
 
-  m_dataZMass = new TH1D( TString( m_name + "_dataZMass"), "DataZMass", m_setting->GetZMassNBins(), m_setting->GetZMassMin(), m_setting->GetZMassMax() );    
-  m_dataZMass->GetXaxis()->SetTitle( "M_{ee}" );
+  // m_dataZMass = new TH1D( TString( m_name + "_dataZMass"), "DataZMass", m_setting->GetZMassNBins(), m_setting->GetZMassMin(), m_setting->GetZMassMax() );    
+  // m_dataZMass->GetXaxis()->SetTitle( "M_{ee}" );
 
 }
 
@@ -186,27 +186,20 @@ int ChiMatrix::Load( TFile *inFile, bool justTemplate ) {
 }
 
 //========================
-int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
+int  ChiMatrix::Save( string outFileName, bool justTemplate ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::Save" << endl;
   if ( m_quality.to_ulong() ) return 0;
-
+  TFile * outFile = new TFile( outFileName.c_str(), "UPDATE" );
   if ( !outFile ) {
     cout << "TFile is a 0 pointer" << endl;
     return 1;}
-
-  if ( !outFile->IsOpen() ) {
-    cout << "TFile is not opened" << endl;
-    return 2;
-  }
-
-  outFile->cd();
 
   if ( justTemplate ) {
     for ( unsigned int i_alpha = 0; i_alpha <  m_MCZMass.size(); i_alpha++ ) {
       for ( unsigned int i_sigma = 0; i_sigma <  m_MCZMass.back().size(); i_sigma++ ) {
 	m_MCZMass[i_alpha][i_sigma]->Write( "", TObject::kOverwrite );
       }}
-
+    
   }
   else {
      if ( m_chiMatrix ) m_chiMatrix->Write( "", TObject::kOverwrite );
@@ -227,7 +220,8 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
     infoTree->Write( "", TObject::kOverwrite );
     delete infoTree; infoTree=0;
   }
-
+  outFile->Close();
+  delete outFile;
 
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::Save Done" << endl;
   return 0;
@@ -312,7 +306,9 @@ void ChiMatrix::FillTemplates( ) {
   LinkMCTree();
 
   unsigned int imax = m_setting->GetNUseEl();
+  cout << "entries : " << m_MCTree->GetEntries() << endl;
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
+    if ( iEvent % 50000 == 0 ) cout << iEvent << endl;
     m_MCTree->GetEntry( iEvent );
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
       double randVal1 =  m_rand.Gaus();
@@ -357,7 +353,7 @@ void ChiMatrix::FitChi2() {
     return;
   }
   FillChiMatrix();
-
+  DrawPlot( {m_chiMatrix}, "chiMatrixTest" );
   TF1 *fittingFunction = 0;
 
   if ( m_setting->GetDoScale() && m_setting->GetDoSmearing()) {      
@@ -574,8 +570,9 @@ int ChiMatrix::CreateTemplates( int nTemplates ) {
       m_MCZMass.back().back() = new TH1D( TString::Format( "%s_MCZMass_sc%d_sm%d", m_name.c_str() ,(int) (m_scaleValues[i_alpha]*1e6),  (int) (m_sigmaValues[i_sigma]*1e6) ), TString::Format( "MCZMass_sc%i_sm%d", (int) (m_scaleValues[i_alpha]*1e6), (int) (m_sigmaValues[i_sigma]*1e6) ), m_setting->GetZMassNBins(), m_setting->GetZMassMin(), m_setting->GetZMassMax() );  
       m_MCZMass.back().back()->GetXaxis()->SetTitle( "M_{ee}" );
     }}
-
+  cout << "fill templates : " << endl;
   FillTemplates();
+  cout << "fillChimatrix" << endl;
   FillChiMatrix();
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::CreateTemplate Done" << endl;
@@ -777,7 +774,6 @@ double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 
 //==============================
 TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
-  cout << "fitHistMode :" << mode << endl;
  //Create the fit
   TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);	
   //  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);	

@@ -176,11 +176,11 @@ int main( int argc, char* argv[] ) {
 	for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
 	  iConf = iBin;
 	  sigma = sigmaResult->GetBinContent(iBin+1);
-	  if ( sigma < 0 ) { 
-	    string negativeName = string( TString::Format( "Note_%u", runNumber ) );
-	    TempMeasure.MakePlot("", negativeName + ".tex" );
-	    TempMeasure.Save( negativeName + ".root" );
-	  }
+	  // if ( sigma < 0 ) { 
+	  //   string negativeName = string( TString::Format( "Note_%u", runNumber ) );
+	  //   TempMeasure.MakePlot("", negativeName + ".tex" );
+	  //   TempMeasure.Save( negativeName + ".root" );
+	  // }
 	    
 	  errSigma = sigmaResult->GetBinError(iBin+1);
 	  scalesTree->Fill();
