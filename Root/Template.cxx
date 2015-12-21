@@ -14,7 +14,9 @@
 #include "PlotFunctions/DrawPlot.h"
 #include <algorithm>
 #include <TROOT.h>
+#include <string>
 
+using std::string;
 using std::swap;
 using boost::extents;
 using std::cout;
@@ -47,7 +49,6 @@ Template::Template() : m_setting(), m_rand(), m_name()
 
   m_matrixNames = { "combin", "combinErr"  };
   m_vectMatrix.resize( extents[2][m_matrixNames.size()] );
-
 }
 
 Template::Template( const string &outFileName, const string &configFile,  
@@ -63,6 +64,8 @@ Template::Template( const string &outFileName, const string &configFile,
   }
   //  m_setting.Print();
   m_saveFileName = outFileName;
+  m_saveTemplateFileName = TString(outFileName).Insert( outFileName.find_last_of( "." ), "_template" );
+  cout << "saveTemplateFileName : " << m_saveTemplateFileName << endl;
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
     if ( iType && !MCFileNames.size() ) continue;
@@ -381,7 +384,7 @@ int Template::CreateTemplate() {
 //############################
 int Template::ExtractFactors() {
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors" << endl;
-
+  cout << "m_saveTemplateFileName : " << m_saveTemplateFileName << endl;
   //Decide which variables to extract and how to cut the detector
   vector<double> etaBins = m_setting.GetEtaBins();
   vector<double> ptBins = m_setting.GetPtBins();
@@ -410,6 +413,7 @@ int Template::ExtractFactors() {
       chiMatrix->CreateTemplates();
       chiMatrix->FitChi2();
       chiMatrix->Save( m_saveFileName, false );
+      cout << " saveTemplateFileName : " << m_saveTemplateFileName << endl;
       chiMatrix->Save( m_saveTemplateFileName, true );
 
       for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
@@ -715,14 +719,15 @@ void Template::MakePlot( string path, string latexFileName ) {
     }
     WriteLatexMinipage( latex, plotNames, 2 );
   }
-  latex << "\\clearpage" << endl;
+  //  latex << "\\clearpage" << endl;
   latex.close();
-  cout << "chiMatrixPlots" << endl;
+  //  cout << "chiMatrixPlots" << endl;
   //Create the intermediate plots
-  for ( int i = 0; i < (int) m_chiMatrix.size(); i++ ) {
-    for ( int j = 0; j < (int) m_chiMatrix[i].size(); j++ ) {
-      m_chiMatrix[i][j]->MakePlot( path , latexFileName );
-    }}
+
+  // for ( int i = 0; i < (int) m_chiMatrix.size(); i++ ) {
+  //   for ( int j = 0; j < (int) m_chiMatrix[i].size(); j++ ) {
+  //     m_chiMatrix[i][j]->MakePlot( path , latexFileName );
+  //   }}
 
   latex.open( path + latexFileName, fstream::out | fstream::app );
   latex << "\\end{document}" << endl;

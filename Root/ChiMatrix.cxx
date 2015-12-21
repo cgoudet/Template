@@ -193,7 +193,7 @@ int  ChiMatrix::Save( string outFileName, bool justTemplate ) {
   if ( !outFile ) {
     cout << "TFile is a 0 pointer" << endl;
     return 1;}
-
+  outFile->cd();
   if ( justTemplate ) {
     for ( unsigned int i_alpha = 0; i_alpha <  m_MCZMass.size(); i_alpha++ ) {
       for ( unsigned int i_sigma = 0; i_sigma <  m_MCZMass.back().size(); i_sigma++ ) {
@@ -220,7 +220,7 @@ int  ChiMatrix::Save( string outFileName, bool justTemplate ) {
     infoTree->Write( "", TObject::kOverwrite );
     delete infoTree; infoTree=0;
   }
-  outFile->Close();
+  outFile->Close("R");
   delete outFile;
 
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::Save Done" << endl;
@@ -353,7 +353,6 @@ void ChiMatrix::FitChi2() {
     return;
   }
   FillChiMatrix();
-  DrawPlot( {m_chiMatrix}, "chiMatrixTest" );
   TF1 *fittingFunction = 0;
 
   if ( m_setting->GetDoScale() && m_setting->GetDoSmearing()) {      
