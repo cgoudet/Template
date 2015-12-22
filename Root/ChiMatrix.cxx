@@ -306,7 +306,6 @@ void ChiMatrix::FillTemplates( ) {
   LinkMCTree();
 
   unsigned int imax = m_setting->GetNUseEl();
-  cout << "entries : " << m_MCTree->GetEntries() << endl;
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     if ( iEvent % 50000 == 0 ) cout << iEvent << endl;
     m_MCTree->GetEntry( iEvent );
@@ -681,8 +680,6 @@ void ChiMatrix::OptimizeRanges( ) {
 	  continue;
 	}
 	
-	cout << "histMin : " << histScale->GetMinimum() << " " << histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) << endl;
-
 	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
 	  delete histScale; histScale=0;
 	  break;
