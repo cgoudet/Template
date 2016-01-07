@@ -13,8 +13,8 @@ inputStat = [ 1000000 ]
 nIteration = 30
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
-nUseEl=1
-fitPerJob= 3
+nUseEl= 3
+fitPerJob= 1
 
 plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
 

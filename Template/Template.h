@@ -125,7 +125,7 @@ class Template
      - Call ChiMatrix.CreateTemplate for each configuration
 
 */
-  int CreateTemplate();
+  //  int CreateTemplate();
 
   /**\brief Save The results in logFile
      \param outFileName Name of the file to write the objects on

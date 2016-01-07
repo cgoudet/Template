@@ -106,18 +106,17 @@ int main( int argc, char* argv[] ) {
 	if ( true ) { //Only to free memory	
 	  Template TempDistorded( "", configFile, {}, {}, {}, dataFileNames, dataTreeNames, dataWeights );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
-	  settingDistorded.SetDebug( 0 );
+	  settingDistorded.SetDebug( 1 );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
 	  inputC = inputValues[iInput];
-	  //	  statTree = inputStat[iStat];
-
-	  settingDistorded.Print();
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
+	  cout << "end if" << endl;
 	}
 
-
+	cout << "measurement step " << endl;
 	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, {1}, MCFileNames, MCTreeNames, MCWeights  );
+	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
 	//This part is usefull for deviation sigma plots if needed later
@@ -125,7 +124,7 @@ int main( int argc, char* argv[] ) {
 	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
 
 	settingMeasure.SetNUseEvent( inputStat[iStat] );
-
+	cout << "extracting" << endl;
 
 	err = TempMeasure.ExtractFactors( );
 	if ( err ) {

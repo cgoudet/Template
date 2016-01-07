@@ -93,15 +93,6 @@ int main( int argc, char* argv[] ) {
       return 4;
     }} 
   
-  else if ( !vm.count( "noExtraction" ) ) {
-    cout << "create Templates" << endl;
-    err = Temp.CreateTemplate();
-    if ( err ) {
-      cout << "Template::CreateTemplate failed : " << err << endl;
-      return 6;
-    }
-    cout << "created templates" << endl;
-  }
   
   if ( !vm.count( "noExtraction" ) )  {
     err = Temp.ExtractFactors();

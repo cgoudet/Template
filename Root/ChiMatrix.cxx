@@ -773,8 +773,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
  //Create the fit
   TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);	
   //  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);	
-  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);	
-  //  cubicFit->SetParameter( 3, 1000 );
+  TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*TMath::Abs((x-[2]))*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);	
   cubicFit->SetParLimits( 3, 0, 1e3 );
   TF1 *fittingFunction = 0;
   TFitResultPtr fitResult = 0;
@@ -800,9 +799,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
     break;
   default : //Fit alpha optimization
     fittingFunction = quadraticFit;
-    
   }
-
 
   fittingFunction->SetParLimits( 0, 0, 2*hist->GetMinimum() );    
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
@@ -817,8 +814,6 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
   int nFits=5;
   do {
-    //    fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
-    //    if ( fitResult.Get() ) delete fitResult.Get();
     fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
     nFits --;
   }
@@ -835,7 +830,6 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 	fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
 	fittingFunction->SetParameter( 1, sigma );
-	//	if ( fitResult.Get() ) delete fitResult.Get();
 	fitResult =   hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
 	nFits--;
       }

@@ -11,7 +11,7 @@ if switch==0 :
         configFiles=[ 
 		#Mesure des scales
 		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
-		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
+		#		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2'] ],
 		# #mesure avec electron tight
 		# ['DataOff_13TeV_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', ['nUseEl=2'] ],
 		# #mesure sans pileup
@@ -26,12 +26,12 @@ if switch==0 :
 		# ['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=2'] ],
 		# ['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2']],
 		# #Mesure avec les geometries modifiees
-		# ['DataOff_13TeV_25ns_geo02.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo02_Lkh1', ['nUseEl=2'] ],
-		# ['DataOff_13TeV_25ns_geo11.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo11_Lkh1', ['nUseEl=2'] ],
-		# ['DataOff_13TeV_25ns_geo12.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo12_Lkh1', ['nUseEl=2'] ],
-		# ['DataOff_13TeV_25ns_geo13.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo13_Lkh1', ['nUseEl=2'] ],
-		# ['DataOff_13TeV_25ns_geo14.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo14_Lkh1', ['nUseEl=2'] ],
-		# ['DataOff_13TeV_25ns_geo15.root', 'MC_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_geo15_Lkh1', ['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo02.root', 'MC_13TeV_Zee_25ns_geo02_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo11.root', 'MC_13TeV_Zee_25ns_geo11_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo12.root', 'MC_13TeV_Zee_25ns_geo12_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo13.root', 'MC_13TeV_Zee_25ns_geo13_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo14.root', 'MC_13TeV_Zee_25ns_geo14_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
+		# ['DataOff_13TeV_25ns_geo15.root', 'MC_13TeV_Zee_25ns_geo15_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['nUseEl=2'] ],
 		]
 	
 elif switch == 1 :
