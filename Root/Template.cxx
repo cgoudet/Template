@@ -69,7 +69,7 @@ Template::Template( const string &outFileName, const string &configFile,
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
     if ( iType && !MCFileNames.size() ) continue;
-
+    gROOT->cd();
     TTree *outTree = new TTree( "outTTree", "outTTree" );
     
     vector<string> &fileNames = iType ? MCFileNames : dataFileNames;
@@ -90,9 +90,11 @@ Template::Template( const string &outFileName, const string &configFile,
 	cout << treeNames[iFile] << " in " << fileNames[iFile] << " does not exist. Exiting" << endl;
 	exit( 0 );
       }
+      dumTree->SetDirectory(0);
+      gROOT->cd();
 
       if ( m_setting.GetSelection() != "" ) {
-	gROOT->cd();
+
 	TTree* selectedTree = dumTree->CopyTree( m_setting.GetSelection().c_str() );
 	delete dumTree; dumTree=0;
 	dumTree = selectedTree;
@@ -110,6 +112,7 @@ Template::Template( const string &outFileName, const string &configFile,
 
     if ( !iType ) {
       m_dataTree = outTree;
+      m_dataTree->SetName( "dataTree" );
       m_setting.SetDataName( dataFileNames.front() );
       m_dataFileNames = dataFileNames;
       m_dataTreeNames = dataTreeNames;
@@ -117,6 +120,7 @@ Template::Template( const string &outFileName, const string &configFile,
     }
     else {
       m_MCTree = outTree;
+      m_MCTree->SetName( "MCTree" );
       m_setting.SetMCName( MCFileNames.front() );
       m_MCFileNames = MCFileNames;
       m_MCTreeNames = MCTreeNames;
@@ -336,6 +340,7 @@ int Template::ExtractFactors() {
   //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
   int eta1Max = (int) etaBins.size()-1;  
   int eta2Max = 0;
+
   //Setup ChiMatrix
   for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
     //If only eta binning : we do a tringular matrix 
@@ -353,7 +358,7 @@ int Template::ExtractFactors() {
       chiMatrix->Save( m_saveFileName, false );
       cout << " saveTemplateFileName : " << m_saveTemplateFileName << endl;
       chiMatrix->Save( m_saveTemplateFileName, true );
-
+      chiMatrix->MakePlot( m_sStream );
       for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
 	
 	bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
@@ -390,10 +395,13 @@ int Template::ExtractFactors() {
 	
 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !chiMatrix->GetQuality() ) ? chiMatrix->GetScale(iVar) : 0;
-	(*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
 	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !chiMatrix->GetQuality() ) ? chiMatrix->GetErrScale(iVar) : 100;
-	(*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
-	
+
+	if ( m_setting.GetMode() == "1VAR" ) {
+	  (*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
+	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
+	}
+
 	if ( m_vectHist[iVar][histDevBin] && !chiMatrix->GetQuality() ) {
 	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
 	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
@@ -429,9 +437,6 @@ int Template::ExtractFactors() {
       }//end for iBin
     }
   }//end loop iVer
-  cout << "combinSigma : " << endl;
-  m_vectMatrix[1][0]->Print();
-  m_vectMatrix[1][1]->Print();
 
   Save();  
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors Done" << endl;
@@ -548,8 +553,14 @@ void Template::MakePlot( string path, string latexFileName ) {
   dumName.ReplaceAll("_", "\\_");
   latex << "Data : " << dumName << "\\newline" << endl;
   latex << "Events : " << m_setting.GetNEventData() << "\\newline" << endl;
-  latex << "Variable1 : $" << m_setting.GetVar1() << "$ \\newline" << endl;
-  if ( m_setting.GetMode() != "1VAR" )  latex << "Variable1 : " << m_setting.GetVar1() << endl;
+  dumName = m_setting.GetVar1();
+  dumName.ReplaceAll("_", "\\_");
+  latex << "Variable1 : " << dumName << " \\newline" << endl;
+  if ( m_setting.GetMode() != "1VAR" )  {
+  dumName = m_setting.GetVar2();
+  dumName.ReplaceAll("_", "\\_");
+  latex << "Variable2 : " << dumName << endl;
+  }
   latex << "Fit Method : " << m_setting.GetFitMethod() << "\\newline" << endl;
   latex << "nUseEl : " << m_setting.GetNUseEl() << "\\newline" << endl;
   latex << "nEventCut : " << m_setting.GetNEventCut() << "\\newline" << endl;
@@ -633,17 +644,8 @@ void Template::MakePlot( string path, string latexFileName ) {
     }
     WriteLatexMinipage( latex, plotNames, 2 );
   }
-  //  latex << "\\clearpage" << endl;
-  latex.close();
-  //  cout << "chiMatrixPlots" << endl;
-  //Create the intermediate plots
-
-  // for ( int i = 0; i < (int) m_chiMatrix.size(); i++ ) {
-  //   for ( int j = 0; j < (int) m_chiMatrix[i].size(); j++ ) {
-  //     m_chiMatrix[i][j]->MakePlot( path , latexFileName );
-  //   }}
-
-  latex.open( path + latexFileName, fstream::out | fstream::app );
+  latex << "\\clearpage" << endl;
+  latex << m_sStream.str() << endl;
   latex << "\\end{document}" << endl;
   latex.close();
 
@@ -652,7 +654,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   system( commandLine.c_str() );
   system( commandLine.c_str() );
   system( commandLine.c_str() );
-  system( "rm ChiMatrix_*" );
+  //  system( "rm ChiMatrix_*" );
 
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }

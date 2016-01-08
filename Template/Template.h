@@ -12,7 +12,8 @@
 #include <map>
 #include "boost/multi_array.hpp"
 
-
+#include <sstream>
+using std::stringstream;
 using boost::multi_array;
 using std::vector;
 using std::string;
@@ -294,6 +295,7 @@ class Template
   TTree *m_dataTree;
   string m_saveTemplateFileName;
   string m_saveFileName;
+  stringstream m_sStream;
 };
 
 //#########################################
