@@ -10,10 +10,10 @@ configFiles=[
 
 inputC = [ 0.007 ]
 inputStat = [ 1000000 ]
-nIteration = 30
+nIteration = 9
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
-nUseEl= 3
+nUseEl= 1
 fitPerJob= 1
 
 plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
