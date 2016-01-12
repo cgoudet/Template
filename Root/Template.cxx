@@ -446,13 +446,13 @@ int Template::ExtractFactors() {
 //###############################==
 void Template::CreateDistordedTree( string outFileName ) {
   if ( m_setting.GetDebug() ) cout << "Template : CreateDistordedTree" << endl;
-
+  
   vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
   vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
   vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();
   vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();
   map< string, string > mapVarNames = m_setting.GetBranchVarNames();
-
+  
   if ( alphaSimEta.size()!= sigmaSimEta.size() 
        || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
        || alphaSimPt.size() != sigmaSimPt.size()
@@ -461,27 +461,14 @@ void Template::CreateDistordedTree( string outFileName ) {
     cout << "simulation vector sizes not ok" << endl;
     exit(0);
   }
-
+  
   //Set a random seed to the generator
   if ( m_setting.GetIndepDistorded() ) {
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     m_rand.SetSeed( t1.time_since_epoch().count() );
     cout << "RandomSeed : " << m_rand.GetSeed() << endl;
   }
-
-  //
-  if ( m_setting.GetBootstrap() ) {
-    gROOT->cd();
-    TTree* bootTree = Bootstrap( {m_MCTree}, m_setting.GetNUseEvent() );
-    cout << "bootstrap name : " << bootTree->GetName() << endl;
-    if ( m_MCTree ) delete m_MCTree; m_MCTree=0;
-    m_MCTree = bootTree;
-    TFile *bootFile = new TFile( "bootstrapData.root", "recreate" );
-    m_MCTree->Write();
-    bootFile->Close("R");
-    delete bootFile;
-  }
-    
+  
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
   cout << "outFileName : " << outFileName << endl;
   string treeName = outFileName;
@@ -503,27 +490,49 @@ void Template::CreateDistordedTree( string outFileName ) {
     unsigned int i_eta = 0, j_eta = 0;
     if ( FindBin( i_eta, j_eta ) ) continue;
     
-    if ( m_setting.GetMode() == "1VAR" ) {
-      //      cout << alphaSimEta[i_eta] << " " << alphaSimEta[j_eta] << endl;
-      double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
-      double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
-      
-      //if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
-      m_mapDouble[mapVarNames["PT_1"]] *= factor1;
-      m_mapDouble[mapVarNames["PT_2"]] *= factor2;
-      m_mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
-      dataTree->Fill();
-      counterEvent++;
+    double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
+    double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
+    
+    if ( m_setting.GetMode() == "2VAR" ) {
+      factor1 *= ( 1 + alphaSimPt[i_eta] )  * ( 1 + m_rand.Gaus(0,1)*sigmaSimPt[i_eta] );
+      factor2 *= ( 1 + alphaSimPt[j_eta] )  * ( 1 + m_rand.Gaus(0,1)*sigmaSimPt[j_eta] );
     }
+    
+    m_mapDouble[mapVarNames["PT_1"]] *= factor1;
+    m_mapDouble[mapVarNames["PT_2"]] *= factor2;
+    m_mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
+
+    if ( counterEvent < 10 ) {
+      cout << alphaSimEta[i_eta] << " " << alphaSimPt[i_eta] << endl;
+      cout << m_mapDouble[mapVarNames["ETA_CALO_1"]] << " " << m_mapDouble[mapVarNames["PHI_1"]] << " " << factor1 << endl;
+      cout << m_mapDouble[mapVarNames["ETA_CALO_2"]] << " " << m_mapDouble[mapVarNames["PHI_2"]] << " " << factor2 << endl;
+    }
+    dataTree->Fill();
+    counterEvent++;
   }
+  
+
   if ( m_MCTree ) delete m_MCTree; m_MCTree=0;
-  cout << "deleted" << endl;
   m_MCTree = dataTree;
+
+  if ( m_setting.GetBootstrap() ) {
+    gROOT->cd();
+    TTree* bootTree = Bootstrap( {m_MCTree}, m_setting.GetNUseEvent() );
+    cout << "bootstrap name : " << bootTree->GetName() << endl;
+    if ( m_MCTree ) delete m_MCTree; m_MCTree=0;
+    m_MCTree = bootTree;
+    TFile *bootFile = new TFile( "bootstrapData.root", "recreate" );
+    m_MCTree->Write();
+    bootFile->Close("R");
+    delete bootFile;
+  }
+
 
   TFile *distorded = new TFile( outFileName.c_str(), "RECREATE" );
   m_MCTree->Write( "", TObject::kOverwrite );
   distorded->Close("R");
   delete distorded; distorded = 0;
+
 
   if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }
@@ -879,16 +888,15 @@ TObject* Template::CreateConfObject( unsigned int i_eta, unsigned int j_eta, boo
   for ( int iEntry = 0; iEntry<nEntries; iEntry++ ) {
     inTree->GetEntry(iEntry);
     unsigned int i1, i2, i3=etaBins.size(), i4=etaBins.size();
-
     if ( FindBin( i1, i2 )
 	 || ( m_setting.GetMode() == "2VAR" && FindBin( i3, i4, 1 ) )
 	 || ( !( i1==i_eta && i2==j_eta ) && !(i3==i_eta && i4==j_eta ) ) ) continue;
 
     double weight = ( m_setting.GetMode() == "1VAR" || ( i1==i3 && i2==i4 ) ) ? 1 : 0.5;
-    
     for ( auto weightName : m_setting.GetDataBranchWeightNames() ) weight *= m_mapDouble[weightName];
-    m_mapDouble["WEIGHT"] = weight;
-    if ( !isData ) dynamic_cast<TTree*>(outObject)->Fill();
+    if ( !isData ) {
+      dynamic_cast<TTree*>(outObject)->Fill();
+    }
     else {
       TLorentzVector e1, e2;
       e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
