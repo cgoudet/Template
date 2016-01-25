@@ -309,7 +309,7 @@ void ChiMatrix::FillTemplates( ) {
 
   unsigned int imax = m_setting->GetNUseEl();
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
-    if ( iEvent % 50000 == 0 ) cout << iEvent << endl;
+    //    if ( iEvent % 50000 == 0 ) cout << iEvent << endl;
     m_MCTree->GetEntry( iEvent );
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
       double randVal1 =  m_rand.Gaus();
@@ -333,6 +333,14 @@ void ChiMatrix::FillTemplates( ) {
 	  
 	  TLorentzVector Z = dum_el1 + dum_el2;
 	  if ( Z.M()/1000. < m_setting->GetZMassMin() || Z.M()/1000. > m_setting->GetZMassMax() ) continue;
+
+	  m_mapVarEvent["WEIGHT"] = 1;
+	  vector<string> branchWeightName = m_setting->GetMCBranchWeightNames();
+	  for ( unsigned int iWeight = 0; iWeight < branchWeightName.size(); iWeight++ ) {
+	    string mapKey = string( TString::Format( "weightName_%s", branchWeightName[iWeight].c_str() ) );
+	    m_mapVarEvent["WEIGHT"] *= m_mapVarEvent[mapKey];
+	  }
+
 	  m_MCZMass[i_alpha][i_sigma]->Fill( Z.M() /1000., m_mapVarEvent["WEIGHT"] );
 	  
       }}}
@@ -668,7 +676,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	int minBin = histScale->GetMinimumBin();
 	//	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
 	//Dealing with minimum bin too close to overflow
-	if ( minBin > histScale->GetNbinsX()-2 && allowedRangeMax != rangeMax ) {
+	if ( minBin > floor( histScale->GetNbinsX()*3/4. ) && allowedRangeMax != rangeMax ) {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
 	  continue;
 	}
@@ -678,23 +686,34 @@ void ChiMatrix::OptimizeRanges( ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
 	  continue;
 	}
+
+	cout << "counter : " << counter << endl;
+	cout << "start" << endl;
+	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
+	cout << "chiMin : " << chiMin << endl;
+	cout << "minimum : " << histScale->GetMinimum() << endl;
+	cout << "scaleMin : " << scaleMin << endl;
+	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
+	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
+	cout << "sigmaDown/Up : " << sqrt( histScale->GetBinContent(1) - histScale->GetMinimum() )  << " " << sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() ) << endl;
 	
 	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
 	  delete histScale; histScale=0;
 	  break;
 	}
-
-	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
-	cout << "chiMin : " << chiMin << " " << scaleMin << endl;
 	if ( iScale && scaleMin<0 ) scaleMin=0;
 	chiMin = histScale->GetMinimum();
 
-	cout << "histExtrem : " << histScale->GetBinContent(1) << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
 	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - chiMin );
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - chiMin);
 	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+	cout << "end" << endl;
 	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	cout << "rangeMin : " << rangeMin << endl;
+	cout << "rangeMax : " << rangeMax << endl;
+
       }//end else counter
 
       if ( histScale ) delete histScale; histScale=0;
@@ -813,15 +832,15 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
   int nFits=5;
   do {
-    fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+    fitResult = hist->Fit( fittingFunction, "QS", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
     nFits --;
   }
   while( fitResult->Status() && nFits );
 
   if ( fitResult->Status() ) {
     while ( maxBin - minBin > 8 ) {
-      minBin = min( minBin+1, hist->GetMinimumBin() );
-      maxBin = max( maxBin-1, hist->GetMinimumBin() );
+      minBin = min( minBin+1, max( hist->GetMinimumBin()-2, 0 ) );
+      maxBin = max( maxBin-1, min( hist->GetMinimumBin()+2, hist->GetNbinsX() ) );
       nFits = 3;
       do {
 	cout << "fit failed 3 times : try with another range" << endl;
@@ -829,7 +848,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 	fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
 	fittingFunction->SetParameter( 1, sigma );
-	fitResult =   hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+	fitResult =   hist->Fit( fittingFunction, "QS", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
 	nFits--;
       }
       while ( fitResult->Status() && nFits );
@@ -896,14 +915,21 @@ void ChiMatrix::CreateMCTree() {
 int ChiMatrix::LinkMCTree( ) {
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree" << endl;
   if ( !m_MCTree ) CreateMCTree();
-  m_MCTree->SetBranchStatus( "*", 1);
+  m_MCTree->SetBranchStatus( "*", 1 );
   m_MCTree->SetBranchAddress( "pt_1"  , &m_mapVar1["PT"] );
   m_MCTree->SetBranchAddress( "eta_1" , &m_mapVar1["ETA_TRK"] );
   m_MCTree->SetBranchAddress( "phi_1" , &m_mapVar1["PHI"] );
   m_MCTree->SetBranchAddress( "pt_2"  , &m_mapVar2["PT"] );
   m_MCTree->SetBranchAddress( "eta_2" , &m_mapVar2["ETA_TRK"] );
   m_MCTree->SetBranchAddress( "phi_2" , &m_mapVar2["PHI"] );
-  m_MCTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
+  //  m_MCTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
+
+  vector<string> branchWeightName = m_setting->GetMCBranchWeightNames();
+  for ( unsigned int iWeight = 0; iWeight < branchWeightName.size(); iWeight++ ) {
+    string mapKey = string( TString::Format( "weightName_%s", branchWeightName[iWeight].c_str() ) );
+    m_mapVarEvent[mapKey]=0;
+    m_MCTree->SetBranchAddress( branchWeightName[iWeight].c_str(), &m_mapVarEvent[mapKey] );
+  }
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree done" << endl;  
   return 0;
 }

@@ -140,7 +140,7 @@ class Setting
      - 1VAR : Electrons are separated in eta bins
      - 2VAR : Electrons are separated in eta and pt bins
    */
-  string  m_mode;
+  string m_mode;
   string m_var1;
   string m_var2;
   /**\brief Z mass lower bound

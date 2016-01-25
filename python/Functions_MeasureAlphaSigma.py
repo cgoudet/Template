@@ -13,12 +13,6 @@ MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25n
 MCFILESETS['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/MC_13TeV_Zee_25ns_Lkh1_pt20_1.root' ]
 MCFILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
 MCFILESETS['MC_8TeV_Zee_Lkh1']     =[ PREFIXDATASETS + 'MC_8TeV_Zee_1Lepton_Lkh1/MC_8TeV_Zee_1Lepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_0.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_1.root', PREFIXDATASETS + 'MC_8TeV_Zee_DiLepton_Lkh1/MC_8TeV_Zee_DiLepton_Lkh1_2.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo02_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo02_Lkh1/MC_13TeV_Zee_25ns_geo02_Lkh1_0.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo11_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo11_Lkh1/MC_13TeV_Zee_25ns_geo11_Lkh1_0.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo12_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo12_Lkh1/MC_13TeV_Zee_25ns_geo12_Lkh1_0.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo13_Lkh1/MC_13TeV_Zee_25ns_geo13_Lkh1_0.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1/MC_13TeV_Zee_25ns_geo14_Lkh1_0.root' ]
-MCFILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1/MC_13TeV_Zee_25ns_geo15_Lkh1_0.root' ]
 
 MCFILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 MCWEIGHTSET={}
@@ -34,12 +28,6 @@ MCWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ 1, 1]
 MCWEIGHTSET['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel']  =[ 1, 1] 
 MCWEIGHTSET['MC_8TeV_Zee_Lkh1']     =[ 0.32194, 0.2923, 0.2923, 0.2923 ]
 MCWEIGHTSET['ClosureMC'] = [1]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo02_Lkh1'] = [ 1 ]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo11_Lkh1'] = [ 1 ]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo12_Lkh1'] = [ 1 ]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo13_Lkh1'] = [ 1 ]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo14_Lkh1'] = [ 1 ]
-MCWEIGHTSET['MC_13TeV_Zee_25ns_geo15_Lkh1'] = [ 1 ]
 
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 DATAFILESETS={}
@@ -58,6 +46,12 @@ DATAFILESETS['ClosureData'] = ['/sps/atlas/c/cgoudet/Calibration/Closure/MC24_Pa
 DATAFILESETS['Data_8TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1/Data_8TeV_Zee_Lkh1_0.root', PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1/Data_8TeV_Zee_Lkh1_1.root' ]
 DATAFILESETS['Data_8TeV_Zee_Lkh1_scaled'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1_scaled/Data_8TeV_Zee_Lkh1_scaled_0.root', PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1_scaled/Data_8TeV_Zee_Lkh1_scaled_0.root' ]
 DATAFILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1_1.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo02_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo02_Lkh1/MC_13TeV_Zee_25ns_geo02_Lkh1_0.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo11_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo11_Lkh1/MC_13TeV_Zee_25ns_geo11_Lkh1_0.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo12_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo12_Lkh1/MC_13TeV_Zee_25ns_geo12_Lkh1_0.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo13_Lkh1/MC_13TeV_Zee_25ns_geo13_Lkh1_0.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1/MC_13TeV_Zee_25ns_geo14_Lkh1_0.root' ]
+DATAFILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1/MC_13TeV_Zee_25ns_geo15_Lkh1_0.root' ]
 
 DATAWEIGHTSET={}
 DATAWEIGHTSET['Data_13TeV_Zee_50ns_Lkh1']       =[ 1 ]
@@ -75,6 +69,12 @@ DATAWEIGHTSET['ClosureData'] = [1]
 DATAWEIGHTSET['Data_8TeV_Zee_Lkh1'] = [ 1, 1 ]
 DATAWEIGHTSET['Data_8TeV_Zee_Lkh1_scaled'] = [ 1, 1 ]
 DATAWEIGHTSET['MC_13TeV_Zee_25ns_Lkh1'] = [ 1, 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo02_Lkh1'] = [ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo11_Lkh1'] = [ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo12_Lkh1'] = [ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo13_Lkh1'] = [ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo14_Lkh1'] = [ 1 ]
+DATAWEIGHTSET['MC_13TeV_Zee_25ns_geo15_Lkh1'] = [ 1 ]
 
 
 def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
@@ -109,10 +109,15 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
     resultPath="Results/"
     plotPath="Plots/"
 
-    configName = PREFIXPATH + configPath + StripName( outNameFile ) + '.boost' 
-    CreateConfig( configName, configOptions )
+    configName = []
+    if mode == 1 :
+        configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '_alpha.boost' )
+        configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '_c.boost' )
+    else :
+        configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '.boost' )
 
-    fileName = PREFIXPATH + batchPath + StripName( outNameFile ) + '.sh'
+
+    fileName = PREFIXPATH + batchPath + StripName( outNameFile ) + '.sh' 
 
 
     with open( fileName, 'w+') as batch:
@@ -128,7 +133,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                     )
         
 #Copy the configuration file to the server
-        batch.write( 'cp ' + configName + ' . \n' )
+        for confName in configName :
+            batch.write( 'cp ' + confName + ' . \n' )
         
 #copy the data files to the server and prepare the command line
         dataLine=""
@@ -142,53 +148,61 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             batch.write( 'cp -v ' + MCFiles[iFile] + ' . \n' )
             MCLine+=" --MCFileName " + StripName( MCFiles[iFile], 1, 0 ) + ' --MCWeight ' + str( MCWeights[iFile] )
 
-#If correction Alpha
-#Check the size of the vector
-#copy the file on the server
-#prepare the command line
-        correctionLine=""
-        if len( inVector ) > 6 and inVector[5] != "" and inVector[6] != "" :
-            correctionLine +=' --correctAlphaFileName ' + inVector[5] + ' --correctAlphaHistName ' + inVector[6]
-            batch.write( 'cp ' + PREFIXPATH + inVector[5] + ' . \n')
-
-        if len( inVector ) > 8 and inVector[7] != "" and inVector[8] != "" :
-            correctionLine +=' --correctSigmaFileName ' + inVector[7] + ' --correctSigmaHistName ' + inVector[8]
-            batch.write( 'cp ' + PREFIXPATH + inVector[7] + ' . \n')
-
-#Create an outName
-        if outNameFile != "" :
-            outNameFile = ' --outFileName ' + outNameFile
-
 #Fill the command line
-            if mode==0 :
-                if doDistorded==0 :
-                        batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0)
-                                 + dataLine + MCLine + correctionLine + outNameFile + ' --makePlot\n')
-                else : 
-                    batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0) 
-                                 + dataLine.replace( '--dataFileName', '--MCFileName' ) +  correctionLine + outNameFile + ' --createDistorded MC_distorded.root \n')
-                    batch.write( 'MeasureScale --configFile ' + StripName(configName, 1, 0 )
-                                 + ' --dataFileName MC_distorded.root ' + MCLine + correctionLine + outNameFile + ' --makePlot \n')
-
+        if mode==0 :
+            CreateConfig( configName[0] ,configOptions )
+            batch.write( 'cp -v ' + configName[0] + ' . \n' )
+            outNameFile = ' --outFileName ' + StripName( configName[0] ) + '.root '
+            if doDistorded==0 :
+                batch.write( 'MeasureScale --configFile ' + StripName(configName[0], 1, 0)
+                             + dataLine + MCLine + outNameFile + ' --makePlot\n')
+            else : 
+                batch.write( 'MeasureScale --configFile ' + StripName(configName[0], 1, 0) 
+                             + dataLine.replace( '--dataFileName', '--MCFileName' ) + outNameFile + ' --createDistorded MC_distorded.root \n')
+                batch.write( 'MeasureScale --configFile ' + StripName(configName[0], 1, 0 )
+                             + ' --dataFileName MC_distorded.root ' + MCLine + outNameFile + ' --makePlot \n')
+                
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
+            batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+            batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
+        elif mode == 1 :
+            configOptionsTemp = configOptions[:]
+            configOptionsTemp.append( "doSmearing=0" )
+            CreateConfig( configName[0], configOptionsTemp )
+            batch.write( 'cp -v ' + configName[0] + ' . \n' )
+            outNameFile = ' --outFileName ' + StripName( configName[0] ) + '.root '
+            
+            batch.write( 'MeasureScale --configFile ' + StripName(configName[0], 1, 0)
+                         + dataLine + MCLine + outNameFile + ' --makePlot\n')
+            
+            configOptionsTemp = configOptions
+            configOptionsTemp.append( "doScale=0" )
+            CreateConfig( configName[1], configOptionsTemp )
+            batch.write( 'cp -v ' + configName[1] + ' . \n' )
+            outNameFile = ' --outFileName ' + StripName( configName[1] ) + '.root '
+            batch.write( 'MeasureScale --configFile ' + StripName(configName[1], 1, 0)
+                         + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
+                         + ' --makePlot\n')
+
+            batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[1] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 
-
-            else :
-                batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                             + dataLine + MCLine + optionLine + outNameFile + ' \n' )
-                batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-                batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
-                batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
-                batch.write( 'ls -lh \n ' ) 
-                # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
+        elif mode == 2:
+            batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
+                         + dataLine + MCLine + optionLine + outNameFile + ' \n' )
+            batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+            batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+            batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
+            batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
+            batch.write( 'ls -lh \n ' ) 
+            # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
-        return fileName
+    return fileName
 
 
 

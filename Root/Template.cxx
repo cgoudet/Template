@@ -346,10 +346,10 @@ int Template::ExtractFactors() {
     //If only eta binning : we do a tringular matrix 
     //else we do a full matrix
     eta2Max = ( m_setting.GetMode() == "1VAR" ) ? i_eta+1 : (int) ptBins.size()-1;     
-    cout << "indices : " << eta1Max << " " << eta2Max << endl;    
+    //cout << "indices : " << eta1Max << " " << eta2Max << endl;    
     //Create default ChiMatrix object
     for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-
+      //if ( i_eta!=21 || j_eta!=20 )  continue;
       ChiMatrix *chiMatrix = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
       chiMatrix->SetMCTree( (TTree*) CreateConfObject( i_eta, j_eta ) );
       chiMatrix->SetDataHist( (TH1D*) CreateConfObject( i_eta, j_eta, 1 ) );
