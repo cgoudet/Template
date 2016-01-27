@@ -5,16 +5,16 @@ import time;
 
 #One config file correspond to one job
 configFiles=[ 
-    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=1', 'etaBins=ETA6', 'debug=0', 'inversionMethod=11', 'optimizeRanges=5', 'doScale=0']]
+    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=1', 'etaBins=ETA6', 'debug=0', 'inversionMethod=11', 'optimizeRanges=5', 'doScale=1']]
     ]
 
-inputC = [ 0.01 ]
+inputC = [ 0.007 ]
 inputStat = [ 1000000 ]
-nIteration = 30
+nIteration = 9
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
-nUseEl=1
-fitPerJob= 3
+nUseEl= 1
+fitPerJob= 1
 
 plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
 
