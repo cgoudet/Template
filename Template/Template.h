@@ -175,8 +175,6 @@ class Template
   void CreateDistordedTree( string outFileName = "");
 
 
-  void SetSaveTemplateFileName( string name ) { m_saveTemplateFileName = name; }
-
  private :
 
   /**\brief Properly delete 2D vectors of pointers to ChiMatrix
@@ -288,8 +286,6 @@ class Template
   */
   multi_array< TMatrixD*, 2> m_vectMatrix;
   vector<string> m_matrixNames;
-  string m_saveTemplateFileName;
-  string m_saveFileName;
   stringstream m_sStream;
 
 };
