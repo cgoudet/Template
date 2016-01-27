@@ -690,16 +690,20 @@ void ChiMatrix::OptimizeRanges( ) {
 	  break;
 	}
 
-	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
+	scaleMin = min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
+	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
+	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
+	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+
+	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
+	  delete histScale; histScale=0;
+	  break;
+	}
+
 	if ( iScale && scaleMin<0 ) scaleMin=0;
 	chiMin = histScale->GetMinimum();
 
-	cout << "chiMin : " << chiMin << " " << scaleMin << endl;
-	cout << "histExtrem : " << histScale->GetBinContent( histScale->GetNbinsX() ) << " " << histScale->GetBinContent(1) << endl;
-	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - chiMin );
-	double sigmaDown = sqrt( histScale->GetBinContent(1) - chiMin);
-	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
-	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
 	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
 	cout << "allowed ranges : " << allowedRangeMin << " " << allowedRangeMax << endl;
       }//end else counter
