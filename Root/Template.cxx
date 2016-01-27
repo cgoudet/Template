@@ -57,7 +57,6 @@ Template::Template( const string &outFileName, const string &configFile,
     cout << "Configuration failed " << err << " : exiting" << endl;
     exit( 1 );
   }
-  m_setting.Print();
 
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
@@ -395,7 +394,7 @@ int Template::ExtractFactors() {
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
 	
 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-       
+
 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
 	(*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
@@ -410,6 +409,7 @@ int Template::ExtractFactors() {
 		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
 	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
 	}
+	cout << "end : " << i_eta << " " << j_eta << endl;
       }
     } //end loop on chiMatrix
 
@@ -592,12 +592,15 @@ void Template::CreateDistordedTree( string outFileName ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
     LinkTreeBranches( MCTree, dataTree, m_mapDouble, m_mapLongLong );
-
+    cout << "Nevents : " << MCTree->GetEntries() << endl;
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
       MCTree->GetEntry( iEvent );
 
       unsigned int i_eta = 0, j_eta = 0;
-      if ( FindBin( i_eta, j_eta ) ) continue;
+      if ( FindBin( i_eta, j_eta ) ) {
+	//cout << FindBin( i_eta, j_eta ) << endl;
+	continue;
+      }
 
       if ( m_setting.GetMode() == "1VAR" ) {
 	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
@@ -634,6 +637,7 @@ void Template::CreateDistordedTree( string outFileName ) {
 
 //####################################################==
 void Template::MakePlot( string path, string latexFileName ) {
+  cout << "latexFile : " << path << "/" << latexFileName << endl;
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot" << endl;
   if ( path.back() != '/' && path != "" ) path += "/";
 
@@ -747,6 +751,13 @@ void Template::MakePlot( string path, string latexFileName ) {
     }
     WriteLatexMinipage( latex, plotNames, 2 );
   }
+
+  for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) {
+    for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
+      m_chiMatrix[i_eta][j_eta]->MakePlot( m_sStream );
+    }
+  }
+
   latex << "\\clearpage" << endl;
   latex << m_sStream.str() << endl;
   latex << "\\end{document}" << endl;
@@ -783,11 +794,11 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
   while ( i_eta <  etaBins.size()-1 && eta1 > etaBins[i_eta+1] ) i_eta++;  
 
   if ( m_setting.GetMode() == "1VAR" ) {
-    if ( eta2 <= etaBins[0] || eta2 > etaBins.back() ) return 1;
+    if ( eta2 <= etaBins[0] || eta2 > etaBins.back() ) return 2;
     while ( j_eta <  etaBins.size()-1 && eta2 >  etaBins[j_eta+1] )  j_eta++;  
   }
   else {
-    if ( eta2 <= ptBins[0] || eta2 > ptBins.back() ) return 1;
+    if ( eta2 <= ptBins[0] || eta2 > ptBins.back() ) return 3;
     while ( j_eta <  ptBins.size() && eta2 >  ptBins[j_eta+1] )  j_eta++;  
   }
 

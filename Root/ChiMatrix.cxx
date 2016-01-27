@@ -350,7 +350,6 @@ void ChiMatrix::FillTemplates( ) {
 void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
-
   if ( m_quality.to_ulong() ) {
     m_alpha = 0;
     m_errAlpha = 100;
@@ -358,8 +357,8 @@ void ChiMatrix::FitChi2() {
     m_errSigma = 100;
     return;
   }
-  FillChiMatrix();
 
+  FillChiMatrix();
   TF1 *fittingFunction = 0;
 
   if ( m_setting->GetDoScale() && m_setting->GetDoSmearing()) {      
@@ -781,11 +780,9 @@ double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 //==============================
 TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
   cout << "fitHistMode :" << mode << endl;
- //Create the fit
-  TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);	
-  //  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);	
-  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);	
-  //  cubicFit->SetParameter( 3, 1000 );
+  TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);
+  //  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);
+  TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*TMath::Abs((x-[2]))*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   cubicFit->SetParLimits( 3, 0, 1e3 );
   TF1 *fittingFunction = 0;
   TFitResultPtr fitResult = 0;
@@ -811,9 +808,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
     break;
   default : //Fit alpha optimization
     fittingFunction = quadraticFit;
-    
   }
-
 
   fittingFunction->SetParLimits( 0, 0, 2*hist->GetMinimum() );    
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
@@ -872,13 +867,10 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
     fittingFunction->SetParameter( 1, currentValue-minVal );
 
   }
-
-
   TF1* result = (TF1*) fittingFunction->Clone();
   result->SetName( "fittingFunction" );
   delete quadraticFit; quadraticFit=0;
   delete cubicFit; cubicFit=0;
-
 
  return result;
 }

@@ -102,7 +102,7 @@ class ChiMatrix
      \param path directory path where to save the plots
      \param latexFileName latex file to write in 
   */
-  void MakePlot( stringstream &ss, string path );
+  void MakePlot( stringstream &ss, string path = "" );
 
   /*\brief Create the templates
     \return 0 OK
