@@ -11,8 +11,9 @@
 #include <vector>
 #include <map>
 #include "boost/multi_array.hpp"
+#include <sstream>
 
-
+using std::stringstream;
 using boost::multi_array;
 using std::vector;
 using std::string;
@@ -140,7 +141,7 @@ class Template
 
      Do not save informations from bad configurations.
    */
-  int Save( string outFileName = "", bool justTemplate = false );
+  int Save();
 
 
   /**\brief Create a pdf note with all the fits (may be heavy in case of high configuration number
@@ -288,6 +289,10 @@ class Template
   */
   multi_array< TMatrixD*, 2> m_vectMatrix;
   vector<string> m_matrixNames;
+  string m_saveTemplateFileName;
+  string m_saveFileName;
+  stringstream m_sStream;
+
 };
 
 //#########################################
