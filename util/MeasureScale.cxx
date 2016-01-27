@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
-  if ( saveTemplateFileName != "" ) Temp.SetSaveTemplateFileName( saveTemplateFileName );
+  //  if ( saveTemplateFileName != "" ) Temp.SetSaveTemplateFileName( saveTemplateFileName );
   if ( vm.count("loadFull") ) {
     err = Temp.Load( loadFullFileName, false);
     if ( err ) {

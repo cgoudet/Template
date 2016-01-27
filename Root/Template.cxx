@@ -98,8 +98,8 @@ Template::Template( const string &outFileName, const string &configFile,
     }
   }
 
-  m_saveFileName = outFileName == ""  ? "TemplateDefault.root" : outFileName;
-  m_saveTemplateFileName =   TString( m_saveFileName ).ReplaceAll( ".root", "_template.root" ).Data();
+  m_name = outFileName == ""  ? "TemplateDefault" : TString(outFileName).ReplaceAll(".root", "" );
+  //  m_saveTemplateFileName =   TString( m_saveFileName ).ReplaceAll( ".root", "_template.root" ).Data();
   
   if ( m_setting.GetDebug() )  cout << "Template : Constructor Done" << endl;  
 }
@@ -243,7 +243,8 @@ int Template::Save() {
   if ( m_setting.GetDebug() ) cout << "Template::Save()" << endl;
 
   //create the output TFile
-  TFile *outFile = new TFile( m_saveFileName.c_str(), "UPDATE");
+  string saveFileName = m_name + ".root";
+  TFile *outFile = new TFile( saveFileName.c_str(), "UPDATE");
   cout << "saving file : " << outFile->GetName() << endl;  
   
   int err = 0;
