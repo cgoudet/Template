@@ -486,8 +486,6 @@ void Template::FillDistrib( bool isData ) {
       e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
       e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 
-      m_mapDouble["WEIGHT"] = GetWeight(isData) * (( isData ) ? m_dataWeights[iFile] : m_MCWeights[iFile] );
-
 
       //##############################
       if ( isData ) m_setting.SetNEventData();
@@ -666,8 +664,14 @@ void Template::MakePlot( string path, string latexFileName ) {
   dumName.ReplaceAll("_", "\\_");
   latex << "Data : " << dumName << "\\newline" << endl;
   latex << "Events : " << m_setting.GetNEventData() << "\\newline" << endl;
-  latex << "Variable1 : $" << m_setting.GetVar1() << "$ \\newline" << endl;
-  if ( m_setting.GetMode() != "1VAR" )  latex << "Variable1 : " << m_setting.GetVar1() << endl;
+  dumName = m_setting.GetVar1();
+  dumName.ReplaceAll("_", "\\_");
+  latex << "Variable1 : " << dumName << " \\newline" << endl;
+  if ( m_setting.GetMode() != "1VAR" )  {
+    dumName = m_setting.GetVar2();
+    dumName.ReplaceAll("_", "\\_");
+    latex << "Variable2 : " << dumName << endl;
+  }
   latex << "Fit Method : " << m_setting.GetFitMethod() << "\\newline" << endl;
   latex << "nUseEl : " << m_setting.GetNUseEl() << "\\newline" << endl;
   latex << "nEventCut : " << m_setting.GetNEventCut() << "\\newline" << endl;
@@ -752,15 +756,7 @@ void Template::MakePlot( string path, string latexFileName ) {
     WriteLatexMinipage( latex, plotNames, 2 );
   }
   latex << "\\clearpage" << endl;
-  latex.close();
-  cout << "chiMatrixPlots" << endl;
-  //Create the intermediate plots
-  for ( int i = 0; i < (int) m_chiMatrix.size(); i++ ) {
-    for ( int j = 0; j < (int) m_chiMatrix[i].size(); j++ ) {
-      m_chiMatrix[i][j]->MakePlot( path , latexFileName );
-    }}
-
-  latex.open( path + latexFileName, fstream::out | fstream::app );
+  latex << m_sStream.str() << endl;
   latex << "\\end{document}" << endl;
   latex.close();
 
@@ -769,7 +765,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   system( commandLine.c_str() );
   system( commandLine.c_str() );
   system( commandLine.c_str() );
-  system( "rm ChiMatrix_*" );
+  //  system( "rm ChiMatrix_*" );
 
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
@@ -998,12 +994,4 @@ string Template::CreateHistMatName( string objName, unsigned int iVar ) {
 }
 
 //#############################
-double Template::GetWeight( bool isData ) {
-  double weight=1;
 
-  vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
-  for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {
-    weight *= m_mapDouble[dumVect[iName]];
-  }
-  return weight;
-}

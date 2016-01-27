@@ -11,7 +11,9 @@
 #include <chrono>
 #include "PlotFunctions/DrawPlot.h"
 #include "TAxis.h"
+#include <sstream>
 
+using std::stringstream;
 using std::string;
 using std::cout;
 using std::endl;
@@ -463,7 +465,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FitChi2() done " << endl << endl;;
 }
 //====================================================
-void ChiMatrix::MakePlot( string path, string latexFileName ) {
+void ChiMatrix::MakePlot( stringstream &ss, string path ) {
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot " << m_name << endl;
   cout <<  "quality : " << m_quality.to_ulong() << endl;
   if ( m_quality.to_ulong() ) return;
@@ -478,11 +480,9 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
   if ( bestSigma < 0 ) bestSigma = 0;
   if ( bestSigma > m_chiMatrix->GetNbinsY()-1 ) bestSigma = m_chiMatrix->GetNbinsX()-1;
 
-  fstream latex;
-  latex.open( path + latexFileName, fstream::out | fstream::app );
   TString dumName = m_name;
   dumName.ReplaceAll("_", "\\_");
-  latex << "\\section{" << dumName << "}" << endl;
+  ss << "\\section{" << dumName << "}" << endl;
 
   vector<double> etaBins(m_setting->GetEtaBins());
 
@@ -497,18 +497,17 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
 
   if ( isClosure ) expAlpha = ( m_setting->GetMode() == "1VAR" ) ? (alphaSimEta[m_eta1Bin] + alphaSimEta[m_eta2Bin])/2. : (alphaSimEta[m_eta1Bin] + alphaSimPt[m_eta2Bin])/2. ;
   if ( isClosure ) expC = (   m_setting->GetMode() == "1VAR" ) ? sqrt((sigmaSimEta[m_eta1Bin]*sigmaSimEta[m_eta1Bin] + sigmaSimEta[m_eta2Bin]*sigmaSimEta[m_eta2Bin])/2.) : sqrt((sigmaSimEta[m_eta1Bin]*sigmaSimEta[m_eta1Bin] + sigmaSimPt[m_eta2Bin]*sigmaSimPt[m_eta2Bin])/2.); 
-  latex << "\\begin{minipage}{0.49\\linewidth} Results \\newline" << endl;
-  if ( m_MCZMass.size() && m_MCZMass.front().size() )  latex << "MCEvents : " << m_MCZMass.front().front()->GetEntries() << "\\newline" << endl;
-  latex << "DataEvents : " << m_dataZMass->GetEntries() <<" \\newline" << endl;
-  latex << "ThresholdMass : " << 27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin+1]+etaBins[m_eta1Bin]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) << "\\\\" << endl;
-  if ( m_setting->GetDoSimulation() || TString(m_setting->GetDataName()).Contains("distorded"))  latex << "$\\alpha_{ij}^{th}=" << expAlpha << "$     $c_{ij}^{th}=" << expC << "$" << endl;
-  if ( m_setting->GetDoScale() )    latex << "$$\\alpha_{ij} = " << m_alpha << "\\pm " << m_errAlpha << "$$" << endl;
-  if ( m_setting->GetDoSmearing() ) latex << "$$\\sigma_{ij} = " << m_sigma << "\\pm " << m_errSigma << "$$" << endl;
-  latex << "\\end{minipage}\\hfill" << endl;
+  ss << "\\begin{minipage}{0.49\\linewidth} Results \\newline" << endl;
+  if ( m_MCZMass.size() && m_MCZMass.front().size() )  ss << "MCEvents : " << m_MCZMass.front().front()->GetEntries() << "\\newline" << endl;
+  ss << "DataEvents : " << m_dataZMass->GetEntries() <<" \\newline" << endl;
+  ss << "ThresholdMass : " << 27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin+1]+etaBins[m_eta1Bin]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) << "\\\\" << endl;
+  if ( m_setting->GetDoSimulation() || TString(m_setting->GetDataName()).Contains("distorded"))  ss << "$\\alpha_{ij}^{th}=" << expAlpha << "$     $c_{ij}^{th}=" << expC << "$" << endl;
+  if ( m_setting->GetDoScale() )    ss << "$$\\alpha_{ij} = " << m_alpha << "\\pm " << m_errAlpha << "$$" << endl;
+  if ( m_setting->GetDoSmearing() ) ss << "$$\\sigma_{ij} = " << m_sigma << "\\pm " << m_errSigma << "$$" << endl;
+  ss << "\\end{minipage}\\hfill" << endl;
   plotName = path + m_name + "_chiMatrix";
-  //  plotNames.push_back( plotName );
   DrawPlot( {m_chiMatrix}, plotName );
-  WriteLatexMinipage( latex, {plotName}, 2 );
+  WriteLatexMinipage( ss, {plotName}, 2 );
 
   //Comparison data and extrmal alpha templates
   if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
@@ -522,15 +521,15 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
       plotNames.push_back( plotName   );
     }
   
-  if ( m_setting->GetDoSmearing() ) {
-    legends.clear();
-    legends.push_back( "legend=Data" );
-    legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
-    legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
-    plotName = path + m_name + "_CompareSigma";
-    DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
-    plotNames.push_back( plotName );
-  }
+    if ( m_setting->GetDoSmearing() ) {
+      legends.clear();
+      legends.push_back( "legend=Data" );
+      legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
+      legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
+      plotName = path + m_name + "_CompareSigma";
+      DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
+      plotNames.push_back( plotName );
+    }
   }
   
   plotName = path + m_name + "_chi2FitConstVar";
@@ -542,7 +541,7 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
     DrawPlot( { m_corAngle}, plotName );
     plotNames.push_back( plotName );
   }
-  WriteLatexMinipage( latex, plotNames, 2 );
+  WriteLatexMinipage( ss, plotNames, 2 );
 
   plotNames.clear();
   for ( int i=0; i< (int) m_chi2FitNonConstVar.size(); i++ ) {
@@ -550,10 +549,11 @@ void ChiMatrix::MakePlot( string path, string latexFileName ) {
     DrawPlot( { m_chi2FitNonConstVar[i] }, plotName );
     plotNames.push_back( plotName );
   }
-  WriteLatexMinipage( latex, plotNames, 4 );
+  WriteLatexMinipage( ss, plotNames, 4 );
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot Done" << endl;
 }
+
 
 //=========================================
 int ChiMatrix::CreateTemplates( int nTemplates ) {

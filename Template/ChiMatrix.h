@@ -10,7 +10,9 @@
 #include "TFile.h"
 #include <map>
 #include <bitset>
+#include <sstream>
 
+using std::stringstream;
 using std::bitset;
 using std::map;
 class ChiMatrix
@@ -100,7 +102,7 @@ class ChiMatrix
      \param path directory path where to save the plots
      \param latexFileName latex file to write in 
   */
-  void MakePlot( string path = "", string latexFileName = "latex.tex" );
+  void MakePlot( stringstream &ss, string path );
 
   /*\brief Create the templates
     \return 0 OK
