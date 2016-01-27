@@ -296,6 +296,8 @@ class Template
   string m_saveTemplateFileName;
   string m_saveFileName;
   stringstream m_sStream;
+  vector< vector< TTree *> > m_treeConfig;
+  vector< vector< TH1D* > > m_histConfig;
 };
 
 //#########################################

@@ -687,32 +687,33 @@ void ChiMatrix::OptimizeRanges( ) {
 	  continue;
 	}
 
-	cout << "counter : " << counter << endl;
-	cout << "start" << endl;
-	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
-	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
-	cout << "chiMin : " << chiMin << endl;
-	cout << "minimum : " << histScale->GetMinimum() << endl;
-	cout << "scaleMin : " << scaleMin << endl;
-	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
-	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
-	cout << "sigmaDown/Up : " << sqrt( histScale->GetBinContent(1) - histScale->GetMinimum() )  << " " << sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() ) << endl;
-	
+	// cout << "counter : " << counter << endl;
+	// cout << "start" << endl;
+	// cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	scaleMin = min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
+	// cout << "chiMin : " << chiMin << endl;
+	// cout << "minimum : " << histScale->GetMinimum() << endl;
+	// cout << "scaleMin : " << scaleMin << endl;
+	// cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
+	// cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
+	// cout << "sigmaDown/Up : " << sqrt( histScale->GetBinContent(1) - histScale->GetMinimum() )  << " " << sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() ) << endl;
+
+	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
+	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
+	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+
 	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
 	  delete histScale; histScale=0;
 	  break;
 	}
 	if ( iScale && scaleMin<0 ) scaleMin=0;
 	chiMin = histScale->GetMinimum();
-
-	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - chiMin );
-	double sigmaDown = sqrt( histScale->GetBinContent(1) - chiMin);
-	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
-	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
-	cout << "end" << endl;
-	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
-	cout << "rangeMin : " << rangeMin << endl;
-	cout << "rangeMax : " << rangeMax << endl;
+	
+	// cout << "end" << endl;
+	// cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	// cout << "rangeMin : " << rangeMin << endl;
+	// cout << "rangeMax : " << rangeMax << endl;
 
       }//end else counter
 

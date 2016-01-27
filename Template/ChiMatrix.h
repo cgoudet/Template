@@ -41,6 +41,7 @@ class ChiMatrix
   double GetSigmaMax() const { return m_sigmaMax; }
   unsigned int  GetQuality() const { return m_quality.to_ulong(); };
   unsigned int GetStat() const { return m_dataZMass ? m_dataZMass->GetEntries() : 0;}
+  unsigned int GetMCStat() const { return ( m_MCTree ) ? m_MCTree->GetEntries() : 0; }
   double GetDataRMS() const { return m_dataZMass->GetStdDev(); }
 
   void SetAlphaMin( double alphaMin ) { m_alphaMin = alphaMin; }

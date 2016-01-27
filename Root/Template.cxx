@@ -341,6 +341,10 @@ int Template::ExtractFactors() {
   int eta1Max = (int) etaBins.size()-1;  
   int eta2Max = 0;
 
+  if ( m_setting.GetUseMCOnce() ) {
+    CreateConfObject( 0, 0 );
+    CreateConfObject( 0, 0, 1 );
+  }
   //Setup ChiMatrix
   for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
     //If only eta binning : we do a tringular matrix 
@@ -349,16 +353,29 @@ int Template::ExtractFactors() {
     //cout << "indices : " << eta1Max << " " << eta2Max << endl;    
     //Create default ChiMatrix object
     for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-      //if ( i_eta!=21 || j_eta!=20 )  continue;
+      //      if ( i_eta!=9 || j_eta!=4 )  continue;
+	
+      clock_t begin = clock();
       ChiMatrix *chiMatrix = new ChiMatrix( string( TString::Format( "ChiMatrix_%i_%i", i_eta, j_eta )), m_setting );
-      chiMatrix->SetMCTree( (TTree*) CreateConfObject( i_eta, j_eta ) );
-      chiMatrix->SetDataHist( (TH1D*) CreateConfObject( i_eta, j_eta, 1 ) );
+      if ( !m_setting.GetUseMCOnce() ) {
+	chiMatrix->SetMCTree( (TTree*) CreateConfObject( i_eta, j_eta ) );
+	chiMatrix->SetDataHist( (TH1D*) CreateConfObject( i_eta, j_eta, 1 ) );
+      }
+      else { 
+	chiMatrix->SetMCTree( m_treeConfig[i_eta][j_eta] );
+	chiMatrix->SetDataHist( m_histConfig[i_eta][j_eta] );
+      }
       chiMatrix->CreateTemplates();
       chiMatrix->FitChi2();
       chiMatrix->Save( m_saveFileName, false );
       cout << " saveTemplateFileName : " << m_saveTemplateFileName << endl;
       chiMatrix->Save( m_saveTemplateFileName, true );
       chiMatrix->MakePlot( m_sStream );
+
+      clock_t end = clock();
+      double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+      cout << "configuration : " << elapsed_secs << " seconds for " << chiMatrix->GetMCStat() << " events" << endl;
+
       for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
 	
 	bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
@@ -877,35 +894,72 @@ TObject* Template::CreateConfObject( unsigned int i_eta, unsigned int j_eta, boo
   gROOT->cd();
   TObject* outObject = 0;
   TTree *inTree = isData ? m_dataTree : m_MCTree;
-  if ( !isData ) {
-    outObject = new TTree( "mcTree", "mcTree" );
-    LinkTreeBranches( inTree, dynamic_cast<TTree*>(outObject), m_mapDouble, m_mapLongLong );
+  if ( !m_setting.GetUseMCOnce() ) {
+    if ( !isData ) {
+      outObject = new TTree( "mcTree", "mcTree" );
+      LinkTreeBranches( inTree, dynamic_cast<TTree*>(outObject), m_mapDouble, m_mapLongLong );
+    }
+    else outObject = new TH1D( TString::Format("ChiMatrix_%d_%d_dataZMass", i_eta, j_eta), "DataZMass", m_setting.GetZMassNBins(), m_setting.GetZMassMin(), m_setting.GetZMassMax() );    
   }
-  else outObject = new TH1D( TString::Format("ChiMatrix_%d_%d_dataZMass", i_eta, j_eta), "DataZMass", m_setting.GetZMassNBins(), m_setting.GetZMassMin(), m_setting.GetZMassMax() );    
-
 
   int nEntries = inTree->GetEntries();
   for ( int iEntry = 0; iEntry<nEntries; iEntry++ ) {
+    if ( !iEntry ) cout << "iEntry : " << iEntry << endl;
     inTree->GetEntry(iEntry);
     unsigned int i1, i2, i3=etaBins.size(), i4=etaBins.size();
     if ( FindBin( i1, i2 )
-	 || ( m_setting.GetMode() == "2VAR" && FindBin( i3, i4, 1 ) )
-	 || ( !( i1==i_eta && i2==j_eta ) && !(i3==i_eta && i4==j_eta ) ) ) continue;
+	 || ( m_setting.GetMode() == "2VAR" && FindBin( i3, i4, 1 ) ) ) continue;
 
     double weight = ( m_setting.GetMode() == "1VAR" || ( i1==i3 && i2==i4 ) ) ? 1 : 0.5;
     for ( auto weightName : m_setting.GetDataBranchWeightNames() ) weight *= m_mapDouble[weightName];
-    if ( !isData ) {
-      dynamic_cast<TTree*>(outObject)->Fill();
-    }
+    TLorentzVector e1, e2;
+    e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+    e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
+
+    if ( !m_setting.GetUseMCOnce() ) {
+      if ( !( i1==i_eta && i2==j_eta ) && !(i3==i_eta && i4==j_eta ) ) continue;
+      if ( !isData ) dynamic_cast<TTree*>(outObject)->Fill();
+      else dynamic_cast<TH1D*>(outObject)->Fill( (e1+e2).M()/1000., weight );
+    }//end useMCOnce
     else {
-      TLorentzVector e1, e2;
-      e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
-      e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
-      dynamic_cast<TH1D*>(outObject)->Fill( (e1+e2).M()/1000., weight );
+      if ( isData ) {
+	while ( m_histConfig.size() <= i1 ) m_histConfig.push_back( vector< TH1D* >() );
+	while ( m_histConfig[i1].size() <= i2 ) m_histConfig[i1].push_back(0);
+	if ( !m_histConfig[i1][i2] ) m_histConfig[i1][i2] = new TH1D( TString::Format( "dataHist_%d_%d", i1, i2 ) , TString::Format( "dataHist_%d_%d", i1, i2 ), m_setting.GetZMassNBins(), m_setting.GetZMassMin(), m_setting.GetZMassMax() );
+	m_histConfig[i1][i2]->Fill( (e1+e2).M()/1000.,  weight );
+
+	while ( m_histConfig.size() <= i3 ) m_histConfig.push_back( vector< TH1D* >() );
+	while ( m_histConfig[i3].size() <= i4 ) m_histConfig[i3].push_back(0);
+	if ( !m_histConfig[i3][i4] ) m_histConfig[i3][i4] = new TH1D( TString::Format( "dataHist_%d_%d", i1, i2 ) , TString::Format( "dataHist_%d_%d", i3, i4 ), m_setting.GetZMassNBins(), m_setting.GetZMassMin(), m_setting.GetZMassMax() );
+	m_histConfig[i3][i4]->Fill( (e1+e2).M()/1000.,  weight );
+      }
+      else {
+
+	while ( m_treeConfig.size() <= i1 ) m_treeConfig.push_back( vector< TTree* >() );
+	while ( m_treeConfig[i1].size() <= i2 ) m_treeConfig[i1].push_back(0);
+	if ( !m_treeConfig[i1][i2] ) { 
+	  m_treeConfig[i1][i2] = new TTree( TString::Format( "dataHist_%d_%d", i1, i2 ) , TString::Format( "dataHist_%d_%d", i1, i2 ) );
+	  LinkTreeBranches( inTree, m_treeConfig[i1][i2], m_mapDouble, m_mapLongLong );
+	}
+	m_treeConfig[i1][i2]->Fill();
+
+	while ( m_treeConfig.size() <= i3 ) m_treeConfig.push_back( vector< TTree* >() );
+	while ( m_treeConfig[i3].size() <= i4 ) m_treeConfig[i3].push_back(0);
+	if ( !m_treeConfig[i3][i4] ) {
+	  m_treeConfig[i3][i4] = new TTree( TString::Format( "dataHist_%d_%d", i3, i4 ) , TString::Format( "dataHist_%d_%d", i3, i4 ) );
+	  LinkTreeBranches( inTree, m_treeConfig[i3][i4], m_mapDouble, m_mapLongLong );
+	}
+	m_treeConfig[i3][i4]->Fill();
+
+      }
     }
   }
-  if ( isData ) dynamic_cast<TH1D*>(outObject)->Sumw2();
+ if ( outObject && isData ) dynamic_cast<TH1D*>(outObject)->Sumw2(); 
 
   if ( m_setting.GetDebug() ) cout << "CreateMCConfTree : " << i_eta << " " << j_eta << " done" << endl;
   return outObject;  
+
 }
+
+
+

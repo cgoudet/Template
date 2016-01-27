@@ -71,7 +71,8 @@ class Setting
   bool GetDoPileup() const { return m_doPileup;}
   bool GetDoWeight() const { return m_doWeight; }
   unsigned int GetApplySelection() const { return m_applySelection; }
- 
+  bool GetUseMCOnce () const { return m_useMCOnce; }
+
   double GetOptimizeRanges()  const { return m_optimizeRanges; };
   vector< double > const &GetEtaBins()     const { return m_etaBins;     };
   vector< double > const &GetPtBins()      const { return m_ptBins;      };
@@ -260,6 +261,7 @@ class Setting
   map<string,string> m_branchVarNames;
   vector< string > m_dataBranchWeightNames;
   vector< string > m_MCBranchWeightNames;
+  bool  m_useMCOnce;
 };
 
 

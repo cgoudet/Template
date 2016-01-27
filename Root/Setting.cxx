@@ -22,7 +22,7 @@ Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin
 		     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
 		     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
 		     m_optimizeRanges( 10 ), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(500), m_thresholdMass( 70 ),
-		     m_indepDistorded( false ), m_indepTemplates( false ), m_inversionMethod(0), m_bootstrap( 0 ), m_doPileup( true ), m_doWeight( true )
+		     m_indepDistorded( false ), m_indepTemplates( false ), m_inversionMethod(0), m_bootstrap( 0 ), m_doPileup( true ), m_doWeight( true ), m_useMCOnce( true )
 {
   m_etaBins.clear();
   m_ptBins.clear();
@@ -86,6 +86,7 @@ int Setting::Configure( const string &configFile ) {
     ( "branchVarNames", po::value< vector< string > >( &branchVarNames )->multitoken(), "" )
     ( "dataBranchWeightName", po::value< string >( &dataBranchWeightName ), "" )
     ( "MCBranchWeightName", po::value< string >( &MCBranchWeightName ), "" )
+    ( "useMCOnce", po::value< bool >( &m_useMCOnce ) ,"" )
     ;
   
   po::variables_map vm;
