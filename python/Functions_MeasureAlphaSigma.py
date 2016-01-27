@@ -140,13 +140,13 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         dataLine=""
         for iFile in range( 0, len( dataFiles ) ) :
             batch.write( 'cp -v ' + dataFiles[iFile] + ' . \n' )
-            dataLine+=" --dataFileName " + StripName( dataFiles[iFile], 1, 0 ) + ' --dataWeight ' + str( dataWeights[iFile] ) 
+            dataLine+=" --dataFileName " + StripName( dataFiles[iFile], 1, 0 )  
         
 #copy the MC files to the server and prepare command line
         MCLine=""
         for iFile in range( 0, len( MCFiles ) ) :
             batch.write( 'cp -v ' + MCFiles[iFile] + ' . \n' )
-            MCLine+=" --MCFileName " + StripName( MCFiles[iFile], 1, 0 ) + ' --MCWeight ' + str( MCWeights[iFile] )
+            MCLine+=" --MCFileName " + StripName( MCFiles[iFile], 1, 0 ) 
 
 #Fill the command line
         if mode==0 :

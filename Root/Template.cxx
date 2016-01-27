@@ -34,10 +34,8 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_chiMatrix.clear();
   m_dataFileNames.clear();
   m_dataTreeNames.clear();
-  m_dataWeights.clear();
   m_MCFileNames.clear();
   m_MCTreeNames.clear();
-  m_MCWeights.clear();
 
   m_mapDouble["WEIGHT"]=1;
   m_histNames = { "measScale", "inputScale", "deviation" };
@@ -49,8 +47,8 @@ Template::Template() : m_setting(), m_rand(), m_name()
 }
 
 Template::Template( const string &outFileName, const string &configFile,  
-		    vector<string> dataFileNames, vector<string> dataTreeNames, vector<double> dataWeights,
-		    vector<string> MCFileNames, vector<string> MCTreeNames, vector<double> MCWeights) 
+		    vector<string> dataFileNames, vector<string> dataTreeNames,
+		    vector<string> MCFileNames, vector<string> MCTreeNames )
   : Template()
 {
   //Setup the setting attribute
@@ -67,7 +65,7 @@ Template::Template( const string &outFileName, const string &configFile,
     
     vector<string> &fileNames = iType ? MCFileNames : dataFileNames;
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
-    vector<double> &weight = iType ? MCWeights : dataWeights;    
+
     for ( unsigned int iFile = 0; iFile < fileNames.size(); iFile++ ) {
       
       TFile *dumFile = new TFile( fileNames[iFile].c_str() );
@@ -588,8 +586,6 @@ void Template::CreateDistordedTree( string outFileName ) {
   TTree *dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
   dataTree->SetDirectory(0);
-  double weightTree=1;
-  dataTree->Branch( "weightTree", weightTree );
   int counterEvent=0;
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
@@ -608,7 +604,6 @@ void Template::CreateDistordedTree( string outFileName ) {
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
 
 	//if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
-	m_mapDouble["weightTree"] = m_MCWeights[iFile];
 	m_mapDouble[mapVarNames["PT_1"]] *= factor1;
 	m_mapDouble[mapVarNames["PT_2"]] *= factor2;
 	m_mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
@@ -628,10 +623,8 @@ void Template::CreateDistordedTree( string outFileName ) {
     
   m_dataFileNames.clear();
   m_dataTreeNames.clear();
-  m_dataWeights.clear();
   m_dataFileNames.push_back( distorded->GetName() );
   m_dataTreeNames.push_back( dataTree->GetName() );
-  m_dataWeights.push_back( 1 );
 
   delete dataTree; dataTree = 0;
   distorded->Close("R");
@@ -676,7 +669,6 @@ void Template::MakePlot( string path, string latexFileName ) {
   latex << "nUseEl : " << m_setting.GetNUseEl() << "\\newline" << endl;
   latex << "nEventCut : " << m_setting.GetNEventCut() << "\\newline" << endl;
   latex << "Selection : " << m_setting.GetSelection() << "\\newline" << endl;
-  latex << "doWeight : " << m_setting.GetDoWeight() << "\\newline" << endl;
   latex << "doPileup : " << m_setting.GetDoPileup() << "\\newline" << endl;
   latex << "\\tableofcontents\\clearpage" << endl;
 
@@ -875,7 +867,6 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 	e4.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 	m_mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
 	
-	m_mapDouble[mapBranchNames["WEIGHT"]] *= ( iCorrection ) ? m_MCWeights[iFile] : m_dataWeights[iFile];
 	dumTree->Fill();
       }
       delete dataTree;
@@ -892,16 +883,12 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
       m_MCFileNames.push_back( distorded->GetName() );
       m_MCTreeNames.clear();
       m_MCTreeNames.push_back( dumTree->GetName() );
-      m_MCWeights.clear();
-      m_MCWeights.push_back( 1 );
     }
     else {
       m_dataFileNames.clear();    
       m_dataFileNames.push_back( distorded->GetName() );
       m_dataTreeNames.clear();
       m_dataTreeNames.push_back( dumTree->GetName() );
-      m_dataWeights.clear();
-      m_dataWeights.push_back( 1 );
     }
 
     delete dumTree; dumTree = 0;          

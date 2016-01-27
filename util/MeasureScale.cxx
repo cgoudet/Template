@@ -22,7 +22,6 @@ int main( int argc, char* argv[] ) {
 
   //define all options in the program
   vector<string> dataFileNames, MCTreeNames, MCFileNames, dataTreeNames;
-  vector<double> dataWeights, MCWeights;
   string  outFileName, constVarFit, configFile, distordedTreeName;
   string loadTemplateFileName, saveTemplateFileName, loadFullFileName;
   string correctAlphaFileName, correctAlphaHistName, correctSigmaFileName, correctSigmaHistName;
@@ -31,10 +30,8 @@ int main( int argc, char* argv[] ) {
     ("help", "Display this help message")
     ("dataFileName", po::value<vector<string>>(&dataFileNames)->multitoken(), "1 : Input data file name")
     ("dataTreeName", po::value<vector<string>>(&dataTreeNames)->multitoken(), "Input Data Tree Name" )
-    ("dataWeights", po::value<vector<double>>(&dataWeights)->multitoken(), "Input Data Weights" )
     ("MCFileName", po::value<vector<string>>(&MCFileNames)->multitoken(), "1 : Input MC file name")
     ("MCTreeName", po::value<vector<string>>(&MCTreeNames)->multitoken(), "Input MC Tree Name" )
-    ("MCWeights", po::value<vector<double>>(&MCWeights)->multitoken(), "Input MC Weights" )
     ("outFileName", po::value<string>(&outFileName)->default_value(""), "Output file name")
     ("saveTemplate", po::value<string>(&saveTemplateFileName)->default_value("")->implicit_value( "" ), "Root file for template saving" )
     ("loadTemplate", po::value<string>(&loadTemplateFileName), "In put template file name" )
@@ -72,7 +69,7 @@ int main( int argc, char* argv[] ) {
   }
 
 
-  Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, dataWeights, MCFileNames, MCTreeNames, MCWeights  );
+  Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, MCFileNames, MCTreeNames  );
   Temp.ApplyCorrection( correctAlphaHist, correctSigmaHist );
   if ( vm.count("createDistorded") ) { 
     Temp.CreateDistordedTree( distordedTreeName );

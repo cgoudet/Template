@@ -60,8 +60,8 @@ class Template
      - Accept one missing Ntuple, cases dealt with at template creation.
   */
   Template( const string &outFileName, const string &configFile,  
-	    vector<string> dataFileNames, vector<string> dataTreeNames, vector<double> dataWeights,
-	    vector<string> MCFileNames, vector<string> MCTreeNames, vector<double> MCWeights);
+	    vector<string> dataFileNames, vector<string> dataTreeNames,
+	    vector<string> MCFileNames, vector<string> MCTreeNames );
 
   /**\brief Destructor
    */
@@ -236,7 +236,6 @@ class Template
        */
   void FillDistrib( bool isData );
   
-  double GetWeight( bool isData );  
   /**\brief Class containing all configuration attributes
    */
   Setting m_setting;
@@ -249,11 +248,9 @@ class Template
    */
   vector<string> m_dataFileNames;
   vector<string> m_dataTreeNames;
-  vector<double> m_dataWeights;
 
   vector<string> m_MCFileNames;
   vector<string> m_MCTreeNames;
-  vector<double> m_MCWeights;
 
   /**\brief Random generator for creation of distorded tree
    */

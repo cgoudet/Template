@@ -32,10 +32,8 @@ int main( int argc, char* argv[] ) {
     ("help", "Display this help message")
     ("dataFileName", po::value<vector<string>>(&dataFileNames)->multitoken(), "1 : Input data file name")
     ("dataTreeName", po::value<vector<string>>(&dataTreeNames)->multitoken(), "Input Data Tree Name" )
-    ("dataWeights", po::value<vector<double>>(&dataWeights)->multitoken(), "Input Data Weights" )
     ("MCFileName", po::value<vector<string>>(&MCFileNames)->multitoken(), "1 : Input MC file name")
     ("MCTreeName", po::value<vector<string>>(&MCTreeNames)->multitoken(), "Input MC Tree Name" )
-    ("MCWeights", po::value<vector<double>>(&MCWeights)->multitoken(), "Input MC Weights" )
     ("outFileName", po::value<string>(&outFileName)->default_value("ConfigurationsCTree.root"), "Output file name")
     ("configFile", po::value<string>(&configFile), "Select the configuration file")
     ("nIteration", po::value<unsigned int>(&nIteration)->default_value(1), "" )   
@@ -104,7 +102,7 @@ int main( int argc, char* argv[] ) {
 	cout << "iStat : " << inputStat[iStat] << endl;
 	cout << "iInput : " << inputValues[iInput] << endl;
 	if ( true ) { //Only to free memory	
-	  Template TempDistorded( "", configFile, {}, {}, {}, dataFileNames, dataTreeNames, dataWeights );
+	  Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
 	  settingDistorded.SetDebug( 1 );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
@@ -115,7 +113,7 @@ int main( int argc, char* argv[] ) {
 	}
 
 	cout << "measurement step " << endl;
-	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, {1}, MCFileNames, MCTreeNames, MCWeights  );
+	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
