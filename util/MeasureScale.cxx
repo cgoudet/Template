@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
-  //  if ( saveTemplateFileName != "" ) Temp.SetSaveTemplateFileName( saveTemplateFileName );
+
   if ( vm.count("loadFull") ) {
     err = Temp.Load( loadFullFileName, false);
     if ( err ) {
@@ -97,7 +97,7 @@ int main( int argc, char* argv[] ) {
       cout << "Template::Extraction failed : " << err << endl;
       return 1;
     }
-    //    err = Temp.Save(false);
+    err = Temp.Save();
     // if ( err ) {
     //   cout << "Template::Save failed : " << err << endl;
     //   return 2;

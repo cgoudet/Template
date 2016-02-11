@@ -351,6 +351,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
   if ( m_quality.to_ulong() ) {
+    cout << "bad quality : returns " << endl;
     m_alpha = 0;
     m_errAlpha = 100;
     m_sigma = 0;
@@ -670,17 +671,20 @@ void ChiMatrix::OptimizeRanges( ) {
 	}
       }//end !counter
       else {
+	if ( counter > 30 ) exit(1);
 	int minBin = histScale->GetMinimumBin();
 	//	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
 	//Dealing with minimum bin too close to overflow
 	if ( minBin > histScale->GetNbinsX()-2 && allowedRangeMax != rangeMax ) {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
+	  cout << "rangeMax : " << rangeMax << endl;
 	  continue;
 	}
 	
 	//Dealing with minimum bin too close to underflow
 	if ( minBin <= 2 && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
+	  cout << "rangeMin : " << rangeMin << endl;
 	  continue;
 	}
 	
@@ -689,19 +693,45 @@ void ChiMatrix::OptimizeRanges( ) {
 	  break;
 	}
 
+
+	cout << "counter : " << counter << endl;
+	cout << "start" << endl;
+	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	cout << "chiMin : " << chiMin << endl;
+	cout << "minimum : " << histScale->GetMinimum() << endl;
+	cout << "scaleMin : " << scaleMin << endl;
+	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
+	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
+	cout << "sigmaDown/Up : " << sqrt( histScale->GetBinContent(1) - histScale->GetMinimum() )  << " " << sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() ) << endl;
+
+	chiMin = min( chiMin, histScale->GetMinimum() );
 	scaleMin = min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
 	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
+	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
 	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
+
+	cout << "end" << endl;
+	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+	cout << "rangeMin : " << rangeMin << endl;
+	cout << "rangeMax : " << rangeMax << endl;
+
+
 
 	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
 	  delete histScale; histScale=0;
 	  break;
 	}
 
+
 	if ( iScale && scaleMin<0 ) scaleMin=0;
 	chiMin = histScale->GetMinimum();
+
+	if ( counter == 10 ) {
+	  cout << "counter break optimization"  << endl;
+	  break;
+	}
 
 	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
 	cout << "allowed ranges : " << allowedRangeMin << " " << allowedRangeMax << endl;
@@ -787,6 +817,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
   TF1 *fittingFunction = 0;
   TFitResultPtr fitResult = 0;
 
+  string options = string("S") + ( m_setting->GetDebug() ? "" : "Q" );
   int minBin = 1;
   int maxBin = hist->GetNbinsX();
   int centralBin = hist->GetMinimumBin();
@@ -825,7 +856,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
   do {
     //    fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
     //    if ( fitResult.Get() ) delete fitResult.Get();
-    fitResult = hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+    fitResult = hist->Fit( fittingFunction, options.c_str(), "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
     nFits --;
   }
   while( fitResult->Status() && nFits );
@@ -842,7 +873,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
 	fittingFunction->SetParameter( 1, sigma );
 	//	if ( fitResult.Get() ) delete fitResult.Get();
-	fitResult =   hist->Fit( fittingFunction, "SQ", "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+	fitResult =   hist->Fit( fittingFunction, options.c_str(), "", hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
 	nFits--;
       }
       while ( fitResult->Status() && nFits );

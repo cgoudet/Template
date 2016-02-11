@@ -5,7 +5,6 @@
 #include <fstream>
 #include "TCanvas.h"
 #include "time.h"
-#include <algorithm>
 #include "TKey.h"
 #include "time.h"
 #include "TError.h"
