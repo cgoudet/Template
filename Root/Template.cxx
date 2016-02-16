@@ -308,6 +308,14 @@ int Template::CreateTemplate() {
   //If data events haven't been filled
   else  FillDistrib( true );  
 
+    // m_chiMatrix[16][10]->CreateTemplates();
+    // m_chiMatrix[16][10]->FitChi2();
+    // m_chiMatrix[21][15]->CreateTemplates();
+    // m_chiMatrix[21][15]->FitChi2();
+    // m_chiMatrix[20][17]->CreateTemplates();
+    // m_chiMatrix[20][17]->FitChi2();
+    // exit(0);
+
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
@@ -382,9 +390,9 @@ int Template::ExtractFactors() {
     //Create combined factor matrices
     for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
+
+
     
-    // m_chiMatrix[2][2]->FitChi2();
-    // exit(0);
     //Run over all chiMatrices
     cout << "eta1Max : " << eta1Max << endl;
     for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
@@ -409,7 +417,6 @@ int Template::ExtractFactors() {
 		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
 	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
 	}
-	cout << "end : " << i_eta << " " << j_eta << endl;
       }
     } //end loop on chiMatrix
 
@@ -428,6 +435,7 @@ int Template::ExtractFactors() {
 	m_vectHist[iVar][histMeasBin]->SetBinContent( iBin, resultMatrix(iBin-1,0) );
 	m_vectHist[iVar][histMeasBin]->SetBinError( iBin, resultErrMatrix(iBin-1,0) );
       }
+
     }
     isChi2Done = true; 
   }//end loop iVer
@@ -841,16 +849,20 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
     if ( !iCorrection && !correctionAlpha ) continue;
     cout << "correcting : " << iCorrection << endl;
     //correctionAlpha is applied on the data
-    string dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
-    TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
-    dumTree->SetDirectory(0);
+
+    TTree *dumTree = 0;
+    string dumString="";
     
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
     for ( unsigned int iFile = 0; iFile < nFile; iFile++ ) {
+      dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
+      dumTree = new TTree( dumString.c_str(), dumString.c_str() );
+      dumTree->SetDirectory(0);
+
       dumString = ( iCorrection ) ? m_MCFileNames[iFile] : m_dataFileNames[iFile];
+      cout << "correcting : " << dumString << endl;
       TFile *dataFile = new TFile( dumString.c_str() );
-      dataFile->ls();
       
       dumString = ( iCorrection ) ? m_MCTreeNames[iFile] : m_dataTreeNames[iFile];
       TTree *dataTree = (TTree*) dataFile->Get( dumString.c_str() );
@@ -870,10 +882,6 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 	m_mapDouble[mapBranchNames["PT_1"]] *= factor1;
 	m_mapDouble[mapBranchNames["PT_2"]] *= factor2;
 	
-	if ( !iEvent ) { 
-	  cout << factor1-1 << " " << factor2-1 << endl;
-	}
-
 	e3.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
 	e4.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 	m_mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
@@ -883,28 +891,24 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
       delete dataTree;
       dataFile->Close("R");
       delete dataFile;
-    }  
-      
-    dumString = ( iCorrection ) ? "CorrectedMC.root" : "CorrectedData.root";
-    TFile *distorded = new TFile( dumString.c_str(), "RECREATE" );
-    dumTree->Write( "", TObject::kOverwrite );
+
+      TString outFileName = iCorrection ? m_MCFileNames[iFile] : m_dataFileNames[iFile];
+      outFileName.ReplaceAll( ".root", "_corrected.root" );
+      cout << "saving : " << outFileName << endl;
+      TFile distorded( outFileName, "RECREATE" );
+      dumTree->Write( "", TObject::kOverwrite );
+      distorded.Close("R");
 
     if ( iCorrection ) {
-      m_MCFileNames.clear();    
-      m_MCFileNames.push_back( distorded->GetName() );
-      m_MCTreeNames.clear();
-      m_MCTreeNames.push_back( dumTree->GetName() );
+      m_MCFileNames[iFile] = outFileName;
+      m_MCTreeNames[iFile] = dumTree->GetName();
     }
     else {
-      m_dataFileNames.clear();    
-      m_dataFileNames.push_back( distorded->GetName() );
-      m_dataTreeNames.clear();
-      m_dataTreeNames.push_back( dumTree->GetName() );
+      m_dataFileNames[iFile] = distorded.GetName();
+      m_dataTreeNames[iFile] = dumTree->GetName();
     }
-
-    delete dumTree; dumTree = 0;          
-    distorded->Close("R");
-    delete distorded; distorded = 0;
+    delete dumTree; dumTree = 0;
+    }//end iFile  
 
   }//end if correctionAlpha
 

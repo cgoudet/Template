@@ -410,7 +410,7 @@ void ChiMatrix::FitChi2() {
   // Create a bool which will be used several times
   // Is sigma the variable into constVarFit?
   bool isSigmaConstVar = m_setting->GetDoSmearing() && ( !m_setting->GetDoScale() || (m_setting->GetDoScale() && m_setting->GetConstVarFit() == "SIGMA" ) );
-  auto mode = (m_setting->GetConstVarFit() == "SIGMA") ?  m_setting->GetFitMethod() : 0;
+  auto mode = ( m_setting->GetDoSmearing() && m_setting->GetConstVarFit() == "SIGMA") ?  m_setting->GetFitMethod() : 0;
   fittingFunction = FitHist( m_chi2FitConstVar , mode, 0, 0 );
 
   if ( fittingFunction ) {  
@@ -461,7 +461,9 @@ void ChiMatrix::FitChi2() {
     }
     delete linearFit; linearFit=0;
   }
-  cout << m_name << " scales : " << m_alpha << " " << m_sigma << endl;
+  cout << m_name << " scales : " << endl;
+  cout << "alpha : " << m_alpha << " +- " << m_errAlpha << endl; 
+  cout << "sigma : " << m_sigma << " +- " << m_errSigma << endl;
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FitChi2() done " << endl << endl;;
 }
 //====================================================
@@ -611,7 +613,7 @@ void ChiMatrix::FillScaleValues( int nTemplates) {
 
 //===========================================
 void ChiMatrix::OptimizeRanges( ) {
-  if ( m_setting->GetDebug() ) cout << "ChiMatrix::OptimizeRanges() " << m_name << endl;
+  if ( m_setting->GetDebug() ) cout << m_name << "::OptimizeRanges() " << m_name << endl;
 
   TH1D *histScale = 0;
 
@@ -650,7 +652,7 @@ void ChiMatrix::OptimizeRanges( ) {
       histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )
 	: m_chiMatrix->ProjectionX( m_name.c_str() + TString("histAlpha"), 1, 1, "o" );
 
-      
+
       if ( !counter ) {
 	//On the first iteration, perform a fit to roughly locate the minimum
 	TF1* fittingFunction = FitHist( histScale, iScale );
@@ -671,18 +673,21 @@ void ChiMatrix::OptimizeRanges( ) {
 	}
       }//end !counter
       else {
-	if ( counter > 30 ) exit(1);
+	if ( counter > 10 ) {
+	  exit(1);
+	}
 	int minBin = histScale->GetMinimumBin();
+
 	//	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
 	//Dealing with minimum bin too close to overflow
-	if ( minBin > histScale->GetNbinsX()-2 && allowedRangeMax != rangeMax ) {
+	if ( minBin >= floor( histScale->GetNbinsX()*3./4 ) && allowedRangeMax != rangeMax ) {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
 	  cout << "rangeMax : " << rangeMax << endl;
 	  continue;
 	}
 	
 	//Dealing with minimum bin too close to underflow
-	if ( minBin <= 2 && allowedRangeMin != rangeMin ) {
+	if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
 	  cout << "rangeMin : " << rangeMin << endl;
 	  continue;
@@ -693,23 +698,41 @@ void ChiMatrix::OptimizeRanges( ) {
 	  break;
 	}
 
-
+	//	if ( m_name == "ChiMatrix_10_3" ) DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) ); 
 	cout << "counter : " << counter << endl;
 	cout << "start" << endl;
 	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
 	cout << "chiMin : " << chiMin << endl;
-	cout << "minimum : " << histScale->GetMinimum() << endl;
+	cout << "minimum : " << histScale->GetMinimum() << " " << minBin << endl;
 	cout << "scaleMin : " << scaleMin << endl;
 	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
 	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
-	cout << "sigmaDown/Up : " << sqrt( histScale->GetBinContent(1) - histScale->GetMinimum() )  << " " << sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() ) << endl;
 
-	chiMin = min( chiMin, histScale->GetMinimum() );
-	scaleMin = min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
-	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
+	if ( m_name == "ChiMatrix_10_8" ) {
+	  DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) );       
+	  DrawPlot( { m_dataZMass, m_MCZMass.front().front() }, string( TString::Format( "TestOptimize_ZMass_%d", counter ) ) );
+	  for ( int i =1; i<=histScale->GetNbinsX(); i++ )
+	    cout << i << " " << histScale->GetBinContent( i ) << endl;
+	}
+
+	chiMin = histScale->GetMinimum();
+	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
+	  //min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
+
+	//	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
+	double deltaUp = 0;
+	for ( int iBin = minBin+1; iBin <= histScale->GetNbinsX(); iBin++ ) {
+	  cout << histScale->GetXaxis()->GetBinCenter(iBin)-scaleMin << " " << sqrt(histScale->GetBinContent( iBin ) - histScale->GetMinimum() ) << endl;
+	  deltaUp += ( histScale->GetXaxis()->GetBinCenter(iBin)-scaleMin ) / sqrt(histScale->GetBinContent( iBin ) - histScale->GetMinimum() );
+	}
+	deltaUp /= ( histScale->GetNbinsX() - minBin );
+	
+	cout << " delta Up : " << deltaUp << endl;
+
 	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
-	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	//	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	rangeMax = min( allowedRangeMax, scaleMin + deltaUp*m_setting->GetOptimizeRanges() );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
 
 	cout << "end" << endl;
@@ -738,7 +761,6 @@ void ChiMatrix::OptimizeRanges( ) {
       }//end else counter
 
       if ( histScale ) delete histScale; histScale=0;
-      if ( counter == 10 ) exit(0);
     }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
   }
@@ -895,7 +917,8 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
       width/=2.;
       currentValue += ( (*fittingFunction)(currentValue) - (*fittingFunction)(minVal) < 1 ) ? width : -width;
     }
-    fittingFunction->SetParameter( 1, currentValue-minVal );
+    double error = fabs(currentValue-minVal);
+    fittingFunction->SetParameter( 1, error > 1e-7 ? error : 100  );
 
   }
   TF1* result = (TF1*) fittingFunction->Clone();
