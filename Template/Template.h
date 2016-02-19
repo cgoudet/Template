@@ -288,6 +288,7 @@ class Template
   vector<string> m_matrixNames;
   stringstream m_sStream;
 
+  double GetWeight( bool isData );
 };
 
 //#########################################

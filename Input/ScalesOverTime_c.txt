@@ -1,5 +1,5 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160213/EnergyScaleFactors.root	linearity_c 0
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160213/Data6_13TeV_25ns.root		measScale_c	27
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160213/Data6_13TeV_25ns_pt20.root	measScale_c	20
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160213/Data6_13TeV_25ns_pt30.root	measScale_c	30
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160213/Data6_13TeV_25ns_pt35.root	measScale_c	35
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/EnergyScaleFactors.root	linearity_c 0
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Data6_13TeV_25ns.root		measScale_c	27
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Data6_13TeV_25ns_pt20.root	measScale_c	20
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Data6_13TeV_25ns_pt30.root	measScale_c	30
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Data6_13TeV_25ns_pt35.root	measScale_c	35

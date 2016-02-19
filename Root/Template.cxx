@@ -56,6 +56,7 @@ Template::Template( const string &outFileName, const string &configFile,
     cout << "Configuration failed " << err << " : exiting" << endl;
     exit( 1 );
   }
+  m_setting.Print();
 
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
@@ -71,7 +72,7 @@ Template::Template( const string &outFileName, const string &configFile,
 	cout << fileNames[iFile] << " does not exist. Exiting" << endl;
 	exit( 0 );
       }
-      
+
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
       if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile );
       TTree *dumTree = (TTree*) dumFile->Get( treeNames[iFile].c_str() );
@@ -492,6 +493,7 @@ void Template::FillDistrib( bool isData ) {
       e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
       e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 
+      m_mapDouble["WEIGHT"] = GetWeight(isData);
 
       //##############################
       if ( isData ) m_setting.SetNEventData();
@@ -501,16 +503,7 @@ void Template::FillDistrib( bool isData ) {
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
 	int foundBin = FindBin( i_eta, j_eta );
-	// if ( isData && iEvent< 10 ) {
-	//   cout << "foundBin : " << foundBin << " " << i_eta << " " << j_eta << endl; 
-	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_1"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_1"]] << endl;
-	//   cout << "kinematics : " << mapBranchNames["ETA_TRK_2"] << " " << m_mapDouble[mapBranchNames["ETA_TRK_2"]] << endl;
-	// }
-	if ( !foundBin ) {
-	  // if ( i_eta==1 && j_eta==1 && isData ) 
-	  //   cout << m_mapVarNumber["RUNNUMBER"] << " " << m_mapVarNumber["EVENTNUMBER"] << " " << m_mapVar1["PT"] << " " << m_mapVar2["PT"] << " " << m_mapVar1["ETA_TRK"] << " " << m_mapVar2["ETA_TRK"] << " " << m_mapVar1["PHI"] << " " << m_mapVar2["PHI"] << " " << m_mapVar1["ETA_CALO"] << " " << m_mapVar2["ETA_CALO"] << endl;
-	  m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
-	}
+	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
       }
       else {
 	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
@@ -937,13 +930,18 @@ string Template::FindDefaultTree( TFile* inFile ) {
     exit( 0 );
   }
 
-  string dumString = inFile->GetName();
-  dumString = dumString.substr( dumString.find_last_of( "/" ) + 1);
-  dumString = dumString.substr( 0, dumString.find_last_of( "." ) );
-  dumString += "_selectionTree";
+  for ( auto treeName : listTreeNames ) { 
+    cout << treeName << endl;
+    if ( TString( treeName ).Contains( "_selectionTree" ) ) return treeName;
+  }
+  // string dumString = inFile->GetName();
+  // dumString = dumString.substr( dumString.find_last_of( "/" ) + 1);
+  // dumString = dumString.substr( 0, dumString.find_last_of( "." ) );
+  // dumString += "_selectionTree";
 
-  if ( find( listTreeNames.begin(), listTreeNames.end(), dumString ) != listTreeNames.end() )  return dumString;
-  else return listTreeNames.front();
+  // if ( find( listTreeNames.begin(), listTreeNames.end(), dumString ) != listTreeNames.end() )  return dumString;
+  // else if ( 
+  return listTreeNames.front();
 
 }
 
@@ -996,4 +994,12 @@ string Template::CreateHistMatName( string objName, unsigned int iVar ) {
 }
 
 //#############################
+double Template::GetWeight( bool isData ) {
+  double weight=1;
 
+  vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
+  for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {
+    weight *= m_mapDouble[dumVect[iName]];
+  }
+  return weight;
+}
