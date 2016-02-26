@@ -247,6 +247,14 @@ class Setting
   double m_optimizeRanges;
   bool m_symBin;
 
+  /** Chosse wich fit formula to use
+      0 : quadratic fit, uncertainties from the fit parameters
+      1 : cubic fit, uncertainties from the fit parameters
+      2 : cubic Fit, uncertainty obtained by dichotomy
+      3 : qudratic fit only on the right of the minimum
+      4 : look for the minimum of the distribution within 2sigma of the fitted minimum
+
+  */
   unsigned int m_fitMethod;
   unsigned int m_nUseEl;
   unsigned int m_nEventCut;

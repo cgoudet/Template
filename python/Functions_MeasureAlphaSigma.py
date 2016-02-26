@@ -8,6 +8,7 @@ FILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/']
 FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
 FILESETS['MC_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/archive/MC_13TeV_Zee_25nsb_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/archive/MC_13TeV_Zee_25nsb_Lkh1_1.root']
+FILESETS['MC_13TeV_Zee_25nsb_Lkh1_scaled']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_1.root']
 FILESETS['MC_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh2/'] 
 FILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled' ]
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_0']     =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0.root' ]
@@ -79,6 +80,9 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
     if mode == 1 :
         configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '_alpha.boost' )
         configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '_c.boost' )
+    elif mode == 3 or mode == 4 :
+        configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '.boost' )
+        configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '_c24.boost' )
     else :
         configName.append( PREFIXPATH + configPath + StripName( outNameFile ) + '.boost' )
 
@@ -169,6 +173,31 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
+        elif mode == 3 or mode == 4:
+            configOptionsTemp = configOptions[:]
+            if mode == 4 : configOptionsTemp.append( "doSmearing=0" )
+            CreateConfig( configName[0], configOptions )
+            batch.write( 'cp -v ' + configName[0] + ' . \n' )
+            outNameFile = ' --outFileName ' + StripName( configName[0] ) + '.root '
+            batch.write( 'MeasureScale --configFile ' + StripName(configName[0], 1, 0)
+                         + dataLine + MCLine + outNameFile + ' --makePlot\n')
+            
+            configOptionsTemp = configOptions
+            configOptionsTemp.append( "doScale=0" )
+            configOptionsTemp.append( "etaBins=ETA24" )
+            CreateConfig( configName[1], configOptionsTemp )
+            batch.write( 'cp -v ' + configName[1] + ' . \n' )
+            outNameFile = ' --outFileName ' + StripName( configName[1] ) + '.root '
+            batch.write( 'MeasureScale --configFile ' + StripName(configName[1], 1, 0)
+                         + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
+                         + ' --makePlot\n')
+            batch.write( 'ls DataOff*' )
+            batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
+            batch.write( 'cp -v ' + StripName( configName[1] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+
+
     return fileName
 
 
@@ -232,7 +261,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['bootstrap']=0
     options['doPileup']=1
     options['doWeight']=1
-    options['etaBins']=defaultBinning['ETA24']
+    options['etaBins']=defaultBinning['ETA68']
     options['ptBins']=''
     options['applySelection']=0
     options['branchVarNames']={}

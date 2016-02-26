@@ -390,7 +390,7 @@ void ChiMatrix::FitChi2() {
       m_chi2FitNonConstVar.back()->GetYaxis()->SetTitle( "#chi^{2}" );
 
       //Create the fit
-      fittingFunction = FitHist( m_chi2FitNonConstVar.back(), !(m_setting->GetConstVarFit() == "SIGMA"), 0, 0 );
+      fittingFunction = FitHist( m_chi2FitNonConstVar.back(), m_setting->GetConstVarFit() == "SIGMA" ? 0 : m_setting->GetFitMethod(), 0, 0 );
       if ( fittingFunction ) {              
 	double alphaMin = fittingFunction->GetParameter(2);
 	double alphaErr = fittingFunction->GetParameter(1);
@@ -424,7 +424,7 @@ void ChiMatrix::FitChi2() {
 	for ( int bin = max( m_chi2FitConstVar->FindBin( m_sigma - 2*m_errSigma ), 1); bin <= min( m_chi2FitConstVar->FindBin( m_sigma +2*m_errSigma ), m_chi2FitConstVar->GetNbinsX() ); bin++ ) {
 	  if ( m_chi2FitConstVar->GetBinContent( bin ) > minChi ) continue;
 	  minChi = m_chi2FitConstVar->GetBinContent( bin );
-	  m_sigma = m_chi2FitConstVar->GetXaxis()->GetBinCenter( bin );
+	  m_sigma = max( 0., m_chi2FitConstVar->GetXaxis()->GetBinCenter( bin ) );
 	}
       }
     }
@@ -511,28 +511,28 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
   DrawPlot( {m_chiMatrix}, plotName );
   WriteLatexMinipage( ss, {plotName}, 2 );
 
-  //Comparison data and extrmal alpha templates
-  if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
-    if ( m_setting->GetDoScale() ) {
-      legends.clear();
-      legends.push_back( "legend=Data" );
-      legends.push_back( string(TString::Format("legend=Template : alpha=%i",(int) ( m_scaleValues.front()*1e6)) ) );
-      legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
-      plotName = TString( path + m_name + "_CompareAlpha" );
-      DrawPlot( { m_dataZMass, m_MCZMass[0][bestSigma],  m_MCZMass.back()[bestSigma]}, plotName, legends );
-      plotNames.push_back( plotName   );
-    }
+  // //Comparison data and extrmal alpha templates
+  // if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
+  //   if ( m_setting->GetDoScale() ) {
+  //     legends.clear();
+  //     legends.push_back( "legend=Data" );
+  //     legends.push_back( string(TString::Format("legend=Template : alpha=%i",(int) ( m_scaleValues.front()*1e6)) ) );
+  //     legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
+  //     plotName = TString( path + m_name + "_CompareAlpha" );
+  //     DrawPlot( { m_dataZMass, m_MCZMass[0][bestSigma],  m_MCZMass.back()[bestSigma]}, plotName, legends );
+  //     plotNames.push_back( plotName   );
+  //   }
   
-    if ( m_setting->GetDoSmearing() ) {
-      legends.clear();
-      legends.push_back( "legend=Data" );
-      legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
-      legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
-      plotName = path + m_name + "_CompareSigma";
-      DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
-      plotNames.push_back( plotName );
-    }
-  }
+  //   if ( m_setting->GetDoSmearing() ) {
+  //     legends.clear();
+  //     legends.push_back( "legend=Data" );
+  //     legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
+  //     legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
+  //     plotName = path + m_name + "_CompareSigma";
+  //     DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
+  //     plotNames.push_back( plotName );
+  //   }
+  // }
   
   plotName = path + m_name + "_chi2FitConstVar";
   DrawPlot( { m_chi2FitConstVar }, plotName );
@@ -546,12 +546,12 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
   WriteLatexMinipage( ss, plotNames, 2 );
 
   plotNames.clear();
-  for ( int i=0; i< (int) m_chi2FitNonConstVar.size(); i++ ) {
-    plotName = path + m_chi2FitNonConstVar[i]->GetName();
-    DrawPlot( { m_chi2FitNonConstVar[i] }, plotName );
-    plotNames.push_back( plotName );
-  }
-  WriteLatexMinipage( ss, plotNames, 4 );
+  // for ( int i=0; i< (int) m_chi2FitNonConstVar.size(); i++ ) {
+  //   plotName = path + m_chi2FitNonConstVar[i]->GetName();
+  //   DrawPlot( { m_chi2FitNonConstVar[i] }, plotName );
+  //   plotNames.push_back( plotName );
+  // }
+  // WriteLatexMinipage( ss, plotNames, 4 );
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot Done" << endl;
 }
@@ -692,8 +692,9 @@ void ChiMatrix::OptimizeRanges( ) {
 	  cout << "rangeMin : " << rangeMin << endl;
 	  continue;
 	}
-	
-	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
+
+	double sigmaUp = sqrt( histScale->GetBinContent(histScale->GetNbinsX()) - histScale->GetMinimum());
+	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 && sigmaUp>m_setting->GetOptimizeRanges() ) {
 	  delete histScale; histScale=0;
 	  break;
 	}
@@ -708,18 +709,10 @@ void ChiMatrix::OptimizeRanges( ) {
 	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
 	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
 
-	if ( m_name == "ChiMatrix_10_8" ) {
-	  DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) );       
-	  DrawPlot( { m_dataZMass, m_MCZMass.front().front() }, string( TString::Format( "TestOptimize_ZMass_%d", counter ) ) );
-	  for ( int i =1; i<=histScale->GetNbinsX(); i++ )
-	    cout << i << " " << histScale->GetBinContent( i ) << endl;
-	}
 
-	chiMin = histScale->GetMinimum();
-	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );
-	  //min( scaleMin, histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() ) );
+	chiMin = min( chiMin, histScale->GetMinimum() );
+	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );	
 
-	//	double sigmaUp = sqrt(histScale->GetBinContent( histScale->GetNbinsX() ) - histScale->GetMinimum() );
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
 	double deltaUp = 0;
 	for ( int iBin = minBin+1; iBin <= histScale->GetNbinsX(); iBin++ ) {
@@ -731,8 +724,8 @@ void ChiMatrix::OptimizeRanges( ) {
 	cout << " delta Up : " << deltaUp << endl;
 
 	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
-	//	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
-	rangeMax = min( allowedRangeMax, scaleMin + deltaUp*m_setting->GetOptimizeRanges() );
+	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	//	rangeMax = min( allowedRangeMax, scaleMin + deltaUp*m_setting->GetOptimizeRanges() );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
 
 	cout << "end" << endl;
@@ -859,6 +852,17 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
+  case 3 :
+    fittingFunction = quadraticFit;
+    minCentral=max( 0., hist->GetXaxis()->GetXmin() );
+    cout << "minBin : " << minBin;
+    minBin = hist->GetMinimumBin();
+    cout << " " << minBin << endl;
+    break;
+  case 4 :
+    fittingFunction = cubicFit;
+    minCentral=max( 0., hist->GetXaxis()->GetXmin() );
+    break;
   default : //Fit alpha optimization
     fittingFunction = quadraticFit;
   }
@@ -908,7 +912,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
   }
 
 
-  if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
+  if ( !fitResult->Status() && ( mode == 2 || mode == 4 ) ) { //solve the equation chi(C))=1 with dichotomy
     double minVal = fittingFunction->GetParameter(2);
     double currentValue = hist->GetXaxis()->GetXmax();
     double width = currentValue-minVal;
