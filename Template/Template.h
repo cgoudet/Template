@@ -1,6 +1,6 @@
 #ifndef TEMPLATE_H
 #define TEMPLATE_H
-
+#include "PlotFunctions/MapBranches.h"
 #include "Setting.h"
 #include "TTree.h"
 #include "TH2F.h"
@@ -254,12 +254,7 @@ class Template
    */
   TRandom3 m_rand;
 
-  map<string, double> m_mapDouble;
-  /* map< string, double > m_mapVar1; */
-  /* map< string, double > m_mapVar2; */
-  /* map< string, double > m_mapVarEvent; */
-  /*  map< string, long long int  > m_mapVarNumber; */
-  map< string, long long int  > m_mapLongLong;
+  MapBranches m_mapBranches;
   string m_name;
 
   /**\brief 2D vector containing usefull histograms for alpha and c

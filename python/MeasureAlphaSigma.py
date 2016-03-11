@@ -67,7 +67,9 @@ elif switch == 2 :
 	configFiles.append( ['MC6_nUseEl1.root',  'ClosureData', 'ClosureMC', ['nUseEl=1', 'etaBins=ETA6' ]] )
 
 elif switch == 3 :
- 	configFiles =[	['TestFitMethod.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=1', 'debug=1', 'fitMethod=4', 'etaBins=ETA24'] ]]
+ 	configFiles =[	['TestFitMethod4.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=1', 'debug=1', 'fitMethod=4', 'etaBins=ETA24'] ]
+			,['TestFitMethod2.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=1', 'debug=1', 'etaBins=ETA24'] ]
+			]
  	# configFiles =[	
 	# 	['Data_LwG.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25nsb_Lkh1_scaled', ['nUseEl=1', 'debug=1', 'selection=(gain_1==2 || gain_2==2) && m12>70 && m12<110 ', 'optimizeRanges=10', 'ZMassMin=70', 'ZMassMax=110', 'etaBins=-2.47 2.47'] ]
 	# 	# ,['Data_HiG.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25nsb_Lkh1_scaled', ['nUseEl=1', 'debug=1', 'selection=gain_1==0 && gain_2==0 ', 'optimizeRanges=10', 'etaBins=-2.47 2.47'] ]

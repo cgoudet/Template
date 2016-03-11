@@ -36,7 +36,7 @@ Template::Template() : m_setting(), m_rand(), m_name()
   m_MCFileNames.clear();
   m_MCTreeNames.clear();
 
-  m_mapDouble["WEIGHT"]=1;
+  m_mapBranches.SetVal("WEIGHT", 1. );
   m_histNames = { "measScale", "inputScale", "deviation" };
   m_vectHist.resize( extents[2][m_histNames.size()] );
 
@@ -453,7 +453,8 @@ void Template::FillDistrib( bool isData ) {
   if ( isData ) m_setting.SetNEventData(0);
   else m_setting.SetNEventMC(0);
   
-  
+  map<string, double> &mapDouble = m_mapBranches.GetMapDouble();
+
   unsigned int nEntry = ( isData && m_setting.GetNUseEvent() ) ? m_setting.GetNUseEvent() : 0;
   unsigned int nFiles = ( isData ) ? m_dataFileNames.size() : m_MCFileNames.size();
   unsigned long int counterEntry = 0;
@@ -482,7 +483,8 @@ void Template::FillDistrib( bool isData ) {
 
     //    inputTree->SetDirectory( 0 );
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
-    LinkTreeBranches( inputTree, 0, m_mapDouble, m_mapLongLong );
+    m_mapBranches.LinkTreeBranches( inputTree, 0 );
+
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
@@ -490,10 +492,10 @@ void Template::FillDistrib( bool isData ) {
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       TLorentzVector e1, e2;  
 
-      e1.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
-      e2.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
+      e1.SetPtEtaPhiM( mapDouble[mapBranchNames["PT_1"]], mapDouble[mapBranchNames["ETA_TRK_1"]], mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+      e2.SetPtEtaPhiM( mapDouble[mapBranchNames["PT_2"]], mapDouble[mapBranchNames["ETA_TRK_2"]], mapDouble[mapBranchNames["PHI_2"]], 0.511 );
 
-      m_mapDouble["WEIGHT"] = GetWeight(isData);
+      mapDouble["WEIGHT"] = GetWeight(isData);
 
       //##############################
       if ( isData ) m_setting.SetNEventData();
@@ -503,14 +505,14 @@ void Template::FillDistrib( bool isData ) {
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
 	int foundBin = FindBin( i_eta, j_eta );
-	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  m_mapDouble["WEIGHT"] );
+	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData,  mapDouble["WEIGHT"] );
       }
       else {
 	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, mapDouble["WEIGHT"]/2. );
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, m_mapDouble["WEIGHT"]/2. );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( e1, e2, isData, mapDouble["WEIGHT"]/2. );
       }
       
       counterEntry++;
@@ -589,10 +591,12 @@ void Template::CreateDistordedTree( string outFileName ) {
   dataTree->SetDirectory(0);
   int counterEvent=0;
 
+  map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
+
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
-    LinkTreeBranches( MCTree, dataTree, m_mapDouble, m_mapLongLong );
+    m_mapBranches.LinkTreeBranches( MCTree, dataTree );
     cout << "Nevents : " << MCTree->GetEntries() << endl;
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
       MCTree->GetEntry( iEvent );
@@ -608,9 +612,9 @@ void Template::CreateDistordedTree( string outFileName ) {
 	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
 
 	//if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
-	m_mapDouble[mapVarNames["PT_1"]] *= factor1;
-	m_mapDouble[mapVarNames["PT_2"]] *= factor2;
-	m_mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
+	mapDouble[mapVarNames["PT_1"]] *= factor1;
+	mapDouble[mapVarNames["PT_2"]] *= factor2;
+	mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
 	dataTree->Fill();
 	counterEvent++;
       }
@@ -778,14 +782,15 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
+  map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
 
   i_eta = 0;
   j_eta = 0;
 
   double eta1 = 0;
   double eta2 = 0;
-  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str() ]] ) : m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str()] ];
-  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : m_mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
+  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str()] ];
+  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
   // cout << m_setting.GetVar1() << " " << m_mapVar1[m_setting.GetVar1()] << " " << m_mapVar1["ETA_TRK"]  << endl;
   // cout << "eta : " << eta1 << " " << eta2 << endl;  
   if ( m_setting.GetMode() == "1VAR" && eta1 < eta2 ) swap( eta1, eta2 );
@@ -845,7 +850,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
     TTree *dumTree = 0;
     string dumString="";
-    
+    map< string, double > &mapDouble = m_mapBranches.GetMapDouble();     
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
     for ( unsigned int iFile = 0; iFile < nFile; iFile++ ) {
@@ -859,25 +864,25 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
       
       dumString = ( iCorrection ) ? m_MCTreeNames[iFile] : m_dataTreeNames[iFile];
       TTree *dataTree = (TTree*) dataFile->Get( dumString.c_str() );
-      LinkTreeBranches( dataTree, dumTree, m_mapDouble, m_mapLongLong );
+      m_mapBranches.LinkTreeBranches( dataTree, dumTree );
       
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
 	dataTree->GetEntry( iEvent );
 	
 	double factor1 = ( iCorrection ) ? 
-	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_1" ]] ) ))
-	    : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_1" ]] ) ) );
+	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_1" ]] ) ))
+	    : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_1" ]] ) ) );
 	double factor2 = ( iCorrection ) ? 
-	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_2" ]] ) ))
-	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_2" ]] ) ) );
+	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( mapDouble[mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_2" ]] ) ))
+	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( mapDouble[mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_2" ]] ) ) );
 	
 	
-	m_mapDouble[mapBranchNames["PT_1"]] *= factor1;
-	m_mapDouble[mapBranchNames["PT_2"]] *= factor2;
+	mapDouble[mapBranchNames["PT_1"]] *= factor1;
+	mapDouble[mapBranchNames["PT_2"]] *= factor2;
 	
-	e3.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_1"]], m_mapDouble[mapBranchNames["ETA_TRK_1"]], m_mapDouble[mapBranchNames["PHI_1"]], 0.511 );
-	e4.SetPtEtaPhiM( m_mapDouble[mapBranchNames["PT_2"]], m_mapDouble[mapBranchNames["ETA_TRK_2"]], m_mapDouble[mapBranchNames["PHI_2"]], 0.511 );
-	m_mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
+	e3.SetPtEtaPhiM( mapDouble[mapBranchNames["PT_1"]], mapDouble[mapBranchNames["ETA_TRK_1"]], mapDouble[mapBranchNames["PHI_1"]], 0.511 );
+	e4.SetPtEtaPhiM( mapDouble[mapBranchNames["PT_2"]], mapDouble[mapBranchNames["ETA_TRK_2"]], mapDouble[mapBranchNames["PHI_2"]], 0.511 );
+	mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
 	
 	dumTree->Fill();
       }
@@ -996,10 +1001,11 @@ string Template::CreateHistMatName( string objName, unsigned int iVar ) {
 //#############################
 double Template::GetWeight( bool isData ) {
   double weight=1;
+  map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
 
   vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {
-    weight *= m_mapDouble[dumVect[iName]];
+    weight *= mapDouble[dumVect[iName]];
   }
   return weight;
 }
