@@ -119,6 +119,10 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             MCLine+=" --MCFileName " + StripName( MCFiles[iFile], 1, 0 ) 
 
 #Fill the command line
+#Modes  description
+# 0 Normal
+# 1 Corrects alpha and c
+
         if mode==0 :
             CreateConfig( configName[0] ,configOptions )
             batch.write( 'cp -v ' + configName[0] + ' . \n' )
@@ -157,14 +161,16 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                          + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
                          + ' --makePlot\n')
 
+
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
                 
         elif mode == 2:
-            batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName, 1, 0)
-                         + dataLine + MCLine + optionLine + outNameFile + ' \n' )
+            CreateConfig( configName[0] ,configOptions )
+            batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName[0], 1, 0)
+                         + dataLine + MCLine + optionLine + ' --outFileName ' + outNameFile + ' \n' )
             batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
@@ -191,7 +197,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             batch.write( 'MeasureScale --configFile ' + StripName(configName[1], 1, 0)
                          + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
                          + ' --makePlot\n')
-            batch.write( 'ls DataOff*' )
+            batch.write( 'ls DataOff*\n' )
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 

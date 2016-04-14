@@ -143,7 +143,7 @@ int main( int argc, char* argv[] ) {
       	configCDistrib[binBin][statBin][inputBin][iConf][jConf][0]->GetYaxis()->SetTitle( "# Event" );
 	saveHist.push_back( configCDistrib[binBin][statBin][inputBin][iConf][jConf][0] );
       	titleConfig = TString::Format( "CBiasConfig_%d_%d_%d_%d_%d", nBins, statTree, (int) floor( input*1e6), iConf, jConf );
-      	configCDistrib[binBin][statBin][inputBin][iConf][jConf][1] = new TH1D( titleConfig, titleConfig, 71, -0.021, 0.05 );
+      	configCDistrib[binBin][statBin][inputBin][iConf][jConf][1] = new TH1D( titleConfig, titleConfig, 100, -0.01, 0.01 );
 	configCDistrib[binBin][statBin][inputBin][iConf][jConf][1]->Sumw2();
 	configCDistrib[binBin][statBin][inputBin][iConf][jConf][1]->SetDirectory(0);
       	configCDistrib[binBin][statBin][inputBin][iConf][jConf][1]->GetXaxis()->SetTitle( "C^{meas}-C^{in}" );

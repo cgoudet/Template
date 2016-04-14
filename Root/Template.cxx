@@ -56,7 +56,7 @@ Template::Template( const string &outFileName, const string &configFile,
     cout << "Configuration failed " << err << " : exiting" << endl;
     exit( 1 );
   }
-  m_setting.Print();
+  //  m_setting.Print();
 
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
@@ -309,14 +309,6 @@ int Template::CreateTemplate() {
   //If data events haven't been filled
   else  FillDistrib( true );  
 
-    // m_chiMatrix[16][10]->CreateTemplates();
-    // m_chiMatrix[16][10]->FitChi2();
-    // m_chiMatrix[21][15]->CreateTemplates();
-    // m_chiMatrix[21][15]->FitChi2();
-    // m_chiMatrix[20][17]->CreateTemplates();
-    // m_chiMatrix[20][17]->FitChi2();
-    // exit(0);
-
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
@@ -401,9 +393,9 @@ int Template::ExtractFactors() {
       cout << "eta2Max : " << eta2Max << endl;
 
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-	
+	if ( i_eta == 17 && j_eta == 13 ) m_setting.SetDebug( 1 );	
 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-
+	m_setting.SetDebug( 0 );
 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
 	(*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
@@ -462,6 +454,8 @@ void Template::FillDistrib( bool isData ) {
   TTree *inputTree = 0;
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
+  cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
+
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
@@ -486,6 +480,7 @@ void Template::FillDistrib( bool isData ) {
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
+      //      if ( iEvent < 1000000 ) continue;
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );

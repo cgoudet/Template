@@ -5,33 +5,30 @@ from Functions_MeasureAlphaSigma import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=3
+switch=4
 
 if switch==0 :
         configFiles=[ 
 # 		#Mesure des scales
- 		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'fitMethod=3', 'etaBins=ETA24'] ],
-# 		['DataOff_13TeV_25ns_68Bins.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1'] ],
-# 		['DataOff_13TeV_25ns_2Steps.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'], 1 ],
-# 		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-# 		#mesure avec electron tight
-# 		['DataOff_13TeV_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-# #		mesure sans pileup
-# 		['DataOff_13TeV_25ns_noPileup.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1',['MCBranchWeightName=vertexWeight SFID SFReco datasetWeight TrigPS', 'nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-		# #bkg
-		# ['DataOff_13TeV_25ns_bkg.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', ['nUseEl=2', 'debug=1, 'etaBins=ETA24''] ],
- 		# ['DataOff_13TeV_25ns_bkg_68Bins.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', ['nUseEl=2', 'etaBins=ETA68', 'debug=1', 'etaBins=ETA24'] ],
-# 		#mesure avec masse sueil Off0
-# 		['DataOff_13TeV_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2','thresholdMass=75', 'debug=1', 'etaBins=ETA24']],
-# 		#mesure avec fenetre masse plus faible
-# 		['DataOff_13TeV_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'ZMassMin=82.5', 'ZMassMax=97.5', 'debug=1', 'etaBins=ETA24'] ],
-# 		#mesure avec fBrem
-# 		['DataOff_13TeV_25ns_fBrem.root', 'Data_13TeV_Zee_25ns_Lkh1_fBrem50', 'MC_13TeV_Zee_25ns_Lkh1_fBrem50', ['nUseEl=2','thresholdMass=75', 'debug=1', 'etaBins=ETA24']],
-# 		#mesure globale avec pt seuil
-# 		['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-# 		['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-# 		['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
-# 		['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24']],
+ 		['DataOff_13TeV_25ns_24Bins.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'fitMethod=3', 'etaBins=ETA24'] ],
+		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=5', 'debug=1'] ],
+		['DataOff_13TeV_25ns_2Steps.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'], 1 ],
+		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		#mesure avec electron tight
+		['DataOff_13TeV_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		#bkg
+		['DataOff_13TeV_25ns_bkg.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', ['nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		#mesure avec masse sueil Off0
+		['DataOff_13TeV_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2','thresholdMass=75', 'debug=1', 'etaBins=ETA24']],
+		#mesure avec fenetre masse plus faible
+		['DataOff_13TeV_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=2', 'ZMassMin=82.5', 'ZMassMax=97.5', 'debug=1', 'etaBins=ETA24'] ],
+		#mesure avec fBrem
+		['DataOff_13TeV_25ns_fBrem.root', 'Data_13TeV_Zee_25ns_Lkh1_fBrem50', 'MC_13TeV_Zee_25ns_Lkh1_fBrem50', ['nUseEl=2','thresholdMass=75', 'debug=1', 'etaBins=ETA24']],
+		# #mesure globale avec pt seuil
+		# ['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		# ['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		# ['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24'] ],
+		# ['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=2', 'debug=1', 'etaBins=ETA24']],
 # #		Mesure avec les geometries modifiees
 # 		['MCOff_13TeV_25ns_geo02.root', 'MC_13TeV_Zee_25ns_geo02_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
 # 		['MCOff_13TeV_25ns_geo11.root', 'MC_13TeV_Zee_25ns_geo11_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
@@ -81,24 +78,24 @@ elif switch == 4 :
         configFiles=[ 
  		#Mesure des scales
 
- 		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', [], 3 ],
-		['DataOff_13TeV_25ns_2Steps.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', [], 4 ],
-		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', [], 3 ],
+ 		# ['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=5'], 3 ],
+		# ['DataOff_13TeV_25ns_2Steps.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=5'], 4 ],
+		#['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', ['nUseEl=5'], 3 ],
 		#mesure avec electron tight
-		['DataOff_13TeV_25ns_tight.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', [], 3 ],
+#		['DataOff_13TeV_25ns_ID.root', 'Data_13TeV_Zee_25ns_Lkh2', 'MC_13TeV_Zee_25ns_Lkh2', ['nUseEl=5'], 3 ],
 		#bkg
-		['DataOff_13TeV_25ns_bkg.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', [], 3 ],
+		['DataOff_13TeV_25ns_EW.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', ['nUseEl=5'], 3 ],
 		#mesure avec masse sueil Off0
-		['DataOff_13TeV_25ns_thresholdMass.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['thresholdMass=75'], 3],
+#		['DataOff_13TeV_25ns_Threshold.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['thresholdMass=75','nUseEl=5'], 3],
 		#mesure avec fenetre masse plus faible
-		['DataOff_13TeV_25ns_massWindow.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5'], 3 ],
-		#mesure avec fBrem
-		['DataOff_13TeV_25ns_fBrem.root', 'Data_13TeV_Zee_25ns_Lkh1_fBrem50', 'MC_13TeV_Zee_25ns_Lkh1_fBrem50', ['nUseEl=2','thresholdMass=75', 'debug=1'], 3],
-		#mesure globale avec pt seuil
-		['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6',], 3 ],
-		['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6',], 3 ],
-		['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6',], 3 ],
-		['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6',], 3],
+		['DataOff_13TeV_25ns_Window.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5','nUseEl=5'], 3 ],
+		# #mesure avec fBrem
+		['DataOff_13TeV_25ns_fBrem.root', 'Data_13TeV_Zee_25ns_Lkh1_fBrem50', 'MC_13TeV_Zee_25ns_Lkh1_fBrem50', ['nUseEl=5','thresholdMass=75', 'debug=1'], 3],
+		# #mesure globale avec pt seuil
+		# ['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6','nUseEl=5'], 3 ],
+		# ['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6','nUseEl=5'], 3 ],
+		# ['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6','nUseEl=5'], 3 ],
+		# ['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6','nUseEl=5'], 3],
 	]
 
 elif switch == 12 :

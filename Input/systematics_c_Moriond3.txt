@@ -1,4 +1,4 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/EnergyScaleFactors.root				totSyst_c	dum
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/EnergyScaleFactors.root				totSyst_c	dum
 /sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root						Run1/ctErrZee_run1_EW EWRun1
 /sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root						Run1/ctErrZee_run1_QCD QCDRun1
 /sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root						Run1/ctErrZee_run1_RecoEff RecoEffRun1

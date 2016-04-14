@@ -1,5 +1,5 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/EnergyScaleFactors.root				totSyst_c	dum
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Inversion.root					hist_2		dum
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160217/Inversion.root					hist_3		inversion_c
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/EnergyScaleFactors.root				totSyst_c	dum
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/Inversion.root					hist_2		dum
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/Inversion.root					hist_3		inversion_c
 
 
