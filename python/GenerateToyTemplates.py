@@ -9,14 +9,14 @@ configFiles=[
     ]
 
 inputC = [ 0.007 ]
-inputStat = [ 1000000 ]
-nIteration = 2000
+inputStat = [ 100000 ]
+nIteration = 4
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl= 1
 fitPerJob= 2
 
-plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
+plotPath='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/'
 
 for vInput in  inputC  :
     for vStat in inputStat :
@@ -26,7 +26,7 @@ for vInput in  inputC  :
             
             configFiles[0][0] = outName + str( counter ) + '.root'
 
-            optionLine = ' --inputC ' + str( vInput ) + ' --inputStat ' + str( vStat ) + ' --nIteration ' + str( min( nIteration-iIteration, fitPerJob ) ) + ' '
+            optionLine = ' --inputC ' + str( vInput ) + ' --inputStat ' + str( vStat ) + ' --nIteration ' + str( min( nIteration-iIteration, fitPerJob ) ) + ' --toyNumber '+ str( iIteration )+' '
             if nUseEl != 1 :
                 configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
             logPath="Log/"

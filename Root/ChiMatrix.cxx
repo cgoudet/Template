@@ -287,12 +287,6 @@ int ChiMatrix::FillChiMatrix(  ) {
 //==========
 void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight ) {
   //if ( m_setting->GetDebug() ) cout << m_name << " : FillDistrib" <<endl;
-  //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
-  if ( m_setting->GetIndepTemplates() ) {
-    cout << "setting new Template seed ChiMatrix" << endl;
-    high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    m_rand.SetSeed( t1.time_since_epoch().count() );
-  }
   
   if ( isData ) {
     m_dataZMass->Fill( (e1+e2).M() / 1000., weight );
@@ -314,6 +308,18 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
 //=======================================
 void ChiMatrix::FillTemplates( ) {
   //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
+
+  //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
+  if ( m_setting->GetIndepTemplates() ) {
+    cout << "setting new Template seed ChiMatrix" << endl;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    m_rand.SetSeed( t1.time_since_epoch().count() );
+  }
+
+  else m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );
+
+  cout<<"Test seed in FillTemplates: "<<m_rand.GetSeed()<<endl;
+
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
@@ -327,6 +333,8 @@ void ChiMatrix::FillTemplates( ) {
 	  
 	  double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
 	  double factor2Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) :m_scaleValues[i_alpha]  );
+
+	  if ((iEvent ==0 || iEvent ==m_MCTree->GetEntries()-1)&& i_alpha==0 && i_sigma==0 ) cout<<"iEvent "<<iEvent<<" factor1Alpha: " << factor1Alpha<<" "<<m_rand.GetSeed()<<endl;
 
 	  double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 	  double factor2Sigma = 1 + randVal2 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );

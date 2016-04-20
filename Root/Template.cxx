@@ -480,7 +480,7 @@ void Template::FillDistrib( bool isData ) {
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-      //      if ( iEvent < 1000000 ) continue;
+      // if ( iEvent < 500000 ) continue;
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
@@ -650,7 +650,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   fstream latex;
   TString dumName;
   latex.open( path + latexFileName, fstream::out | fstream::trunc );
-  WriteLatexHeader( latex, "Christophe Goudet" );
+  WriteLatexHeader( latex, "Antinea Guerguichon" );
   //Give the main info about the analysis
   latex << "Mass Distribution : " << m_setting.GetZMassNBins() << " " << m_setting.GetZMassMin() << " " << m_setting.GetZMassMax() << "\\newline" << endl;
   dumName = m_setting.GetMCName();
