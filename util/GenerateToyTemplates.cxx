@@ -53,9 +53,9 @@ int main( int argc, char* argv[] ) {
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
-  unsigned int iConf, jConf, statConf, statTree, runNumber, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
+  unsigned int iConf, jConf, statConf, statTree, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
-
+  unsigned long long runNumber;
   cout << "Opening " << outFileName << endl;
   TFile *outFile = new TFile( outFileName.c_str(), "RECREATE" );
 
@@ -113,7 +113,7 @@ int main( int argc, char* argv[] ) {
 	}
 
 	cout << "measurement step " << endl;
-	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
+	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );

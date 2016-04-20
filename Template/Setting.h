@@ -64,10 +64,10 @@ class Setting
   string GetVar1() const { return m_var1; };
   string GetVar2() const { return m_var2; };
   double GetThresholdMass() const { return m_thresholdMass; };
-  bool GetIndepDistorded() const { return m_indepDistorded; };
-  bool GetIndepTemplates() const { return m_indepTemplates; };
+  unsigned long GetIndepDistorded() const { return m_indepDistorded; };
+  unsigned long GetIndepTemplates() const { return m_indepTemplates; };
   unsigned int GetInversionMethod() const { return m_inversionMethod; }
-  bool GetBootstrap() const { return m_bootstrap; }
+  unsigned long GetBootstrap() const { return m_bootstrap; }
   bool GetDoPileup() const { return m_doPileup;}
   bool GetDoWeight() const { return m_doWeight; }
   unsigned int GetApplySelection() const { return m_applySelection; }
@@ -97,8 +97,8 @@ class Setting
   void SetAlphaSimEta( vector<double> alphaSimEta ) { if ( alphaSimEta.size() == m_etaBins.size()-1 ) m_alphaSimEta = alphaSimEta; }
   void SetNUseEvent( unsigned int nUseEvent ) { m_nUseEvent = nUseEvent; }
   void SetNUseEl( unsigned int nUseEl ) { m_nUseEl = nUseEl; }
-  void SetIndepDistorded( bool indepDistorded ) { m_indepDistorded = indepDistorded; }
-  void SetIndepTemplates( bool indepTemplates ) { m_indepTemplates = indepTemplates; }
+  void SetIndepDistorded( unsigned long indepDistorded ) { m_indepDistorded = indepDistorded; }
+  void SetIndepTemplates( unsigned long indepTemplates ) { m_indepTemplates = indepTemplates; }
   void SetDoWeight( bool doWeight ) { m_doWeight = doWeight; };
 
   /**\brief Save the content into a file
@@ -259,10 +259,10 @@ class Setting
   unsigned int m_nUseEl;
   unsigned int m_nEventCut;
   double m_thresholdMass;
-  bool m_indepDistorded;
-  bool m_indepTemplates;
+  unsigned long m_indepDistorded;
+  unsigned long m_indepTemplates;
   unsigned int m_inversionMethod;
-  bool m_bootstrap;
+  unsigned long m_bootstrap;
   bool m_doPileup;
   bool m_doWeight;
   map<string,string> m_branchVarNames;

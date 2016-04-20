@@ -288,11 +288,6 @@ int ChiMatrix::FillChiMatrix(  ) {
 void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight ) {
   //if ( m_setting->GetDebug() ) cout << m_name << " : FillDistrib" <<endl;
   //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
-  if ( m_setting->GetIndepTemplates() ) {
-    cout << "setting new Template seed ChiMatrix" << endl;
-    high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    m_rand.SetSeed( t1.time_since_epoch().count() );
-  }
   
   if ( isData ) {
     m_dataZMass->Fill( (e1+e2).M() / 1000., weight );
@@ -314,6 +309,15 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
 //=======================================
 void ChiMatrix::FillTemplates( ) {
   //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
+  if ( m_setting->GetIndepTemplates() ) {
+    if ( m_setting->GetIndepTemplates() == 1 ) {
+    cout << "setting new Template seed ChiMatrix" << endl;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    m_rand.SetSeed( t1.time_since_epoch().count() );
+    }
+    else m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );  
+  }
+
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
