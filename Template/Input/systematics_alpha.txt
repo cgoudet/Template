@@ -1,0 +1,8 @@
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/EnergyScaleFactors.root				totSyst_alpha	dum
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns.root			measScale_alpha alphaOff_alpha	
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_EW.root 		measScale_alpha EW_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_Window.root 	measScale_alpha Window_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_Threshold.root 	measScale_alpha Threshold_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_ID.root 		measScale_alpha ID_alpha 
+/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_fBrem.root 		measScale_alpha fBrem_alpha 
+
