@@ -73,8 +73,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
     configPath="Config/"
     batchPath="Batch/"
-    resultPath="Results/TestDum/"
-    plotPath="Plots/TestDum/"
+    resultPath="Results/Set2/"
+    plotPath="Plots/Set2/"
 
     configName = []
     if mode == 1 :
@@ -138,6 +138,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                 
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
+                
+            batch.write( 'rm *distorded* \n')
             batch.write( 'cp -v TestOptimize*.pdf /sps/atlas/a/aguerguichon/Calibration/Test/. \n' ) 
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
@@ -160,8 +162,9 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             batch.write( 'MeasureScale --configFile ' + StripName(configName[1], 1, 0)
                          + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
                          + ' --makePlot\n')
+            
 
-
+            batch.write( 'rm *distorded* \n')
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
@@ -171,7 +174,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             CreateConfig( configName[0] ,configOptions )
             batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName[0], 1, 0)
                          + dataLine + MCLine + optionLine + ' --outFileName ' + outNameFile + ' --makePlot \n' )
-            batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+            batch.write( 'rm *distorded* \n')
+            #batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
             batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
@@ -198,6 +202,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                          + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
                          + ' --makePlot\n')
             batch.write( 'ls DataOff*\n' )
+            batch.write( 'rm *distorded* \n')
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 

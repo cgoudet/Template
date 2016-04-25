@@ -480,7 +480,7 @@ void Template::FillDistrib( bool isData ) {
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-      // if ( iEvent < 500000 ) continue;
+      if ( iEvent < 500000 ) continue;
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
@@ -542,10 +542,15 @@ void Template::CreateDistordedTree( string outFileName ) {
   }
 
   if ( m_setting.GetIndepDistorded() ) {
-    high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    m_rand.SetSeed( t1.time_since_epoch().count() );
-    cout << "RandomSeed : " << m_rand.GetSeed() << endl;
+    if ( m_setting.GetIndepDistorded() == 1 ) {
+      high_resolution_clock::time_point t1 = high_resolution_clock::now();
+      m_rand.SetSeed( t1.time_since_epoch().count() );
+      cout << "RandomSeed : " << m_rand.GetSeed() << endl;
+    }
+    else m_rand.SetSeed(  m_setting.GetIndepDistorded() );
   }
+
+  // cout <<"IndepDistorded Seed: "<<m_rand.GetSeed()<<endl;
 
   if ( m_setting.GetBootstrap() ) {
   vector< TTree* > vectorTree;
@@ -559,7 +564,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   }
 
   TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
-  TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent() );
+  TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap() );
   cout << "bootstrap name : " << bootTree->GetName() << endl;
   distordedFile.cd();
   bootTree->Write( "", TObject::kOverwrite );
@@ -642,7 +647,11 @@ void Template::MakePlot( string path, string latexFileName ) {
   if ( path.back() != '/' && path != "" ) path += "/";
 
 
-  if ( latexFileName == "" ) latexFileName = m_name + ".tex";
+  if ( latexFileName == "" ) 
+    if ( m_name != "" ) latexFileName = m_name + ".tex";
+    else latexFileName = "latex.tex";
+
+  cout << m_name << " " << latexFileName << endl;
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
   unsigned int histInputBin = SearchVectorBin( string("inputScale"), m_histNames );   
 
@@ -917,6 +926,8 @@ string Template::FindDefaultTree( TFile* inFile ) {
   vector<string> listTreeNames;
 
   TIter nextkey( inFile->GetListOfKeys());
+  cout<<"File: "<<inFile->GetName();
+  
   TKey *key=0;
   while ((key = (TKey*)nextkey())) {
     if (strcmp( "TTree",key->GetClassName())) continue;

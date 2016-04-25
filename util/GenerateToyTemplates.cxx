@@ -21,7 +21,7 @@ int main( int argc, char* argv[] ) {
 
 
   unsigned int nIteration, makePlot;
-  unsigned long long int toyNumber, toyNumberTemp;
+  unsigned long long int toyNumber, toyNumberTmp;
   vector< double > inputValues;
   vector< unsigned int > inputStat;
 
@@ -41,7 +41,7 @@ int main( int argc, char* argv[] ) {
     ("inputC", po::value<vector<double>>(&inputValues)->multitoken(), "" )
     ("inputStat", po::value<vector<unsigned int>>(&inputStat)->multitoken(), "" )
     ("makePlot", po::value<unsigned int>(&makePlot)->default_value(0)->implicit_value(1), "" ) 
-    ("toyNumber", po::value<unsigned long long int>(&toyNumberTemp), "")
+    ("toyNumber", po::value<unsigned long long int>(&toyNumber), "")
    ;
 
 
@@ -55,10 +55,9 @@ int main( int argc, char* argv[] ) {
   int err = 0;
 
   double sigma, errSigma, inputC, rms;
-  unsigned long long int runNumber;
   unsigned int iConf, jConf, statConf, statTree, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
-
+  unsigned long long runNumber;
   cout << "Opening " << outFileName << endl;
   TFile *outFile = new TFile( outFileName.c_str(), "RECREATE" );
 
@@ -79,7 +78,7 @@ int main( int argc, char* argv[] ) {
   outTree->Branch( "nOptim", &nOptim );
   outTree->Branch( "bootstrap", &bootstrap );
   outTree->Branch( "fitMethod", &fitMethod );
-  outTree->Branch( "toyNumber", &toyNumber );
+  outTree->Branch( "toyNumber", &toyNumberTmp );
 
   TTree *scalesTree = new TTree( "scalesTree", "scalesTree" );
   scalesTree->SetDirectory( 0 );
@@ -97,7 +96,7 @@ int main( int argc, char* argv[] ) {
   scalesTree->Branch( "bootstrap", &bootstrap );
   scalesTree->Branch( "fitMethod", &fitMethod );
   scalesTree->Branch( "inversionMethod", &inversionMethod );
-  scalesTree->Branch( "toyNumber", &toyNumber );
+  scalesTree->Branch( "toyNumber", &toyNumberTmp );
 
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
@@ -106,12 +105,18 @@ int main( int argc, char* argv[] ) {
 	cout << "New loop : " << iIteration << endl;
 	cout << "iStat : " << inputStat[iStat] << endl;
 	cout << "iInput : " << inputValues[iInput] << endl;
-	cout << "toyNumber" << toyNumber << endl;
-	continue;
-	//toyNumber=iIteration;
+	toyNumberTmp = toyNumber+iIteration;
+	cout << "toyNumber" << toyNumberTmp << endl;
+
 	if ( true ) { //Only to free memory	
 	  Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
+	  if ( settingDistorded.GetIndepDistorded()>1 ) settingDistorded.SetIndepDistorded( toyNumberTmp+2 );
+	  if ( settingDistorded.GetBootstrap()>1 ) settingDistorded.SetBootstrap( 2*toyNumberTmp+3 );
+
+	  cout<<" setting ok"<<endl;
+
+	 
 	  settingDistorded.SetDebug( 1 );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
@@ -119,25 +124,29 @@ int main( int argc, char* argv[] ) {
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
 	  cout << "end if" << endl;
 	}
+	
 
-	cout << "measurement step " << endl;
-	Template TempMeasure( "", configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
+	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
+
+	
+	cout << "measurement step " << endl;
+       
 	//This part is usefull for deviation sigma plots if needed later
+	if ( settingMeasure.GetIndepTemplates()>1 ) settingMeasure.SetIndepTemplates( 3*toyNumberTmp+4 );
 	settingMeasure.SetSigmaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, inputValues[iInput] ) );
 	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
 
 	settingMeasure.SetNUseEvent( inputStat[iStat] );
 	cout << "extracting" << endl;
-
+   
 	err = TempMeasure.ExtractFactors( );
 	if ( err ) {
 	  cout << "Template::Extraction failed : " << err << endl;
 	  return 1;
 	}
-
 
 	if ( makePlot ) TempMeasure.MakePlot();
 	statTree=settingMeasure.GetNEventData();
@@ -153,10 +162,11 @@ int main( int argc, char* argv[] ) {
 
 	nBins = settingMeasure.GetEtaBins().size()-1;
 	nOptim = settingMeasure.GetOptimizeRanges();
-	bootstrap = settingMeasure.GetBootstrap();
 	fitMethod = settingMeasure.GetFitMethod();
+	if (indepTemplates > 1 ) indepTemplates =2;
+	else indepTemplates = settingMeasure.GetIndepTemplates();
+	bootstrap = settingMeasure.GetBootstrap();
 	indepDistorded = settingMeasure.GetIndepDistorded();
-	indepTemplates = settingMeasure.GetIndepTemplates();
 	inversionMethod = settingMeasure.GetInversionMethod();
 
 	cout << "filling confTree" << endl;

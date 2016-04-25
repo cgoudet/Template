@@ -151,7 +151,7 @@ class Template
      To call preferably after Template::Save() because changes colors, etc...\n
      - Calls ChiMatrix::MakePlot() : \n
   */
-  void MakePlot( string path = "", string latexFileName = "latex.tex" );
+  void MakePlot( string path = "", string latexFileName = "" );
 
   /**\brief Apply scale factors to MC and data Ntuples
      \param correctionAlpha histogram containing corrections of energy scale factor.
