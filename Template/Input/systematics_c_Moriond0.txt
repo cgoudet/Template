@@ -1,4 +1,0 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/EnergyScaleFactors.root				totSyst_c	dum
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25ns_dataScaled_c.root 		measScale_c 	dum
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/160316/DataOff_13TeV_25nsb_dataScaled_c.root 		measScale_c 	material_c
-

@@ -5,18 +5,18 @@ import time;
 
 #One config file correspond to one job
 configFiles=[ 
-    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=1', 'indepTemplates=1', 'bootstrap=0', 'etaBins=ETA6', 'doScale=0']]
+    ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=0', 'etaBins=ETA6', 'doScale=0']]
     ]
 
 inputC = [ 0.007 ]
-inputStat = [ 0 ]
-nIteration = 4000
+inputStat = [ 100000 ]
+nIteration = 2000
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl= 1
-fitPerJob= 2
+fitPerJob= 1
 
-plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
+plotPath='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/'
 
 for vInput in  inputC  :
     for vStat in inputStat :
@@ -26,8 +26,10 @@ for vInput in  inputC  :
             
             configFiles[0][0] = outName + str( counter ) + '.root'
 
-            optionLine = ' --inputC ' + str( vInput ) + ' --inputStat ' + str( vStat ) + ' --nIteration ' + str( min( nIteration-iIteration, fitPerJob ) ) + ' '
-            if nUseEl != 1 : configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
+
+            optionLine = ' --inputC ' + str( vInput ) + ' --inputStat ' + str( vStat ) + ' --nIteration ' + str( min( nIteration-iIteration, fitPerJob ) ) + ' --toyNumber '+ str( iIteration )+' '
+            if nUseEl != 1 :
+                configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
             logPath="Log/"
             launcherFile=CreateLauncher( configFiles[0], 2, optionLine )
             launchLine='~/sub1.sh ' + StripName( configFiles[0][0] ) + ' ' \

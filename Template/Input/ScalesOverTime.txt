@@ -1,3 +1,0 @@
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns.root		measScale_alpha	27
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns_pt30.root	measScale_alpha	30
-/sps/atlas/c/cgoudet/Calibration/ScaleResults/284448/Data6_13TeV_25ns_pt35.root	measScale_alpha	35

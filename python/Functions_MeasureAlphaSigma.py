@@ -1,5 +1,5 @@
 import os
-PREFIXPATH="/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH="/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/"
 PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -44,7 +44,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
 #mode 
     # 0 MeasureScale
-    # 1 GenerateToyTemplates
+    # 2 GenerateToyTemplates
     
     global PREFIXPATH
     global FILESETS
@@ -73,8 +73,8 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
     configPath="Config/"
     batchPath="Batch/"
-    resultPath="Results/"
-    plotPath="Plots/"
+    resultPath="Results/Set2/"
+    plotPath="Plots/Set2/"
 
     configName = []
     if mode == 1 :
@@ -95,13 +95,13 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         batch.write('server=`pwd`\n' 
                     + 'cd ${server} \n'
                     + 'ulimit -S -s 100000 \n'
-                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
-                    + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/ \n'
+                    + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/a/aguergui/public/Calibration/RootCoreBin/lib:/afs/in2p3.fr/home/a/aguergui/public/Calibration/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
+                    + 'cd /afs/in2p3.fr/home/a/aguergui/public/Calibration/RootCoreBin/ \n'
                     + 'source local_setup.sh \n'
                     + 'cd ${server} \n'
-                    + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
-                    )
-        
+                    + 'cp -v /afs/in2p3.fr/home/a/aguergui/public/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+                    )    
+    
 #Copy the configuration file to the server
         for confName in configName :
             batch.write( 'cp ' + confName + ' . \n' )
@@ -138,7 +138,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                 
 #Copy the output pdf and root file to result folder
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
-            batch.write( 'cp -v TestOptimize*.pdf /sps/atlas/c/cgoudet/Calibration/Test/. \n' ) 
+            batch.write( 'cp -v TestOptimize*.pdf /sps/atlas/a/aguerguichon/Calibration/Test/. \n' ) 
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
@@ -170,7 +170,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         elif mode == 2:
             CreateConfig( configName[0] ,configOptions )
             batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName[0], 1, 0)
-                         + dataLine + MCLine + optionLine + ' --outFileName ' + outNameFile + ' \n' )
+                         + dataLine + MCLine + optionLine + ' --outFileName ' + outNameFile + ' --makePlot \n' )
             batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
