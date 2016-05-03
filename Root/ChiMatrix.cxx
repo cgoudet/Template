@@ -310,15 +310,14 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
 //=======================================
 void ChiMatrix::FillTemplates( ) {
   //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
-  if ( m_setting->GetIndepTemplates() ) {
-    if ( m_setting->GetIndepTemplates() == 1 ) {
+  if (! m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );  
+  else if ( m_setting->GetIndepTemplates() == 1 ) {
     cout << "setting new Template seed ChiMatrix" << endl;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     m_rand.SetSeed( t1.time_since_epoch().count() );
-    }
-    else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );  
   }
-  else m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );  
+  else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );  
+
 
   //cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
 
@@ -361,7 +360,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
   if ( m_quality.to_ulong() ) {
-    cout << "bad quality : returns " << endl;
+    cout << "bad quality (" << m_quality.to_ulong() << "): returns " << endl;
     m_alpha = 0;
     m_errAlpha = 100;
     m_sigma = 0;
@@ -628,7 +627,6 @@ void ChiMatrix::OptimizeRanges( ) {
 
   for ( unsigned int iScale = 0; iScale < 2; iScale++ ) {
     if ( (!m_setting->GetDoScale() && !iScale) || (!m_setting->GetDoSmearing() && iScale) ) continue;
-    cout << "iScale : " << iScale << endl;
     double &rangeMin = iScale ? m_sigmaMin : m_alphaMin;
     double &rangeMax = iScale ? m_sigmaMax : m_alphaMax;
     double allowedRangeMin = iScale ? max( 0., m_setting->GetSigmaMin()) : m_setting->GetAlphaMin();
@@ -734,19 +732,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );	
 
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
-	double deltaUp = 0;
-	for ( int iBin = minBin+1; iBin <= histScale->GetNbinsX(); iBin++ ) {
-	  cout << histScale->GetXaxis()->GetBinCenter(iBin)-scaleMin << " " << sqrt(histScale->GetBinContent( iBin ) - histScale->GetMinimum() ) << endl;
-	  deltaUp += ( histScale->GetXaxis()->GetBinCenter(iBin)-scaleMin ) / sqrt(histScale->GetBinContent( iBin ) - histScale->GetMinimum() );
-	  if ( sqrt(histScale->GetBinContent( iBin ) - histScale->GetMinimum() )==0 ) {
-	      cout << "infinite deltaUp" << endl;
-	      cout << "minimum bin " << histScale->GetMinimumBin() << endl;
-	      cout << "minimum : " << histScale->GetMinimum() << endl;
-	      cout << "iBin : " << iBin << endl;
-	      exit(0);
-	    }
-	}
-	deltaUp /= ( histScale->GetNbinsX() - minBin );
+
 	if ( histScale->GetNbinsX() == minBin ) {
 	  cout << "NbinsX == minBIn" <<endl;
 	  cout << "minBin : " << minBin << endl;
@@ -755,11 +741,9 @@ void ChiMatrix::OptimizeRanges( ) {
 	  DrawPlot( {m_dataZMass, m_MCZMass.front().front(), m_MCZMass.back().back() }, "/sps/atlas/c/cgoudet/Calibration/PreRec/Results/ZMass" );
 	  exit(0);
 	}
-	cout << " delta Up : " << deltaUp << endl;
 
 	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
 	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
-	//	rangeMax = min( allowedRangeMax, scaleMin + deltaUp*m_setting->GetOptimizeRanges() );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
 
 	cout << "end" << endl;

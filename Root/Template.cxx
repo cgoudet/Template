@@ -455,12 +455,16 @@ void Template::FillDistrib( bool isData ) {
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
   cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
-
+  cout << "nFiles : " << nFiles << endl;
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
-    inputFile = TFile::Open( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
+    inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
+    cout << "openFile : " << inputFile << endl;
+    //    inputFile->ls();
+    // cout << iFile << " " << m_MCTreeNames.size() << " " << m_dataTreeNames.size() << endl;
+    // cout << ( isData  ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() ) << endl;
     inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
-
+    cout << "inputTree : " << inputTree << endl;
     if ( m_setting.GetSelection() != "" && 
 	 ( !m_setting.GetApplySelection() 
 	   || ( m_setting.GetApplySelection()==1 &&  isData ) 
@@ -474,11 +478,11 @@ void Template::FillDistrib( bool isData ) {
       delete inputTree;
       inputTree = dumTree;
     }
-
-    //    inputTree->SetDirectory( 0 );
+    cout << "inputTree : " << inputTree << endl;
+    inputTree->SetDirectory( 0 );
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
-
+    cout << "brances linked" << endl;
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( iEvent < 500000 ) continue;
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
@@ -516,7 +520,7 @@ void Template::FillDistrib( bool isData ) {
     inputFile->Close("R");
     delete inputFile; inputFile = 0;
   }//end loop iFile
-  cout << "entries filled : " << counterEntry << endl;
+  cout << "entries filled (" << isData << ") : " << counterEntry << endl;
   cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
 
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib Done" << endl;
@@ -553,32 +557,34 @@ void Template::CreateDistordedTree( string outFileName ) {
   // cout <<"IndepDistorded Seed: "<<m_rand.GetSeed()<<endl;
 
   if ( m_setting.GetBootstrap() ) {
-  vector< TTree* > vectorTree;
-  for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
-    TFile inFile( m_MCFileNames[iFile].c_str() );
-    TTree *MCTree = (TTree*) inFile.Get( m_MCTreeNames[iFile].c_str() );
-    MCTree->SetDirectory( 0 );
-    vectorTree.push_back(0);
-    vectorTree.back() = MCTree;
-    inFile.Close("R");
-  }
+    cout << "bootstrap" << endl;
+    vector< TTree* > vectorTree;
+    for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
+      TFile inFile( m_MCFileNames[iFile].c_str() );
+      TTree *MCTree = (TTree*) inFile.Get( m_MCTreeNames[iFile].c_str() );
+      MCTree->SetDirectory( 0 );
+      vectorTree.push_back(0);
+      vectorTree.back() = MCTree;
+      inFile.Close("R");
+    }
 
-  TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
-  TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap() );
-  cout << "bootstrap name : " << bootTree->GetName() << endl;
-  distordedFile.cd();
-  bootTree->Write( "", TObject::kOverwrite );
-  m_MCFileNames.clear();
-  m_MCFileNames.push_back( distordedFile.GetName() );
-  m_MCTreeNames.clear();
-  m_MCTreeNames.push_back( bootTree->GetName() );
-  distordedFile.Close( "R" );
-  delete bootTree; bootTree=0;
-  while ( vectorTree.size() ) {
-    delete vectorTree.back();
-    vectorTree.pop_back();
-  }
-  }
+    TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
+    TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap() );
+    cout << "bootstrap name : " << bootTree->GetName() << endl;
+    distordedFile.cd();
+    bootTree->Write( "", TObject::kOverwrite );
+    m_MCFileNames.clear();
+    m_MCFileNames.push_back( distordedFile.GetName() );
+    m_MCTreeNames.clear();
+    m_MCTreeNames.push_back( bootTree->GetName() );
+
+    delete bootTree; bootTree=0;
+    while ( vectorTree.size() ) {
+      delete vectorTree.back();
+      vectorTree.pop_back();
+    }
+    distordedFile.Close( "R" );
+  }//end boosttrap
   
   
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
@@ -603,8 +609,8 @@ void Template::CreateDistordedTree( string outFileName ) {
 
       unsigned int i_eta = 0, j_eta = 0;
       if ( FindBin( i_eta, j_eta ) ) {
-	//cout << FindBin( i_eta, j_eta ) << endl;
-	continue;
+      	//cout << FindBin( i_eta, j_eta ) << endl;
+      	continue;
       }
 
       if ( m_setting.GetMode() == "1VAR" ) {
@@ -620,7 +626,7 @@ void Template::CreateDistordedTree( string outFileName ) {
       }
     }
     delete MCTree; MCTree=0;
-    MCFile->Close( "R" );
+    MCFile->Close();
     delete MCFile; MCFile=0;
   }
   cout << "tree entries : " << dataTree->GetEntries() << endl;
@@ -629,13 +635,15 @@ void Template::CreateDistordedTree( string outFileName ) {
   cout << "Writting in : " << outFileName.c_str() << endl;
   dataTree->Write( "", TObject::kOverwrite );
     
+
   m_dataFileNames.clear();
   m_dataTreeNames.clear();
   m_dataFileNames.push_back( distorded->GetName() );
   m_dataTreeNames.push_back( dataTree->GetName() );
 
+  cout << "deleting" << endl;
   delete dataTree; dataTree = 0;
-  distorded->Close("R");
+  distorded->Close();
   delete distorded; distorded = 0;
   if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }
@@ -647,9 +655,10 @@ void Template::MakePlot( string path, string latexFileName ) {
   if ( path.back() != '/' && path != "" ) path += "/";
 
 
-  if ( latexFileName == "" ) 
+  if ( latexFileName == "" ) {
     if ( m_name != "" ) latexFileName = m_name + ".tex";
     else latexFileName = "latex.tex";
+  }
 
   cout << m_name << " " << latexFileName << endl;
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
