@@ -688,7 +688,7 @@ void ChiMatrix::OptimizeRanges( ) {
 
 	//	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
 	//Dealing with minimum bin too close to overflow
-	cout << "minBin too high : " << minBin << " " << floor( histScale->GetNbinsX()*3./4 ) << " " << allowedRangeMax << " " << rangeMax << endl;
+	//if ( m_setting->GetDebug() ) cout << "minBin too high : " << minBin << " " << floor( histScale->GetNbinsX()*3./4 ) << " " << allowedRangeMax << " " << rangeMax << endl;
 	if ( minBin >= floor( histScale->GetNbinsX()*3./4 )   ) {
 	  if ( allowedRangeMax == rangeMax ) {
 	    m_quality.set(2, 1);
@@ -699,7 +699,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	  } 
 	  else {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
-	  cout << "rangeMax : " << rangeMax << endl;
+	  //	  cout << "rangeMax : " << rangeMax << endl;
 	  continue;
 	  }
 	}
@@ -707,7 +707,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	//Dealing with minimum bin too close to underflow
 	if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
-	  cout << "rangeMin : " << rangeMin << endl;
+	  //cout << "rangeMin : " << rangeMin << endl;
 	  continue;
 	}
 
@@ -717,7 +717,8 @@ void ChiMatrix::OptimizeRanges( ) {
 	  break;
 	}
 
-	//	if ( m_name == "ChiMatrix_10_3" ) DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) ); 
+	//	if ( m_name == "ChiMatrix_10_3" ) DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) );
+	if ( m_setting->GetDebug() ) {
 	cout << "counter : " << counter << endl;
 	cout << "start" << endl;
 	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
@@ -726,31 +727,16 @@ void ChiMatrix::OptimizeRanges( ) {
 	cout << "scaleMin : " << scaleMin << endl;
 	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
 	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
-
+	}
 
 	chiMin = min( chiMin, histScale->GetMinimum() );
 	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );	
 
 	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
 
-	if ( histScale->GetNbinsX() == minBin ) {
-	  cout << "NbinsX == minBIn" <<endl;
-	  cout << "minBin : " << minBin << endl;
-	  cout << "NbinsX : " << histScale->GetNbinsX() << endl;
-	  DrawPlot( {histScale}, "/sps/atlas/c/cgoudet/Calibration/PreRec/Results/Plot" );
-	  DrawPlot( {m_dataZMass, m_MCZMass.front().front(), m_MCZMass.back().back() }, "/sps/atlas/c/cgoudet/Calibration/PreRec/Results/ZMass" );
-	  exit(0);
-	}
-
 	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
 	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
 	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
-
-	cout << "end" << endl;
-	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
-	cout << "rangeMin : " << rangeMin << endl;
-	cout << "rangeMax : " << rangeMax << endl;
-
 
 
 	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
@@ -762,13 +748,6 @@ void ChiMatrix::OptimizeRanges( ) {
 	if ( iScale && scaleMin<0 ) scaleMin=0;
 	chiMin = histScale->GetMinimum();
 
-	if ( counter == 10 ) {
-	  cout << "counter break optimization"  << endl;
-	  break;
-	}
-
-	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
-	cout << "allowed ranges : " << allowedRangeMin << " " << allowedRangeMax << endl;
       }//end else counter
 
       if ( histScale ) delete histScale; histScale=0;
@@ -880,16 +859,19 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
     fittingFunction = quadraticFit;
   }
 
-  fittingFunction->SetParLimits( 0, 0, hist->GetMaximum() );    
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
+  fittingFunction->SetParLimits( 0, 0, hist->GetMaximum() );    
 
-  fittingFunction->SetParLimits( 2, minCentral, hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+
   fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
+  fittingFunction->SetParLimits( 2, minCentral, hist->GetXaxis()->GetBinUpEdge( maxBin ) );
+
 
   int &extrBin = ( maxBin == centralBin ) ? minBin : maxBin;
   double sigma = ( hist->GetBinCenter( extrBin ) - hist->GetBinCenter( centralBin ) ) / sqrt(hist->GetBinContent( extrBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
-  fittingFunction->SetParLimits( 1, 0, 1 );
   fittingFunction->SetParameter( 1, sigma );
+  fittingFunction->SetParLimits( 1, 0, 1 );
+
 
   int nFits=5;
   do {
