@@ -18,6 +18,7 @@ and at https://github.com/paris-swc/python-packaging
 plotID={}
 plotID['nominal']='DataOff_13TeV_25ns'
 plotID['residual']='DataOff_13TeV_25ns_dataScaled'
+plotID['correction']=''
 plotID['totSyst'] = ''
 plotID['fBremSyst'] = 'DataOff_13TeV_25ns_fBrem'
 plotID['ThresholdSyst'] = 'DataOff_13TeV_25ns_Threshold'
@@ -29,6 +30,30 @@ plotID['EWSyst'] = 'DataOff_13TeV_25ns_EW'
 # 0 : central values only
 # 1 : central values + systematics
 
+def listFiles( directory ):
+    output = sub.check_output( ['ls '+ directory ],  shell=1, stderr=sub.STDOUT ) 
+    if '\n' in output : content = output.split() 
+    else : content = [ output ]
+    return content
+
+#===============================================================
+def applyCorrection( directory ) :
+
+    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/c/cgoudet/private/Calibration/Template/python/DataOff_13TeV_25ns.boost --noExtraction '
+    commandLine += ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) )
+    commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' ) )
+    commandLine += ' --correctAlphaHistName measScale_alpha --correctSigmaHistName measScale_c '
+    commandLine += ' --correctAlphaFileName ' + directory + plotID['nominal'] + '.root'
+    commandLine += ' --correctSigmaFileName ' + directory + plotID['nominal'] + '_c24.root'
+    os.chdir( directory )
+     
+    os.system( commandLine )
+    content = listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' )
+    content = [ (f if 'corrected' in f else '' ) for f in content ]
+    os.system( 'mv ' + ' '.join( content ) + ' ' + directory )
+ 
+
+#===========================================
 def getSyst() :
     result = []
     for plotName in plotID :
@@ -75,7 +100,7 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
                              + '\\item MC is {\\bf not }smeared with pre-rec.\\end{itemize}'
                              )
 
-    orderedList = ['nominal', 'residual', 'totSyst' ] + getSyst()
+    orderedList = ['nominal', 'residual' ]
     latex.write( '\n'.join( 
             [drawMinipage([plotName+var+'.pdf' for var in ['_alpha', '_c'] ], plotName[0].upper() + plotName[1:], slideText[plotName] )
              for plotName in orderedList
@@ -83,6 +108,17 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
             )
                  )
 
+    latex.write( '\n' )
+    latex.write( drawMinipage( ['correction_m12.pdf'], 'Correction', slideText['correction'] ) )
+
+
+    orderedList = ( ['totSyst'] if 'totSyst' in plotID else [] ) + getSyst()
+    latex.write( '\n'.join( 
+            [drawMinipage([plotName+var+'.pdf' for var in ['_alpha', '_c'] ], plotName[0].upper() + plotName[1:], slideText[plotName] )
+             for plotName in orderedList
+             ]
+            )
+                 )
 
     for input in concluFiles : 
         with open( input ) as conclu :
@@ -108,11 +144,38 @@ def createBoost( directory, var, ID, options={} ):
 
     optionsUnique = {}
     optionsUnique['inputType']=0
-
     options['rootFileName'].append(directory+plotID[ID] + ( '' if var==0 else '_c24' ) + '.root' )
 
+
     if ID =='residual' : #PreRec
-        if not var : optionsUnique['line']='0'
+        varName = 'ctZee' if var else 'alpha0'
+        options['rootFileName'] += ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root' ]*(1+var)
+        options['rootFileName'].reverse()
+        options['objName'].append( 'PreRecommandations/' + varName + '_prerec_errSyst' )
+        options['legend'] .append('Pre-recommandations, syst. unc. __FILL __NOPOINT' )
+
+        if var : 
+            options['objName'].append( 'PreRecommandations/ctZee_prerec_errStat' )
+            options['legend'].append( 'Pre-recommandations, stat. unc.' )
+            optionsUnique['shiftColor']=-1
+            # print( options['rootFileName'] ) 
+            # exit(0)
+        else :
+            optionsUnique['line']='0'
+            pass
+        optionsUnique['legendPos'] = '0.55 0.9'
+        options['legend'].append( 'Run2' )
+
+    elif ID=='nominal' :
+        print('nominal')
+        varName = 'ctZee' if var else 'alphaTot'
+        options['rootFileName'] += ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root' ]*2
+        options['rootFileName'].reverse()
+        options['objName'] += ['PreRecommandations/'+varName+'_prerec_errSyst', 'PreRecommandations/'+varName+'_prerec_errStat' ]
+        options['legend']= [ 'Pre-recommandations, syst. unc. __FILL __NOPOINT', 'Pre-recommandations, stat. unc.', 'Run2' ]
+        optionsUnique['shiftColor']=-1
+        optionsUnique['legendPos'] = '0.55 0.9'
+
     elif ID == 'totSyst' :
         systs = getSyst()
         options['rootFileName'] =  [directory + 'EnergyScaleFactors.root']*(len( systs )+1)
@@ -125,11 +188,24 @@ def createBoost( directory, var, ID, options={} ):
         options['rootFileName'].append( directory+plotID['nominal'] + ( '' if var==0 else '_c24' ) + '.root' )
         options['rootFileName'].reverse()
         options['legend']=['nominal', ID.replace('Syst', '' ) ]
-        optionsUnique['doRatio']=1
+        optionsUnique['doRatio']=2
         optionsUnique['extendUp']=0.4
 
+    elif ID == 'correction' : 
+        options['rootFileName']=[ ' '.join( listFiles( directory + varName + '_*corrected.root' ) ) for varName in ['MC','Data'] ] 
+        options['objName'] = [ ( 'corrected'+ ( 'MC' if 'MC_' in option else 'Data' ) + ' ' ) * len( option.split(' ') ) for option in options['rootFileName']  ]
+        options['legend'] = [ 'MC', 'Data' ]
+        optionsUnique['inputType']=1   
+        boostFile= directory +'correction.boost'
+        options['varName'] = [ 'm12']
+        options['varMin'] = [ '70' ]
+        options['varMax'] = [ '110' ]
+        optionsUnique['nComparedEvents'] = 40
+        optionsUnique['normalize']=1
+        optionsUnique['doRatio']=1
+
 #Defining default cases of options if not defined
-    if not len( options['objName'] ) : options['objName'] = [ 'measScale_' + ( 'alpha' if var==0 else 'c' ) for dum in range(0, len( options['rootFileName'] ) ) ]
+    if len( options['objName'] ) < len( options['rootFileName'] ) : options['objName'] += [ 'measScale_' + ( 'alpha' if var==0 else 'c' )  ]*(len(options['rootFileName']) - len(options['objName']))
 
 
     print('Print in file : ',boostFile )
@@ -166,9 +242,12 @@ def parseArgs():
     # Here I give the short and the long argument name
     parser.add_argument(
         '--doPlot', help='Tag for recreating plots',
-        default=0, type=int )
+        default=1, type=int )
     parser.add_argument(
         '--doSyst', help='Tag for recreating systematics histos and plots',
+        default=1, type=int )
+    parser.add_argument(
+        '--doCorrection', help='Tag for recreating systematics histos and plots',
         default=0, type=int )
 
     # Floats
@@ -216,6 +295,10 @@ def main():
 
     if not '/' in args.directory : args.directory = '/sps/atlas/c/cgoudet/Calibration/ScaleResults/' + args.directory + '/'
 
+    if args.doCorrection :
+        print('Doing correction')
+        applyCorrection(args.directory)
+
     if args.doSyst :
         print('Creating Systematics')
         systematics = [ createSystematicFile( args.directory, var ) for var in range( 0, 2 ) ]
@@ -224,7 +307,7 @@ def main():
 
     if args.doPlot :
         print('Creating boost files')
-        filesToPlot = [ createBoost( args.directory, var, key ) for var in range( 0, 2 ) for key in plotID ]
+        filesToPlot = list( set( [ createBoost( args.directory, var, key ) for var in range( 0, 2 ) for key in plotID ] ) )
         for boost in filesToPlot : 
             print( 'Creating plot ', boost )
             os.system( 'CompareHist ' + boost )
@@ -233,7 +316,7 @@ def main():
     
     os.chdir( args.directory )
     latexFileName = createLatex( args.directory, '', '' )
-    for i in range(0, 3) : os.system( 'pdflatex ' + latexFileName )
+    for i in range(0, 3) : os.system( 'pdflatex -b ' + latexFileName )
     os.system('pwd')
 
 # The program entrance

@@ -416,9 +416,9 @@ int Template::ExtractFactors() {
     if ( isMeasuredVar && m_setting.GetMode() == "1VAR"  ) {
       TMatrixD resultMatrix( eta1Max, 1 );
       TMatrixD resultErrMatrix( eta1Max, 1 );
-
-      cout << "inversion method : " << (iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10) << endl;
-      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, iVar ? m_setting.GetInversionMethod() : m_setting.GetInversionMethod()/10*10 );
+      unsigned int inversionMethod = (iVar ? m_setting.GetInversionMethod() : 0);
+      cout << "inversion method : " << inversionMethod << endl;
+      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
 
       string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
       m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 

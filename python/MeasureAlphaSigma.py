@@ -5,7 +5,7 @@ from Functions_MeasureAlphaSigma import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=0
+switch=1
 
 if switch==0 :
         configFiles=[ 
@@ -39,7 +39,14 @@ if switch==0 :
 # 		['MCOff_13TeV_25ns_geo14.root', 'MC_13TeV_Zee_25ns_geo14_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
 # 		['MCOff_13TeV_25ns_geo15.root', 'MC_13TeV_Zee_25ns_geo15_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
 	]
-	
+elif switch == 1 :
+        configFiles=[ 
+		#Mesure des scales
+#		['Test1Bin.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA1'], 4 ],
+		['TestOpt10.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['optimizeRanges=10'], 4 ],
+		['TestOpt5.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['optimizeRanges=5'], 4 ],
+	#	['Test2VAR.root', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', ['alphaSimEta=0.005 0.005 0.005 0.005 0.005 0.005', 'alphaSimPt=0 0 0 0 0 0', 'sigmaSimAlpha=0 0 0 0 0 0', 'sigmaSimPt=0 0 0 0 0 0', 'etaBins=ETA6', 'doSmearing=0' ], 0, 1 ],
+		]	
 
 spsPath="/sps/atlas/c/cgoudet/Calibration/PreRec/"
 logPath="Log/"

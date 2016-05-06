@@ -72,8 +72,8 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
     outNameFile=inVector[0]
     doDistorded = 0
-    if  len( inVector ) > 4 :
-        doDistorded = inVector[4]
+    if  len( inVector ) > 5 :
+        doDistorded = inVector[5]
 
 
     configPath="Config/"
@@ -259,7 +259,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaSimPt']=''
     options['symBin']=0
     options['fitMethod']=2
-    options['nUseEl']=5
+    options['nUseEl']=1
     options['nUseEvent']=0
     options['nEventCut']=10
     options['thresholdMass']=70
