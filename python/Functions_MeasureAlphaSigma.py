@@ -17,7 +17,10 @@ FILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/']
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
 FILESETS['MC_8TeV_Zee_Lkh1']     =[ PREFIXDATASETS + 'MC_8TeV_Zee_1Lepton_Lkh1/']
-FILESETS['MC_13TeV_Zee_25ns_Lkh1_fBrem50'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_fBrem50/']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_fBrem30'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_fBrem30/']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_IDSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_IDSyst']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_recoSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_recoSyst']
+
 FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 
@@ -26,7 +29,9 @@ FILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_5
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt20/']
-FILESETS['Data_13TeV_Zee_25ns_Lkh1_fBrem50']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_fBrem50']
+FILESETS['Data_13TeV_Zee_25ns_Lkh1_fBrem30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_fBrem30']
+FILESETS['Data_13TeV_Zee_25ns_Lkh1_IDSyst']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_IDSyst']
+FILESETS['Data_13TeV_Zee_25ns_Lkh1_recoSyst']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_recoSyst']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt35/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled']
 FILESETS['Data_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh2/']
@@ -40,7 +45,7 @@ FILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1' ]
 FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
 
-def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
+def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
 #mode 
     # 0 MeasureScale
@@ -67,14 +72,14 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
     outNameFile=inVector[0]
     doDistorded = 0
-    if  len( inVector ) > 4 :
-        doDistorded = inVector[4]
+    if  len( inVector ) > 5 :
+        doDistorded = inVector[5]
 
 
     configPath="Config/"
     batchPath="Batch/"
-    resultPath="Results/Set2/"
-    plotPath="Plots/Set2/"
+    resultPath="Results/"
+    plotPath="Plots/"
 
     configName = []
     if mode == 1 :
@@ -100,6 +105,7 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                     + 'source local_setup.sh \n'
                     + 'cd ${server} \n'
                     + 'cp -v /afs/in2p3.fr/home/a/aguergui/public/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+
                     )    
     
 #Copy the configuration file to the server
@@ -137,10 +143,13 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
                              + ' --dataFileName MC_distorded.root ' + MCLine + outNameFile + ' --makePlot \n')
                 
 #Copy the output pdf and root file to result folder
+
 #                batch.write( 'cp *.tex ' + PREFIXPATH + resultPath + '. \n' )
                 
             batch.write( 'rm *distorded* \n')
             batch.write( 'cp -v TestOptimize*.pdf /sps/atlas/a/aguerguichon/Calibration/Test/. \n' ) 
+
+
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
 
@@ -174,12 +183,15 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             CreateConfig( configName[0] ,configOptions )
             batch.write( 'GenerateToyTemplates --configFile ' + StripName(configName[0], 1, 0)
                          + dataLine + MCLine + optionLine + ' --outFileName ' + outNameFile + ' --makePlot \n' )
+
             batch.write( 'rm *distorded* \n')
             #batch.write( 'cp *distorded* ' + PREFIXPATH + resultPath + '. \n' )
+
             batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v *.pdf ' + PREFIXPATH + plotPath + '. \n' )
             batch.write( 'cp -v ' + inVector[0] + ' ' + PREFIXPATH + resultPath + '. \n' )
-            batch.write( 'ls -lh \n ' ) 
+
+            #batch.write( 'cp -v *.root ' + PREFIXPATH + plotPath + '. \n' )
             # batch.write( 'cp Note*.root ' + PREFIXPATH + plotPath + '. \n' ) 
                 # batch.write( 'cp Note*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
 
@@ -201,8 +213,10 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
             batch.write( 'MeasureScale --configFile ' + StripName(configName[1], 1, 0)
                          + dataLine + MCLine + outNameFile + ' --correctAlphaFileName ' + StripName( configName[0] ) + '.root --correctAlphaHistName measScale_alpha ' 
                          + ' --makePlot\n')
+
             batch.write( 'ls DataOff*\n' )
             batch.write( 'rm *distorded* \n')
+
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[0] ) + '.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
             batch.write( 'cp -v ' + StripName( configName[1] ) + '.root ' + PREFIXPATH + resultPath + '. \n' ) 

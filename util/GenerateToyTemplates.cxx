@@ -116,7 +116,6 @@ int main( int argc, char* argv[] ) {
 
 	  cout<<" setting ok"<<endl;
 
-	 
 	  settingDistorded.SetDebug( 1 );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
@@ -124,7 +123,6 @@ int main( int argc, char* argv[] ) {
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
 	  cout << "end if" << endl;
 	}
-	
 
 	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
@@ -135,6 +133,8 @@ int main( int argc, char* argv[] ) {
 	cout << "measurement step " << endl;
        
 	//This part is usefull for deviation sigma plots if needed later
+	//if (indepTemplates > 1 ) indepTemplates =2;
+	indepTemplates = settingMeasure.GetIndepTemplates();
 	if ( settingMeasure.GetIndepTemplates()>1 ) settingMeasure.SetIndepTemplates( 3*toyNumberTmp+4 );
 	settingMeasure.SetSigmaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, inputValues[iInput] ) );
 	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
@@ -163,8 +163,6 @@ int main( int argc, char* argv[] ) {
 	nBins = settingMeasure.GetEtaBins().size()-1;
 	nOptim = settingMeasure.GetOptimizeRanges();
 	fitMethod = settingMeasure.GetFitMethod();
-	if (indepTemplates > 1 ) indepTemplates =2;
-	else indepTemplates = settingMeasure.GetIndepTemplates();
 	bootstrap = settingMeasure.GetBootstrap();
 	indepDistorded = settingMeasure.GetIndepDistorded();
 	inversionMethod = settingMeasure.GetInversionMethod();
@@ -173,14 +171,12 @@ int main( int argc, char* argv[] ) {
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
 	  for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
 	    sigma = (*combinSigma)(i1, i2);
-
 	    errSigma = (*combinErrSigma)(i1,i2);
 	    if ( errSigma == 100 ) continue;
 	    iConf = i1;
 	    jConf = i2;
 	    ChiMatrix *chiMatrix = TempMeasure.GetChiMatrix( i1, i2 );
 	    if ( !chiMatrix ) continue;
-	    cout << "sigma : " << sigma  << " " << chiMatrix->GetScale( 1) << endl;
 	    statConf = chiMatrix->GetStat();
 	    rms = chiMatrix->GetDataRMS();
 	    if ( !statConf ) continue;
@@ -193,17 +189,10 @@ int main( int argc, char* argv[] ) {
 	for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
 	  iConf = iBin;
 	  sigma = sigmaResult->GetBinContent(iBin+1);
-	  // if ( sigma < 0 ) { 
-	  //   string negativeName = string( TString::Format( "Note_%u", runNumber ) );
-	  //   TempMeasure.MakePlot("", negativeName + ".tex" );
-	  //   TempMeasure.Save( negativeName + ".root" );
-	  // }
-	    
 	  errSigma = sigmaResult->GetBinError(iBin+1);
 	  scalesTree->Fill();
 	}
 
-	cout << outFile << " " << outTree << " " << scalesTree << " " << endl;
 	outFile->cd();
 	outTree->Write("", TObject::kOverwrite);
 	scalesTree->Write("", TObject::kOverwrite);
@@ -212,7 +201,7 @@ int main( int argc, char* argv[] ) {
       }
     }
   }
-  //  system( "ll -h" );  
+
   cout << "return" << endl;
   return 0;
 
