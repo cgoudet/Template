@@ -360,7 +360,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
   if ( m_quality.to_ulong() ) {
-    cout << "bad quality (" << m_quality.to_ulong() << "): returns " << endl;
+    cout << "bad quality (" << m_quality.to_ulong() << ") : returns " << endl;
     m_alpha = 0;
     m_errAlpha = 100;
     m_sigma = 0;
@@ -699,7 +699,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	  } 
 	  else {
 	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
-	  //	  cout << "rangeMax : " << rangeMax << endl;
+	  cout << "rangeMax : " << rangeMax << endl;
 	  continue;
 	  }
 	}
@@ -707,7 +707,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	//Dealing with minimum bin too close to underflow
 	if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
-	  //cout << "rangeMin : " << rangeMin << endl;
+	  cout << "rangeMin : " << rangeMin << endl;
 	  continue;
 	}
 
@@ -753,6 +753,7 @@ void ChiMatrix::OptimizeRanges( ) {
       if ( histScale ) delete histScale; histScale=0;
     }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
+    //    if ( rangeMax == allowedRangeMax ) m_quality.set( 2, 1 );
   }
 
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::OptimizeRanges() Done" << endl;
@@ -818,7 +819,7 @@ double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 //==============================
 TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
   TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);
-  TF1 *cubicFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])",-1, 1);
+  TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   //TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*TMath::Abs((x-[2]))*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   cubicFit->SetParLimits( 3, 0, 1e5 );
   TF1 *fittingFunction = 0;

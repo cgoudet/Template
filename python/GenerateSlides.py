@@ -20,11 +20,13 @@ plotID['nominal']='DataOff_13TeV_25ns'
 plotID['residual']='DataOff_13TeV_25ns_dataScaled'
 plotID['correction']=''
 plotID['totSyst'] = ''
-plotID['fBremSyst'] = 'DataOff_13TeV_25ns_fBrem'
+#plotID['fBremSyst'] = 'DataOff_13TeV_25ns_fBrem'
 plotID['ThresholdSyst'] = 'DataOff_13TeV_25ns_Threshold'
 plotID['WindowSyst'] = 'DataOff_13TeV_25ns_Window'
 plotID['IDSyst'] = 'DataOff_13TeV_25ns_ID'
-plotID['EWSyst'] = 'DataOff_13TeV_25ns_EW'
+plotID['recoEffSyst'] = 'DataOff_13TeV_25ns_recoEff'
+plotID['IDEffSyst'] = 'DataOff_13TeV_25ns_IDEff'
+#plotID['EWSyst'] = 'DataOff_13TeV_25ns_EW'
 
 # Modes :
 # 0 : central values only
@@ -44,7 +46,7 @@ def applyCorrection( directory ) :
     commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' ) )
     commandLine += ' --correctAlphaHistName measScale_alpha --correctSigmaHistName measScale_c '
     commandLine += ' --correctAlphaFileName ' + directory + plotID['nominal'] + '.root'
-    commandLine += ' --correctSigmaFileName ' + directory + plotID['nominal'] + '_c24.root'
+    commandLine += ' --correctSigmaFileName ' + directory + plotID['nominal'] + '.root'
     os.chdir( directory )
      
     os.system( commandLine )
@@ -64,13 +66,14 @@ def getSyst() :
 
 #===============================================
 def createSystematicFile( directory, var, model=0 ) :
+    suffix = '_c' if var else ''
     outFile = directory + 'systematics_' + ( 'c' if var else 'alpha' ) + '.txt'
     systFile = open( outFile, 'w' )
     systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + ('c' if var else 'alpha') + ' dum\n' )
-    systFile.write( directory + plotID['nominal'] + ( '_c24' if var else '' ) + '.root measScale_' + ' centVal_'.join( [('c' if var else 'alpha')]*2 ) + '\n' )
+    systFile.write( directory + plotID['nominal'] + suffix + '.root measScale_' + ' centVal_'.join( [('c' if var else 'alpha')]*2 ) + '\n' )
 
     systFile.write( '\n'.join( [ 
-                directory + plotID[plotName] + ( '_c24' if var else '' ) + '.root measScale_' + (' ' + plotName.replace('Syst', '_' )).join( [('c' if var else 'alpha')]*2 ) 
+                directory + plotID[plotName] + suffix + '.root measScale_' + (' ' + plotName.replace('Syst', '_' )).join( [('c' if var else 'alpha')]*2 ) 
                 for plotName in getSyst() ] )
                     + '\n' )
 
@@ -86,7 +89,7 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
 
     for input in introFiles : 
         with open( input ) as intro :
-            for line in intro : latex.write( line + '\n' )
+            for line in intro : latex.write( line  )
 
 
     slideText = {}
@@ -122,7 +125,7 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
 
     for input in concluFiles : 
         with open( input ) as conclu :
-            for line in conclu : latex.write( line + '\n' )
+            for line in conclu : latex.write( line  )
 
     latex.write( '\\end{document}' )
     latex.close()
@@ -132,6 +135,7 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
 def createBoost( directory, var, ID, options={} ):
 #    content = sub.check_output( ['ls ' + directory ],  shell=1, stderr=sub.STDOUT )
 #    print(content)
+    fileSuffix = '_c' if var else ''
 
 #Defining variables used in the boost files
     boostFile= directory + ID + '_' + ( 'alpha' if var==0 else 'c' ) + '.boost'
@@ -144,7 +148,8 @@ def createBoost( directory, var, ID, options={} ):
 
     optionsUnique = {}
     optionsUnique['inputType']=0
-    options['rootFileName'].append(directory+plotID[ID] + ( '' if var==0 else '_c24' ) + '.root' )
+    optionsUnique['plotDirectory']=directory
+    options['rootFileName'].append(directory+plotID[ID] + fileSuffix + '.root' )
 
 
     if ID =='residual' : #PreRec
@@ -185,7 +190,7 @@ def createBoost( directory, var, ID, options={} ):
         options['legend'] += [ plotName.replace('Syst', '' ) for plotName in systs ]
 
     elif ID in getSyst() :
-        options['rootFileName'].append( directory+plotID['nominal'] + ( '' if var==0 else '_c24' ) + '.root' )
+        options['rootFileName'].append( directory+plotID['nominal'] + fileSuffix + '.root' )
         options['rootFileName'].reverse()
         options['legend']=['nominal', ID.replace('Syst', '' ) ]
         optionsUnique['doRatio']=2
@@ -242,7 +247,7 @@ def parseArgs():
     # Here I give the short and the long argument name
     parser.add_argument(
         '--doPlot', help='Tag for recreating plots',
-        default=1, type=int )
+        default=0, type=int )
     parser.add_argument(
         '--doSyst', help='Tag for recreating systematics histos and plots',
         default=1, type=int )
@@ -315,8 +320,9 @@ def main():
 #    createLatex( args.directory )
     
     os.chdir( args.directory )
-    latexFileName = createLatex( args.directory, '', '' )
-    for i in range(0, 3) : os.system( 'pdflatex -b ' + latexFileName )
+    os.system('pwd')
+    latexFileName = createLatex( args.directory, [ args.directory + 'intro.tex' ], [ args.directory + 'conclu.tex' ] )
+    for i in range(0, 3) : os.system( 'pdflatex ' + ( ' -interaction=batchmode ' if i else ' ' )  + latexFileName )
     os.system('pwd')
 
 # The program entrance
