@@ -12,7 +12,8 @@ FILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled/']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/']
 FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
-FILESETS['MC_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/archive/MC_13TeV_Zee_25nsb_Lkh1_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/archive/MC_13TeV_Zee_25nsb_Lkh1_1.root']
+FILESETS['MC_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_1.root']
+FILESETS['MC_13TeV_Zee_25nsb_IBL_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_1.root']
 FILESETS['MC_13TeV_Zee_25nsb_Lkh1_scaled']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_1.root']
 FILESETS['MC_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh2/'] 
 FILESETS['MC_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled' ]
@@ -22,9 +23,13 @@ FILESETS['MC_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_pt20/']
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_PassSel.root']
 FILESETS['MC_8TeV_Zee_Lkh1']     =[ PREFIXDATASETS + 'MC_8TeV_Zee_1Lepton_Lkh1/']
-FILESETS['MC_13TeV_Zee_25ns_Lkh1_fBrem30'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_fBrem30/']
-FILESETS['MC_13TeV_Zee_25ns_Lkh1_IDSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_IDSyst']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_fBrem70'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_fBrem70/']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_IDSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_IDSyst/']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1_recoSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_recoSyst']
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_isoSyst']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_isoSyst']
+
+FILESETS['MC_13TeV_Zee_25ns_Lkh1_noIso']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_doIso0']
+FILESETS['Data_13TeV_Zee_25ns_Lkh1_noIso']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_doIso0']
 
 FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
@@ -32,11 +37,11 @@ FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_
 FILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1']
 FILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1_scaled']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1']
+FILESETS['Data_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'Archive/Data_13TeV_Zee_25ns_rel201_0.root']
+FILESETS['Data_13TeV_Zee_25nsb_IBL_Lkh1']       =[ PREFIXDATASETS + 'Archive/Data_13TeV_Zee_25ns_rel201_IBL_0.root']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt20/']
-FILESETS['Data_13TeV_Zee_25ns_Lkh1_fBrem30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_fBrem30']
-FILESETS['Data_13TeV_Zee_25ns_Lkh1_IDSyst']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_IDSyst']
-FILESETS['Data_13TeV_Zee_25ns_Lkh1_recoSyst']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_recoSyst']
+FILESETS['Data_13TeV_Zee_25ns_Lkh1_fBrem70']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_fBrem70']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt35']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt35/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_scaled']
 FILESETS['Data_13TeV_Zee_25ns_Lkh2']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh2/']
@@ -122,22 +127,19 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 # 1 Corrects alpha and c
 
     if doDistorded and mode != 2 : 
-        batch.write( 'MeasureScale --configFile ' + StripString(configName[0], 1, 0) + dataLine.replace( '--dataFileName', '--MCFileName' ) + outNameFile + ' --createDistorded MC_distorded.root \n')
+        batch.write( 'MeasureScale --configFile ' + StripString(configName[0], 1, 0) + dataLine.replace( '--dataFileName', '--MCFileName' ) + ' --outFileName ' + outNameFile + ' --createDistorded MC_distorded.root --noExtraction \n')
         dataLine = ' --dataFileName MC_distorded.root '
 
 #Copy the output pdf and root file to result folder
         
     for name in configName :
-        tmpOptions = configOptions
+        tmpOptions = configOptions[:]
         if '_alpha' in name : tmpOptions.append( 'doSmearing=0' )
         elif '_c' in name : tmpOptions+= [ 'doScale=0', 'etaBins=ETA24' ]
         CreateConfig( name, tmpOptions )
 
 
     for iFit in range( 0, len( configName ) ) :
-        if not iFit : 
-            batch.write( 'cp -v ' + '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160512/' + StripString( configName[iFit] ) + '.root . \n' )
-            continue
         outNameFile = ' --outFileName ' + StripString( configName[iFit] ) + '.root '
         corrLine=''
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
@@ -175,7 +177,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['var2'] = ""
     options['doScale'] = 1
     options['alphaMin']=-0.10
-    options['alphaMax']=0.12
+    options['alphaMax']=0.10
     options['alphaNBins']=20
     options['doSmearing']=1
     options['sigmaMin']=0
@@ -192,7 +194,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaSimPt']=''
     options['symBin']=0
     options['fitMethod']=2
-    options['nUseEl']=5
+    options['nUseEl']=4
     options['nUseEvent']=0
     options['nEventCut']=10
     options['thresholdMass']=70
@@ -235,7 +237,7 @@ def CreateConfig( configName, inOptions = [] ) :
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
-            if iLabel == 'branchVarNames' : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) )
+            if iLabel == 'branchVarNames' : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
             else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         
     return

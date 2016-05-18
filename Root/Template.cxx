@@ -389,18 +389,21 @@ int Template::ExtractFactors() {
     //Run over all chiMatrices
     cout << "eta1Max : " << eta1Max << endl;
     for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
-      eta2Max = ( m_setting.GetMode() == "1VAR" ) ? (int) i_eta+1 : (int) ptBins.size(); 
+      if ( m_setting.GetMode() == "1VAR" ) eta2Max =  (int) i_eta+1;
       cout << "eta2Max : " << eta2Max << endl;
 
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-	if ( i_eta == 17 && j_eta == 13 ) m_setting.SetDebug( 1 );	
+	//	if ( i_eta == 17 && j_eta == 13 ) m_setting.SetDebug( 1 );	
 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-	m_setting.SetDebug( 0 );
+	//m_setting.SetDebug( 0 );
 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
 	(*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
-	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
-	(*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
+
+	if ( m_setting.GetMode() == "1VAR" ) {
+	  (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
+	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
+	}
 
 	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
 	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
@@ -459,12 +462,10 @@ void Template::FillDistrib( bool isData ) {
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
-    cout << "openFile : " << inputFile << endl;
-    //    inputFile->ls();
-    // cout << iFile << " " << m_MCTreeNames.size() << " " << m_dataTreeNames.size() << endl;
-    // cout << ( isData  ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() ) << endl;
+    cout << "openFile : " << inputFile->GetName() << endl;
+    inputFile->ls();
     inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
-    cout << "inputTree : " << inputTree << endl;
+    
     if ( m_setting.GetSelection() != "" && 
 	 ( !m_setting.GetApplySelection() 
 	   || ( m_setting.GetApplySelection()==1 &&  isData ) 
@@ -478,13 +479,13 @@ void Template::FillDistrib( bool isData ) {
       delete inputTree;
       inputTree = dumTree;
     }
-    cout << "inputTree : " << inputTree << endl;
+    cout << "inputTree : " << inputTree->GetName() << endl;
     inputTree->SetDirectory( 0 );
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
-    cout << "brances linked" << endl;
+    cout << "branches linked" << endl;
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-      if ( iEvent < 500000 ) continue;
+
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
@@ -542,6 +543,10 @@ void Template::CreateDistordedTree( string outFileName ) {
        || ( m_setting.GetPtBins().size() && (sigmaSimPt.size() !=  m_setting.GetPtBins().size()-1) )
        ) {
     cout << "simulation vector sizes not ok" << endl;
+    cout << (alphaSimEta.size()!= sigmaSimEta.size()) << " " << alphaSimEta.size() << " " << sigmaSimEta.size() << endl ;
+    cout << ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) ) << endl ;
+    cout << (alphaSimPt.size() != sigmaSimPt.size()) << " " << alphaSimPt.size() << " " << sigmaSimPt.size() << endl ;
+    cout << ( m_setting.GetPtBins().size() && (sigmaSimPt.size() !=  m_setting.GetPtBins().size()-1) ) << endl;
     exit(0);
   }
 
@@ -598,7 +603,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   int counterEvent=0;
 
   map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
-
+  cout << "nFiles distorded : " << m_MCFileNames.size() << endl;
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
@@ -608,22 +613,23 @@ void Template::CreateDistordedTree( string outFileName ) {
       MCTree->GetEntry( iEvent );
 
       unsigned int i_eta = 0, j_eta = 0;
-      if ( FindBin( i_eta, j_eta ) ) {
-      	//cout << FindBin( i_eta, j_eta ) << endl;
-      	continue;
+      if ( FindBin( i_eta, j_eta ) ) continue;
+      if ( m_setting.GetMode() == "2VAR" && FindBin( i_eta, j_eta, 1 ) ) continue;
+
+      double factor1=1, factor2=1;
+      for ( unsigned int iSwap = 0; iSwap < (m_setting.GetMode()=="2VAR" ? 2 : 1); iSwap++ ) {
+	FindBin( i_eta, j_eta, iSwap );
+	factor1 *= ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
+	factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-      if ( m_setting.GetMode() == "1VAR" ) {
-	double factor1 = ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
-	double factor2 = ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
-
-	//if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
+      //	if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
 	mapDouble[mapVarNames["PT_1"]] *= factor1;
 	mapDouble[mapVarNames["PT_2"]] *= factor2;
 	mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
 	dataTree->Fill();
+	      
 	counterEvent++;
-      }
     }
     delete MCTree; MCTree=0;
     MCFile->Close();
@@ -791,7 +797,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
 //#################################################=
-int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
+int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
@@ -802,8 +808,13 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta ) {
 
   double eta1 = 0;
   double eta2 = 0;
-  eta1 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str()] ];
-  eta2 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
+  if ( m_setting.GetMode() == "2VAR" && swapEl ) eta1 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
+  else eta1 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_1" ).c_str()] ];
+
+  if ( m_setting.GetMode() == "2VAR" && !swapEl )     eta2 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar2() + "_1" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar2() + "_1" ).c_str()] ];
+  else if ( m_setting.GetMode() == "2VAR" && swapEl ) eta2 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar2() + "_2" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar2() + "_2" ).c_str()] ];
+  else eta2 = ( m_setting.GetDoSymBin() ) ? fabs( mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str() ]] ) : mapDouble[ mapBranchNames[string( m_setting.GetVar1() + "_2" ).c_str()] ];
+
   // cout << m_setting.GetVar1() << " " << m_mapVar1[m_setting.GetVar1()] << " " << m_mapVar1["ETA_TRK"]  << endl;
   // cout << "eta : " << eta1 << " " << eta2 << endl;  
   if ( m_setting.GetMode() == "1VAR" && eta1 < eta2 ) swap( eta1, eta2 );

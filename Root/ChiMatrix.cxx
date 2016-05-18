@@ -360,7 +360,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
   if ( m_quality.to_ulong() ) {
-    cout << "bad quality (" << m_quality.to_ulong() << ") : returns " << endl;
+    cout << m_name << " : bad quality (" << m_quality.to_ulong() << ") : returns " << endl;
     m_alpha = 0;
     m_errAlpha = 100;
     m_sigma = 0;
@@ -369,6 +369,7 @@ void ChiMatrix::FitChi2() {
   }
 
   FillChiMatrix();
+
   TF1 *fittingFunction = 0;
 
   if ( m_setting->GetDoScale() && m_setting->GetDoSmearing()) {      
@@ -721,7 +722,6 @@ void ChiMatrix::OptimizeRanges( ) {
 	if ( m_setting->GetDebug() ) {
 	cout << "counter : " << counter << endl;
 	cout << "start" << endl;
-	cout << "ranges : " << rangeMin << " " << rangeMax << endl;
 	cout << "chiMin : " << chiMin << endl;
 	cout << "minimum : " << histScale->GetMinimum() << " " << minBin << endl;
 	cout << "scaleMin : " << scaleMin << endl;

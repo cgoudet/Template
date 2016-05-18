@@ -221,7 +221,7 @@ class Template
 
      Bin numbers of the configuration are put into i_eta and j_eta.
   */
-  int FindBin( unsigned int &i_eta, unsigned int &j_eta );
+  int FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl=0 );
 
   /**\brief Fill a ZMass distributions
      \param isData Tell wich role has the input tree

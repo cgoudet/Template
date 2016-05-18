@@ -20,12 +20,15 @@ plotID['nominal']='DataOff_13TeV_25ns'
 plotID['residual']='DataOff_13TeV_25ns_dataScaled'
 plotID['correction']=''
 plotID['totSyst'] = ''
-#plotID['fBremSyst'] = 'DataOff_13TeV_25ns_fBrem'
+plotID['fBremSyst'] = 'DataOff_13TeV_25ns_fBrem'
 plotID['ThresholdSyst'] = 'DataOff_13TeV_25ns_Threshold'
 plotID['WindowSyst'] = 'DataOff_13TeV_25ns_Window'
 plotID['IDSyst'] = 'DataOff_13TeV_25ns_ID'
 plotID['recoEffSyst'] = 'DataOff_13TeV_25ns_recoEff'
+plotID['isoEffSyst'] = 'DataOff_13TeV_25ns_isoEff'
 plotID['IDEffSyst'] = 'DataOff_13TeV_25ns_IDEff'
+plotID['noIsoSyst'] = 'DataOff_13TeV_25ns_noIso'
+plotID['matSyst'] = ''
 #plotID['EWSyst'] = 'DataOff_13TeV_25ns_EW'
 
 # Modes :
@@ -66,18 +69,38 @@ def getSyst() :
 
 #===============================================
 def createSystematicFile( directory, var, model=0 ) :
+    output = []
+
+    specialSyst = [  'matSyst' ]
+    nominalSyst = [ syst  for syst in getSyst() if syst not in specialSyst  ]
+
     suffix = '_c' if var else ''
     outFile = directory + 'systematics_' + ( 'c' if var else 'alpha' ) + '.txt'
     systFile = open( outFile, 'w' )
-    systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + ('c' if var else 'alpha') + ' dum\n' )
-    systFile.write( directory + plotID['nominal'] + suffix + '.root measScale_' + ' centVal_'.join( [('c' if var else 'alpha')]*2 ) + '\n' )
+    systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + ('c' if var else 'alpha') + ' dum 0\n' )
+    systFile.write( directory + plotID['nominal'] + suffix + '.root measScale_' + ' centVal_'.join( [('c' if var else 'alpha')]*2 ) + ' 0\n' )
 
     systFile.write( '\n'.join( [ 
-                directory + plotID[plotName] + suffix + '.root measScale_' + (' ' + plotName.replace('Syst', '_' )).join( [('c' if var else 'alpha')]*2 ) 
-                for plotName in getSyst() ] )
+                directory + plotID[plotName] + suffix + '.root measScale_' + (' ' + plotName.replace('Syst', '_' )).join( [('c' if var else 'alpha')]*2 ) + ' ' + str( model ) 
+                for plotName in nominalSyst ] )
                     + '\n' )
+    output.append( outFile )
 
-    return outFile
+    datasets = {}
+#    datasets['fBremSyst'] = [ 'DataOff_13TeV_25ns_24Bins.root', 'DataOff_13TeV_25ns_fBrem.root' ]
+    datasets['matSyst'] = [ 'DataOff_13TeV_25ns_rel201' + ( '_c' if var else '' ) +'.root', 'DataOff_13TeV_25ns_rel201_IBL' + ( '_c' if var else '') +'.root', str(model) ]
+
+    for syst in specialSyst : 
+        if not syst in plotID : continue
+        outFile = directory + 'systematics_' + syst + '_' + ( 'c' if var else 'alpha' ) + '.txt'
+        systFile = open( outFile, 'w+' )
+        systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + ('c' if var else 'alpha') + ' dum 0 \n' )
+        systFile.write( directory + datasets[syst][0]  + ' measScale_' + ('c' if var else 'alpha') + ' dum 0 \n' )
+        systFile.write( directory + datasets[syst][1] + ' measScale_' + (' ' + syst.replace('Syst', '_' )).join( [('c' if var else 'alpha')]*2 ) + ' ' + datasets[syst][2] + '\n' ) 
+        systFile.close()
+        output.append( outFile )
+
+    return output
 
 #=============================================
 def createLatex( directory, introFiles=[], concluFiles=[] ) :
@@ -85,7 +108,7 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
     print( 'latexFileName : ', latexFileName )
     latex = open( latexFileName, "w" )
 
-    latex.write( LatexHeader( 'Central electron energy scale factors and resolution constant term', 'Electron scale factors' ) )
+    latex.write( LatexHeader( 'Central electron energy scale factors and resolution constant term', 'Electron scale factors', 1 ) )
 
     for input in introFiles : 
         with open( input ) as intro :
@@ -102,6 +125,21 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
                              + '\\begin{itemize}\item Data are corrected with energy scale from pre-recommandations + tempetature, '
                              + '\\item MC is {\\bf not }smeared with pre-rec.\\end{itemize}'
                              )
+    slideText['correction'] = ( 'The lineshape of the $Z$ is compared after application of 2015 corrections between data and MC.\n' )
+    slideText['totSyst'] = ( 'Sources of uncertainty and their contribution in the total systematic uncertainty.\n For statistical reasons, uncertainties are symetrized along $\eta_{calo}$\n' )
+    slideText['WindowSyst'] = 'Systematic defined as the difference between nominal measurement and reducing $Z$ mass range from $[80-100]$~GeV to $[82.5-97.5]$~GeV.\n'
+    slideText['noIsoSyst'] = 'Systematic defined as the difference between nominal measurement and removing the isolation cut.\n'
+    slideText['run1Syst'] = 'Comparison between current systematic model and run1 total systematic uncertainty\n.'
+    slideText['IDSyst'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection\n'
+    slideText['fBremSyst' ] = 'Systematic defined as the difference between nominal measurement and an additional cut removing electrons with fBrem$>0.7$.\n'
+
+    effSyst = [ syst for syst in getSyst() if 'EffSyst' in syst ]
+    for syst in effSyst :
+        effName = ''
+        if syst == 'IDEffSyst' : effName = ' identification '
+        elif syst == 'recoEffSyst' : effName = ' reconstruction '
+        elif syst == 'isoEffSyst ' : effName = ' isolation '
+        slideText[syst] = ( syst + ' is defined as the difference between nominal measurement and pulling the weight of ' + effName + ' efficiency scale factors for each electron one sigma up.\n' )
 
     orderedList = ['nominal', 'residual' ]
     latex.write( '\n'.join( 
@@ -115,10 +153,17 @@ def createLatex( directory, introFiles=[], concluFiles=[] ) :
     latex.write( drawMinipage( ['correction_m12.pdf'], 'Correction', slideText['correction'] ) )
 
 
-    orderedList = ( ['totSyst'] if 'totSyst' in plotID else [] ) + getSyst()
+    latex.write( drawMinipage([ 'totSyst'+var+'.pdf' for var in ['_alpha', '_c'] ], 'Experimental Uncertaities', slideText['totSyst'] ) )
+    latex.write( ' '.join( [drawTabular([ 'totSyst'+var+'.csv' for var in ['_alpha', '_c'] ], 'Experimental Uncertainties breakdown : $\\alpha$ \\& $c$ ' )  ] ) )
     latex.write( '\n'.join( 
             [drawMinipage([plotName+var+'.pdf' for var in ['_alpha', '_c'] ], plotName[0].upper() + plotName[1:], slideText[plotName] )
-             for plotName in orderedList
+             for plotName in getSyst()
+             ]
+            )
+                 )
+
+    latex.write( '\n'.join( 
+            [drawMinipage(['run1Syst'+var+'.pdf' for var in ['_alpha', '_c'] ], 'Run1 systematics', slideText[plotName] )
              ]
             )
                  )
@@ -149,7 +194,7 @@ def createBoost( directory, var, ID, options={} ):
     optionsUnique = {}
     optionsUnique['inputType']=0
     optionsUnique['plotDirectory']=directory
-    options['rootFileName'].append(directory+plotID[ID] + fileSuffix + '.root' )
+    options['rootFileName'].append( directory+plotID[ID] + fileSuffix + '.root' if ID in plotID else '' )
 
 
     if ID =='residual' : #PreRec
@@ -188,7 +233,12 @@ def createBoost( directory, var, ID, options={} ):
         options['legend'].append( 'totSyst' )
         options['objName'] += [ 'syst_' + plotName.replace('Syst', '' ) + '_' + ( 'c' if var else 'alpha' ) for plotName in systs]
         options['legend'] += [ plotName.replace('Syst', '' ) for plotName in systs ]
+        optionsUnique['doTabular']=1
 
+    # elif ID == "fBremSyst" :
+    #     options['rootFileName'] = [ directory+'DataOff_13TeV_25ns_24Bins.root', directory+'DataOff_13TeV_25ns_fBrem.root' ]
+    #     options['legend']=['nominal 24Bins', ID.replace('Syst', '' ) ]
+    #     optionsUnique['doRatio']=2
     elif ID in getSyst() :
         options['rootFileName'].append( directory+plotID['nominal'] + fileSuffix + '.root' )
         options['rootFileName'].reverse()
@@ -208,6 +258,10 @@ def createBoost( directory, var, ID, options={} ):
         optionsUnique['nComparedEvents'] = 40
         optionsUnique['normalize']=1
         optionsUnique['doRatio']=1
+    elif ID == 'run1Syst' :
+        options['rootFileName'] = ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root', directory+'EnergyScaleFactors.root']
+        options['objName'] = [ 'Run1/' + ( 'ct' if var else 'alpha' ) + 'ErrZee_run1_totSyst', 'totSyst_' + ('c' if var else 'alpha') ]
+        options['legend']= [ 'Run1', 'Run2' ]
 
 #Defining default cases of options if not defined
     if len( options['objName'] ) < len( options['rootFileName'] ) : options['objName'] += [ 'measScale_' + ( 'alpha' if var==0 else 'c' )  ]*(len(options['rootFileName']) - len(options['objName']))
@@ -248,6 +302,9 @@ def parseArgs():
     parser.add_argument(
         '--doPlot', help='Tag for recreating plots',
         default=0, type=int )
+    parser.add_argument(
+        '--doLatex', help='Tag for recreating plots',
+        default=1, type=int )
     parser.add_argument(
         '--doSyst', help='Tag for recreating systematics histos and plots',
         default=1, type=int )
@@ -306,24 +363,26 @@ def main():
 
     if args.doSyst :
         print('Creating Systematics')
-        systematics = [ createSystematicFile( args.directory, var ) for var in range( 0, 2 ) ]
+        systematics = []
+        for var in range( 0, 2 )  : systematics += createSystematicFile( args.directory, var, 20 ) 
         #print(systematics)
         os.system( 'AddSyst ' + ' '.join( systematics ) )
 
     if args.doPlot :
         print('Creating boost files')
         filesToPlot = list( set( [ createBoost( args.directory, var, key ) for var in range( 0, 2 ) for key in plotID ] ) )
-        for boost in filesToPlot : 
-            print( 'Creating plot ', boost )
-            os.system( 'CompareHist ' + boost )
+        filesToPlot += [ createBoost( args.directory, var, 'run1Syst' ) for var in range(0,2) ]
+        os.system( 'CompareHist ' + ' '.join( [ boost for boost in filesToPlot ] ) )
+
+
 
 #    createLatex( args.directory )
-    
-    os.chdir( args.directory )
-    os.system('pwd')
-    latexFileName = createLatex( args.directory, [ args.directory + 'intro.tex' ], [ args.directory + 'conclu.tex' ] )
-    for i in range(0, 3) : os.system( 'pdflatex ' + ( ' -interaction=batchmode ' if i else ' ' )  + latexFileName )
-    os.system('pwd')
+    if args.doLatex :     
+        os.chdir( args.directory )
+        os.system('pwd')
+        latexFileName = createLatex( args.directory, [ args.directory + 'intro.tex' ], [ args.directory + 'conclu.tex' ] )
+#        for i in range(0, 3) : os.system( 'pdflatex ' + ( ' -interaction=batchmode ' if i else ' ' )  + latexFileName )
+        os.system('pwd')
 
 # The program entrance
 if __name__ == '__main__':
