@@ -37,8 +37,8 @@ FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_
 FILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1']
 FILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1_scaled']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1']
-FILESETS['Data_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'Archive/Data_13TeV_Zee_25ns_rel201_0.root']
-FILESETS['Data_13TeV_Zee_25nsb_IBL_Lkh1']       =[ PREFIXDATASETS + 'Archive/Data_13TeV_Zee_25ns_rel201_IBL_0.root']
+FILESETS['Data_13TeV_Zee_25nsb_Lkh1']       =[ '/sps/atlas/c/cgoudet/Calibration/Test/Data_13TeV_Zee_25ns_rel201_0.root']
+
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt20/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_fBrem70']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_fBrem70']
@@ -54,6 +54,9 @@ FILESETS['MC_13TeV_Zee_25ns_geo12_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo13_Lkh1' ]
 FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1' ]
 FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
+
+
+
 
 def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
@@ -149,7 +152,7 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
 
     batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
-    batch.write( 'rm ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
+    batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()

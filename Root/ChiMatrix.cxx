@@ -330,8 +330,7 @@ void ChiMatrix::FillTemplates( ) {
       double randVal2 =  m_rand.Gaus();
       for ( int i_alpha = 0; i_alpha < (int) m_MCZMass.size(); i_alpha++ ) {	            
 	for ( int i_sigma = 0; i_sigma < (int) m_MCZMass[i_alpha].size(); i_sigma++ ) {
-
-	  
+	  	  
 	  double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
 	  double factor2Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) :m_scaleValues[i_alpha]  );
 
@@ -340,12 +339,11 @@ void ChiMatrix::FillTemplates( ) {
 
 	  double pt_1 = m_mapVar1["PT"] * factor1Alpha * factor1Sigma;
 	  double pt_2 = m_mapVar2["PT"] * factor2Alpha * factor2Sigma;
-	
 	  TLorentzVector dum_el1, dum_el2;
 	  dum_el1.SetPtEtaPhiM( pt_1, m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
 	  dum_el2.SetPtEtaPhiM( pt_2, m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
-	  
 	  TLorentzVector Z = dum_el1 + dum_el2;
+
 	  if ( Z.M()/1000. < m_setting->GetZMassMin() || Z.M()/1000. > m_setting->GetZMassMax() ) continue;
 	  m_MCZMass[i_alpha][i_sigma]->Fill( Z.M() /1000., m_mapVarEvent["WEIGHT"] );
 	  
@@ -517,18 +515,22 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
   if ( m_setting->GetDoSmearing() ) ss << "$$\\sigma_{ij} = " << m_sigma << "\\pm " << m_errSigma << "$$" << endl;
   ss << "\\end{minipage}\\hfill" << endl;
   plotName = path + m_name + "_chiMatrix";
-  DrawPlot( {m_chiMatrix}, plotName );
+  vector<TH1*> dumVect = {m_chiMatrix};
+  DrawPlot( dumVect, plotName );
   WriteLatexMinipage( ss, {plotName}, 2 );
 
   // //Comparison data and extrmal alpha templates
   if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
     if ( m_setting->GetDoScale() ) {
       legends.clear();
-      legends.push_back( "legend=Data" );
-      legends.push_back( string(TString::Format("legend=Template : alpha=%i",(int) ( m_scaleValues.front()*1e6)) ) );
-      legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
+      legends.push_back( "legend=Data; m=__MEAN" );
+      legends.push_back( string(TString::Format("legend=Template : alpha=%i; m=__MEAN",(int) ( m_scaleValues.front()*1e6)) ) );
+      //      legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
+      legends.push_back("doRatio=1");
       plotName = TString( path + m_name + "_CompareAlpha" );
-      DrawPlot( { m_dataZMass, m_MCZMass[0][bestSigma],  m_MCZMass.back()[bestSigma]}, plotName, legends );
+      cout << "print alpha" << endl;
+      dumVect = { m_dataZMass, m_MCZMass[0][bestSigma] }; //,  m_MCZMass.back()[bestSigma]};
+      DrawPlot( dumVect, plotName, legends );
       plotNames.push_back( plotName   );
     }
   
@@ -538,18 +540,22 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
       legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
       plotName = path + m_name + "_CompareSigma";
-      DrawPlot( { m_dataZMass, m_MCZMass[bestAlpha].front(),  m_MCZMass[bestAlpha].back()}, plotName, legends );
+      cout << "print_c" << endl;
+      dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front() }; //,  m_MCZMass[bestAlpha].back()};
+      DrawPlot( dumVect, plotName, legends );
       plotNames.push_back( plotName );
     }
   }
   
   plotName = path + m_name + "_chi2FitConstVar";
-  DrawPlot( { m_chi2FitConstVar }, plotName );
+  dumVect = { m_chi2FitConstVar };
+  DrawPlot( dumVect, plotName );
   plotNames.push_back( plotName );
 
   if ( m_corAngle ) {
     plotName = path + m_name + "_corAngle";
-    DrawPlot( { m_corAngle}, plotName );
+    dumVect = { m_corAngle};
+    DrawPlot( dumVect, plotName );
     plotNames.push_back( plotName );
   }
   WriteLatexMinipage( ss, plotNames, 2 );

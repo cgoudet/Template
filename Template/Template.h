@@ -141,7 +141,7 @@ class Template
 
      Do not save informations from bad configurations.
    */
-  int Save();
+  int Save( bool saveChiMatrix=0 );
 
 
   /**\brief Create a pdf note with all the fits (may be heavy in case of high configuration number
