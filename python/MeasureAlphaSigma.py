@@ -51,16 +51,16 @@ if switch==0 :
 elif switch == 1 :
         configFiles=[ 
 		#Mesure des scales
-		['TestSame.root', 'MC_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
-		['TestIBL.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
+		# ['TestSame.root', 'MC_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
+		# ['TestIBL.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
 	        # ['DataOff_13TeV_25ns_mat_6Bins.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0'], 0 ],
 	        # ['DataOff_13TeV_25ns_mat.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['doSmearing=0'], 0 ],
 		# ['DataOff_13TeV_25ns_rel201_6Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6'], 0 ],
 		# ['DataOff_13TeV_25ns_rel201_IBL_6Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['etaBins=ETA6'], 0 ],
 		# ['DataOff_13TeV_25ns_rel201_24Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA24'], 0 ],
 		# ['DataOff_13TeV_25ns_rel201_IBL_24Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['etaBins=ETA24'], 0 ],
-		# ['DataOff_13TeV_25ns_rel201.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', [], 3 ],
-		# ['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', [], 3 ],
+		['DataOff_13TeV_25ns_rel201.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', [], 3 ],
+		['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', [], 3 ],
 		# ['DataOff_13TeV_25ns_rel201_2Steps.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', [], 1 ],
 		# ['DataOff_13TeV_25ns_rel201_IBL_2Steps.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', [], 1 ],
 		# ['DataOff_13TeV_25ns_rel201_2Steps_24ins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA24'], 1 ],

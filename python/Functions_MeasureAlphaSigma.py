@@ -220,6 +220,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['branchVarNames']['PT_1']='pt_1'
     options['branchVarNames']['PT_2']='pt_2'
     options['branchVarNames']['MASS']='m12'
+    options['branchVarNames']['WEIGHT']='m12'
     options['dataBranchWeightName']='weight'
     options['MCBranchWeightName']='weight'
 
