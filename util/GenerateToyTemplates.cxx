@@ -152,10 +152,7 @@ int main( int argc, char* argv[] ) {
 	string dumString = outFileName.substr( 0, outFileName.find_last_of( "." ) );
 	dumString = dumString.substr( dumString.find_last_of( "/" )+1 );
 	cout << "latex file : " << dumString + ".tex" << endl;
-	cout << dumString.substr( dumString.find_last_of( "_") +1 ) << endl;
 	runNumber = std::stol( dumString.substr( dumString.find_last_of( "_") +1 ) );
-	cout << "runNumber : ";
-	cout << runNumber << endl;
 	TMatrixD *combinSigma = TempMeasure.GetMatrix( "sigma" );
 	TMatrixD* combinErrSigma = TempMeasure.GetMatrix( "errSigma" );
 

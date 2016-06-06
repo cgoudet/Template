@@ -525,11 +525,10 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.clear();
       legends.push_back( "legend=Data; m=__MEAN" );
       legends.push_back( string(TString::Format("legend=Template : alpha=%i; m=__MEAN",(int) ( m_scaleValues.front()*1e6)) ) );
-      //      legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
+      legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
       legends.push_back("doRatio=1");
       plotName = TString( path + m_name + "_CompareAlpha" );
-      cout << "print alpha" << endl;
-      dumVect = { m_dataZMass, m_MCZMass[0][bestSigma] }; //,  m_MCZMass.back()[bestSigma]};
+      dumVect = { m_dataZMass, m_MCZMass[0][bestSigma], m_MCZMass.back()[bestSigma]};
       DrawPlot( dumVect, plotName, legends );
       plotNames.push_back( plotName   );
     }
@@ -540,8 +539,7 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
       legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
       plotName = path + m_name + "_CompareSigma";
-      cout << "print_c" << endl;
-      dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front() }; //,  m_MCZMass[bestAlpha].back()};
+      dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front(), m_MCZMass[bestAlpha].back()};
       DrawPlot( dumVect, plotName, legends );
       plotNames.push_back( plotName );
     }
@@ -714,7 +712,6 @@ void ChiMatrix::OptimizeRanges( ) {
 	//Dealing with minimum bin too close to underflow
 	if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
 	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
-	  cout << "rangeMin : " << rangeMin << endl;
 	  continue;
 	}
 
@@ -724,7 +721,6 @@ void ChiMatrix::OptimizeRanges( ) {
 	  break;
 	}
 
-	//	if ( m_name == "ChiMatrix_10_3" ) DrawPlot( { histScale }, string( TString::Format( "TestOptimize_%d", counter ) ) );
 	if ( m_setting->GetDebug() ) {
 	cout << "counter : " << counter << endl;
 	cout << "start" << endl;

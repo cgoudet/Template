@@ -51,21 +51,9 @@ if switch==0 :
 elif switch == 1 :
         configFiles=[ 
 		#Mesure des scales
-		# ['TestSame.root', 'MC_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
-		# ['TestIBL.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0', 'optimizeRanges=0', 'alphaMin=0', 'alphaMax=0.05', 'nUseEl=1'], 0 ],
-	        # ['DataOff_13TeV_25ns_mat_6Bins.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6','doSmearing=0'], 0 ],
-	        # ['DataOff_13TeV_25ns_mat.root', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['doSmearing=0'], 0 ],
-		# ['DataOff_13TeV_25ns_rel201_6Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA6'], 0 ],
-		# ['DataOff_13TeV_25ns_rel201_IBL_6Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['etaBins=ETA6'], 0 ],
-		# ['DataOff_13TeV_25ns_rel201_24Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA24'], 0 ],
-		# ['DataOff_13TeV_25ns_rel201_IBL_24Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['etaBins=ETA24'], 0 ],
-		['DataOff_13TeV_25ns_rel201.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', [], 3 ],
-		['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', [], 3 ],
-		# ['DataOff_13TeV_25ns_rel201_2Steps.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', [], 1 ],
-		# ['DataOff_13TeV_25ns_rel201_IBL_2Steps.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', [], 1 ],
-		# ['DataOff_13TeV_25ns_rel201_2Steps_24ins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['etaBins=ETA24'], 1 ],
-		# ['DataOff_13TeV_25ns_rel201_IBL_2Steps_24Bins.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['etaBins=ETA24'], 1 ],
-#		['Test2VAR1.root', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', ['alphaSimEta=0.005 0.005 0.005 0.005 0.005 0.005', 'alphaSimPt=0 0 0 0 0', 'sigmaSimAlpha=0 0 0 0 0', 'sigmaSimEta=0 0 0 0 0 0', 'sigmaSimPt=0 0 0 0 0', 'etaBins=ETA6', 'doSmearing=0', 'ptBins=0 50000 100000 150000 200000 1000000', "var2=PT", "mode=2VAR", 'debug=1' ], 0, 1 ],
+		['DataOff_13TeV_25ns_rel201.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['dataBranchWeightName=' ], 3 ],
+		['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco'], 3 ],
+#		['Test2VAR1.root', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', ['dataBranchWeightName=', 'MCBranchWeightName=', 'alphaSimEta=0.005 0.005 0.005 0.005 0.005 0.005', 'alphaSimPt=0 0 0 0 0', 'sigmaSimAlpha=0 0 0 0 0', 'sigmaSimEta=0 0 0 0 0 0', 'sigmaSimPt=0 0 0 0 0', 'etaBins=ETA6', 'ptBins=0 50000 100000 150000 200000 1000000', "var2=PT", "mode=2VAR", 'doSmearing=0' ], 0, 1 ],
 		]	
 
 spsPath="/sps/atlas/c/cgoudet/Calibration/PreRec/"
