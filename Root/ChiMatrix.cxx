@@ -598,7 +598,7 @@ int ChiMatrix::CreateTemplates( int nTemplates ) {
 }
 
 //==============================
-void ChiMatrix::FillScaleValues( int nTemplates) {
+void ChiMatrix::FillScaleValues( int nTemplates ) {
   //  if ( m_setting->GetDebug() ) cout << "FillScaleValues" << endl;
   m_scaleValues.clear();
   m_sigmaValues.clear();
@@ -609,7 +609,7 @@ void ChiMatrix::FillScaleValues( int nTemplates) {
   if ( !alphaMaxBin ) m_scaleValues.push_back( ( m_alphaMin != m_setting->GetAlphaMin() || m_alphaMax != m_setting->GetAlphaMax() ) ? (m_alphaMin + m_alphaMax)/2 : 0);
   else {
   for ( int i_alpha = 0; i_alpha <=alphaMaxBin; i_alpha++ ) {
-    double scale = ( m_setting->GetDoScale() ) ? m_alphaMin + ( m_alphaMax - m_alphaMin ) /  alphaMaxBin * i_alpha : 0;
+    double scale = ( m_setting->GetDoScale() ) ? m_alphaMin + ( m_alphaMax - m_alphaMin ) /  alphaMaxBin * i_alpha : (m_alphaMax-m_alphaMin)/2.;
     m_scaleValues.push_back( scale );
   }}
     
@@ -629,19 +629,24 @@ void ChiMatrix::OptimizeRanges( ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::OptimizeRanges() " << m_name << endl;
 
   TH1D *histScale = 0;
-
+  double chiOptim = m_setting->GetOptimizeRanges()*m_setting->GetOptimizeRanges();
   for ( unsigned int iScale = 0; iScale < 2; iScale++ ) {
     if ( (!m_setting->GetDoScale() && !iScale) || (!m_setting->GetDoSmearing() && iScale) ) continue;
     double &rangeMin = iScale ? m_sigmaMin : m_alphaMin;
     double &rangeMax = iScale ? m_sigmaMax : m_alphaMax;
     double allowedRangeMin = iScale ? max( 0., m_setting->GetSigmaMin()) : m_setting->GetAlphaMin();
     double allowedRangeMax = iScale ? m_setting->GetSigmaMax() : m_setting->GetAlphaMax();
-    double scaleMin = rangeMax;
-    double chiMin = -99;
+    cout << allowedRangeMin << endl;
+    //    double scaleMin = rangeMax;
+    //    double chiMin = -99;
 
     int counter = -1;
+    bitset<2> foundOptim;
 
+    double upRightRange=allowedRangeMax, lowRightRange=allowedRangeMin, minVal=-99, upLeftRange=allowedRangeMin, lowLeftRange=allowedRangeMax;
     while ( true  ) {    
+      if ( counter > 10 ) { cout << "reached 10 steps for optimization" << endl; exit(1); }
+      foundOptim.reset();
       counter++;
       FillScaleValues( 10 );
       ClearTemplates();
@@ -665,95 +670,161 @@ void ChiMatrix::OptimizeRanges( ) {
 	: m_chiMatrix->ProjectionX( m_name.c_str() + TString("histAlpha"), 1, 1, "o" );
 
 
-      if ( !counter ) {
-	//On the first iteration, perform a fit to roughly locate the minimum
-	TF1* fittingFunction = FitHist( histScale, iScale );
-	if ( fittingFunction ) {
-	  // cout << "fitVal : " <<  fittingFunction->GetParameter(2) << " " << fittingFunction->GetParameter(1) << " " ;
-	  // cout << fittingFunction->GetParameter(2) + m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1) << endl;
-	  rangeMax = min( rangeMax, fittingFunction->GetParameter(2) + m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1) );
-	  double minVal =  fittingFunction->GetParameter(2) - m_setting->GetOptimizeRanges() * fittingFunction->GetParameter(1);
-	  rangeMin = max( rangeMin, (!iScale ? minVal : max( minVal, 0. )) );
-	  delete fittingFunction; fittingFunction=0;
-	  //	  if ( m_name == "ChiMatrix_0_0" ) for ( int i = 1; i<histScale->GetNbinsX()+1; i++ ) cout << histScale->GetBinContent(i) << endl;
-	}
-	else {
-	  m_quality.set(2, 1);
-	  delete histScale; histScale=0;
-	  ClearTemplates();
-	  delete m_chiMatrix; m_chiMatrix=0;
-	  return;
-	}
-      }//end !counter
-      else {
-	if ( counter > 10 ) {
-	  exit(1);
-	}
-	int minBin = histScale->GetMinimumBin();
+      int minBin = histScale->GetMinimumBin();
+      minVal = minVal==-99 ? histScale->GetBinContent(minBin) : min( minVal, histScale->GetBinContent(minBin) );
+      int binUp=histScale->GetNbinsX(), binDown=1;
+      while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
+      while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
 
-	//	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
-	//Dealing with minimum bin too close to overflow
-	//if ( m_setting->GetDebug() ) cout << "minBin too high : " << minBin << " " << floor( histScale->GetNbinsX()*3./4 ) << " " << allowedRangeMax << " " << rangeMax << endl;
-	if ( minBin >= floor( histScale->GetNbinsX()*3./4 )   ) {
-	  if ( allowedRangeMax == rangeMax ) {
-	    m_quality.set(2, 1);
-	    delete histScale; histScale=0;
-	    ClearTemplates();
-	    delete m_chiMatrix; m_chiMatrix=0;
-	    return;
-	  } 
-	  else {
-	  rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
-	  cout << "rangeMax : " << rangeMax << endl;
-	  continue;
-	  }
-	}
+      cout << "binsUp : " << binDown << " " << minBin << " " << binUp << endl;
+      cout << "values : " << histScale->GetBinContent(binDown) << " " << histScale->GetBinContent(binDown+1) << " " << minVal << " " << histScale->GetBinContent( binUp-1 ) << " " << histScale->GetBinContent( binUp )<< endl;
+      cout << "centers : " << histScale->GetXaxis()->GetBinCenter(binDown) << " " << histScale->GetXaxis()->GetBinCenter(binDown+1) << " " << histScale->GetXaxis()->GetBinCenter(minBin) << " " << histScale->GetXaxis()->GetBinCenter(binUp-1) << " " << histScale->GetXaxis()->GetBinCenter(binUp) << endl;
+
+      if ( binUp != histScale->GetNbinsX() ) {
+	//The main dichotomy code suppose that once the dichotomy started, the optimized value of scale is between the last and before the last bin
+	upRightRange = histScale->GetXaxis()->GetBinCenter( binUp );
+	lowRightRange = histScale->GetXaxis()->GetBinCenter( binUp-1 ); 
+      }
+
+      if ( binUp==histScale->GetNbinsX() && minBin>=histScale->GetNbinsX()-1 && rangeMax>allowedRangeMax-1e-10 ) foundOptim.set(0);
+      else if ( binUp == minBin+1 ) rangeMax = histScale->GetXaxis()->GetBinCenter(binUp);
+      else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) < m_setting->GetOptimizeRanges()+1
+		&& sqrt( histScale->GetBinContent(binUp) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
+	rangeMax = histScale->GetXaxis()->GetBinCenter( binUp );
+	foundOptim.set(0);
+      }
+      else if ( sqrt( histScale->GetBinContent(binUp-1) - minVal ) < m_setting->GetOptimizeRanges()+1
+		&& sqrt( histScale->GetBinContent(binUp-1) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
+	rangeMax = histScale->GetXaxis()->GetBinCenter( binUp-1 );
+	foundOptim.set(0);
+      }
+      else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) < m_setting->GetOptimizeRanges()+1 && rangeMax > allowedRangeMax-1e-10 ) foundOptim.set(0);
+      //The following case will always be the first case of dichotomy to happen.
+      //It initialises upRightRange
+      //lowRightRange initial value is set in such way that it will always be non-max at the first use of this case
+      else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) > m_setting->GetOptimizeRanges()+1 ) {
+	upRightRange = histScale->GetXaxis()->GetBinCenter( binUp );
+	//need to redefine lowRightRange as binUp-1 can have a more interesting centreal value than the previous iteration
+	cout << "lowRightRange : " << lowRightRange << " " << histScale->GetXaxis()->GetBinCenter( binUp-1 ) << " " << max( lowRightRange, histScale->GetXaxis()->GetBinCenter( binUp-1 ) ) << endl;
+	lowRightRange = max( lowRightRange, histScale->GetXaxis()->GetBinCenter( binUp-1 ) );
+	rangeMax = ( lowRightRange + histScale->GetXaxis()->GetBinCenter( binUp ) ) /2;
+      }
+      else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) < m_setting->GetOptimizeRanges()-1 ) {
+	cout << "binUp too low : " << upRightRange << " " << histScale->GetXaxis()->GetBinCenter( binUp ) << " " << min( allowedRangeMax, ( upRightRange + histScale->GetXaxis()->GetBinCenter( binUp ) ) /2 ) << endl;
+	rangeMax = min( allowedRangeMax, ( upRightRange + histScale->GetXaxis()->GetBinCenter( binUp ) ) /2 );
+	lowRightRange = max( lowRightRange, histScale->GetXaxis()->GetBinCenter( binUp ) );
+      }
+
+
+      //===========================
+      if ( binDown != 1 ) {
+	//The main dichotomy code suppose that once the dichotomy started, the optimized value of scale is between the first and second bin
+	upLeftRange = histScale->GetXaxis()->GetBinCenter( 1 );
+	lowLeftRange = histScale->GetXaxis()->GetBinCenter( 2 ); 
+      }
+
+      if ( binDown == 1 && minBin<=2 && rangeMin < allowedRangeMin+ 1e-10 ) foundOptim.set(1);
+      else if ( binDown == minBin-1 ) rangeMin = histScale->GetXaxis()->GetBinCenter(binDown);
+      else if ( sqrt( histScale->GetBinContent(binDown) - minVal ) < m_setting->GetOptimizeRanges()+1
+		&& sqrt( histScale->GetBinContent(binDown) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
+	rangeMin = histScale->GetXaxis()->GetBinCenter( binDown );
+	foundOptim.set(1);
+      }
+      else if ( sqrt( histScale->GetBinContent(binDown+1) - minVal ) < m_setting->GetOptimizeRanges()+1
+		&& sqrt( histScale->GetBinContent(binDown+1) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
+	rangeMin = histScale->GetXaxis()->GetBinCenter( binDown+1 );
+	foundOptim.set(1);
+      }
+      else if ( sqrt( histScale->GetBinContent(binDown) - minVal ) < m_setting->GetOptimizeRanges()+1
+		&& rangeMin<allowedRangeMin+1e-10 ) 	foundOptim.set(1);
+      //The following case will always be the first case of dichotomy to happen.
+      //It initialises upLeftRange
+      //lowLeftRange initial value is set in such way that it will always be non-max at the first use of this case
+      else if ( sqrt( histScale->GetBinContent(binDown) - minVal ) > m_setting->GetOptimizeRanges()+1 ) {
+	cout << "reduce range : " << lowLeftRange << " " << histScale->GetXaxis()->GetBinCenter( binDown ) << endl;;
+	upLeftRange = histScale->GetXaxis()->GetBinCenter( binDown );
+	//need to redefine lowLeftRange as binDown-1 can have a more interesting centreal value than the previous iteration
+	lowLeftRange = min( lowLeftRange, histScale->GetXaxis()->GetBinCenter( binDown+1 ) );
+	rangeMin = ( lowLeftRange + histScale->GetXaxis()->GetBinCenter( binDown ) ) /2;
+	cout << "reduce range : " << lowLeftRange << " " << histScale->GetXaxis()->GetBinCenter( binDown ) << endl;
+      }
+      else if ( sqrt( histScale->GetBinContent(binDown) - minVal ) < m_setting->GetOptimizeRanges()-1 ) {
+	cout << "increase range : " << rangeMin << " " << upLeftRange + histScale->GetXaxis()->GetBinCenter( binDown ) /2 << endl;
+	rangeMin = max( allowedRangeMin, upLeftRange + histScale->GetXaxis()->GetBinCenter( binDown ) /2 );
+	cout << rangeMin << " " << lowLeftRange << endl;
+	lowLeftRange = max( lowLeftRange, histScale->GetXaxis()->GetBinCenter( binDown ) );
+	cout << lowLeftRange << endl;
+      }
+      cout << "leftRanges : " << lowLeftRange << " " << upLeftRange << endl;
+      cout << "rightRanges : " << lowRightRange << " " << upRightRange << endl;
+      cout << "ranges : " << rangeMin << " " << rangeMax << endl;
+      cout << "foundOptim : " << foundOptim.to_ulong() << endl;
+      if ( foundOptim.to_ulong() == 3 ) break;
+      
+
+	// //	cout << "minBin : "  << minBin << " " << histScale->GetBinCenter( histScale->GetMiXaxis()->GetXmin() << " " << histScale->GetXaxis()->GetXmax() << endl;
+	// //Dealing with minimum bin too close to overflow
+	// //if ( m_setting->GetDebug() ) cout << "minBin too high : " << minBin << " " << floor( histScale->GetNbinsX()*3./4 ) << " " << allowedRangeMax << " " << rangeMaxu << endl;
+	// if ( minBin >= floor( histScale->GetNbinsX()*3./4 )   ) {
+	//   if ( allowedRangeMax == rangeMax ) {
+	//     m_quality.set(2, 1);
+	//     delete histScale; histScale=0;
+	//     ClearTemplates();
+	//     delete m_chiMatrix; m_chiMatrix=0;
+	//     return;
+	//   } 
+	//   else {
+	//   rangeMax =  min( 2*rangeMax - rangeMin, allowedRangeMax );
+	//   cout << "rangeMax : " << rangeMax << endl;
+	//   continue;
+	//   }
+	// }
 	
-	//Dealing with minimum bin too close to underflow
-	if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
-	  rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
-	  continue;
-	}
+	// //Dealing with minimum bin too close to underflow
+	// if ( minBin <= ceil( histScale->GetNbinsX()/4. ) && allowedRangeMin != rangeMin ) {
+	//   rangeMin =  max( 2*rangeMin - rangeMax, allowedRangeMin );
+	//   continue;
+	// }
 
-	double sigmaUp = sqrt( histScale->GetBinContent(histScale->GetNbinsX()) - histScale->GetMinimum());
-	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 && sigmaUp>m_setting->GetOptimizeRanges() ) {
-	  delete histScale; histScale=0;
-	  break;
-	}
+	// double sigmaUp = sqrt( histScale->GetBinContent(histScale->GetNbinsX()) - histScale->GetMinimum());
+	// if ( histScale->GetMinimum() >= chiMin && chiMin != -99 && sigmaUp>m_setting->GetOptimizeRanges() ) {
+	//   delete histScale; histScale=0;
+	//   break;
+	// }
 
-	if ( m_setting->GetDebug() ) {
-	cout << "counter : " << counter << endl;
-	cout << "start" << endl;
-	cout << "chiMin : " << chiMin << endl;
-	cout << "minimum : " << histScale->GetMinimum() << " " << minBin << endl;
-	cout << "scaleMin : " << scaleMin << endl;
-	cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
-	cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
-	}
+	// if ( m_setting->GetDebug() ) {
+	// cout << "counter : " << counter << endl;
+	// cout << "start" << endl;
+	// cout << "chiMin : " << chiMin << endl;
+	// cout << "minimum : " << histScale->GetMinimum() << " " << minBin << endl;
+	// cout << "scaleMin : " << scaleMin << endl;
+	// cout << "rangeMin : " << rangeMin << " " << histScale->GetBinContent(1) << endl;
+	// cout << "rangeMax : " << rangeMax << " " << histScale->GetBinContent( histScale->GetNbinsX() ) << endl;
+	// }
 
-	chiMin = min( chiMin, histScale->GetMinimum() );
-	scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );	
+	// chiMin = min( chiMin, histScale->GetMinimum() );
+	// scaleMin = histScale->GetXaxis()->GetBinCenter( histScale->GetMinimumBin() );	
 
-	double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
+	// double sigmaDown = sqrt( histScale->GetBinContent(1) - histScale->GetMinimum());
 
-	if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
-	rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
-	rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
-
-
-	if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
-	  delete histScale; histScale=0;
-	  break;
-	}
+	// if ( sigmaDown == 0 ) sigmaDown = m_setting->GetOptimizeRanges();
+	// rangeMax = min( allowedRangeMax, scaleMin + (rangeMax-scaleMin)*m_setting->GetOptimizeRanges()/sigmaUp );
+	// rangeMin = max ( allowedRangeMin, scaleMin + ( rangeMin-scaleMin)*m_setting->GetOptimizeRanges()/sigmaDown );
 
 
-	if ( iScale && scaleMin<0 ) scaleMin=0;
-	chiMin = histScale->GetMinimum();
+	// if ( histScale->GetMinimum() >= chiMin && chiMin != -99 ) {
+	//   delete histScale; histScale=0;
+	//   break;
+	// }
 
-      }//end else counter
+
+	// if ( iScale && scaleMin<0 ) scaleMin=0;
+	// chiMin = histScale->GetMinimum();
+
+      //      }//end else counter
 
       if ( histScale ) delete histScale; histScale=0;
-    }
+  }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
     //    if ( rangeMax == allowedRangeMax ) m_quality.set( 2, 1 );
   }
