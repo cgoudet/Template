@@ -44,7 +44,7 @@ int main( int argc, char* argv[] ) {
   cout << "nFile : " << inputFile.size() << endl;
   for ( unsigned int iFile = 0; iFile<inputFile.size(); iFile++ ) {
     cout << iFile << " : " << inputFile[iFile] << endl;
-    DiffSystematics( inputFile[iFile], 0, iFile );
+    DiffSystematics( inputFile[iFile], iFile );
   }
   //Diphoton model
   // //  DiffSystematics( "/afs/in2p3.fr/home/c/cgoudet/private/Calibration/Template/Input/systematics_alpha.txt", 0, 0 );

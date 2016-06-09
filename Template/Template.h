@@ -141,7 +141,7 @@ class Template
 
      Do not save informations from bad configurations.
    */
-  int Save();
+  int Save( bool saveChiMatrix=0 );
 
 
   /**\brief Create a pdf note with all the fits (may be heavy in case of high configuration number
@@ -221,7 +221,7 @@ class Template
 
      Bin numbers of the configuration are put into i_eta and j_eta.
   */
-  int FindBin( unsigned int &i_eta, unsigned int &j_eta );
+  int FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl=0 );
 
   /**\brief Fill a ZMass distributions
      \param isData Tell wich role has the input tree
