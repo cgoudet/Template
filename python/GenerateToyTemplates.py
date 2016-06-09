@@ -2,7 +2,7 @@ import os
 import sys
 from Functions_MeasureAlphaSigma import *
 import time; 
-
+isAntinea=0
 #One config file correspond to one job
 configFiles=[ 
     ['', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=0', 'etaBins=ETA6', 'doScale=0', 'doSimulation=1'], 0, 1 ]
@@ -16,7 +16,7 @@ counter =0
 nUseEl= 1
 fitPerJob= 2
 
-plotPath='/sps/atlas/c/cgoudet/Calibration/PreRec/'
+plotPath= '/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else '/sps/atlas/c/cgoudet/Calibration/PreRec/'
 
 for vInput in  inputC  :
     for vStat in inputStat :

@@ -1,10 +1,13 @@
 import os
 import sys
-sys.path.append(os.path.abspath("/afs/in2p3.fr/home/c/cgoudet/private/Calibration/PlotFunctions/python"))
+isAntinea=0
+user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
+libPath= "/afs/in2p3.fr/home/'+user +'/Calibration/PlotFunctions/python"
+sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
 
-PREFIXPATH="/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibraiton/Bias/Toys' if isAtninea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -108,11 +111,11 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
     batch.write('server=`pwd`\n' 
                 + 'cd ${server} \n'
                 + 'ulimit -S -s 100000 \n'
-                + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/lib:/afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
-                + 'cd /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/ \n'
+                + 'LD_LIBRARY_PATH=/afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/lib:/afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/bin:$LD_LIBRARY_PATH \n'
+                + 'cd /afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/ \n'
                 + 'source local_setup.sh \n'
                 + 'cd ${server} \n'
-                + 'cp -v /afs/in2p3.fr/home/c/cgoudet/private/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+                + 'cp -v /afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
                 )    
 
 #Copy the configuration file to the server
@@ -150,7 +153,7 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
         if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
 
-
+    batch.write( 'rm *distorded* \n' )
     batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
     batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
