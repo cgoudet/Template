@@ -673,8 +673,8 @@ void ChiMatrix::OptimizeRanges( ) {
       int minBin = histScale->GetMinimumBin();
       minVal = minVal==-99 ? histScale->GetBinContent(minBin) : min( minVal, histScale->GetBinContent(minBin) );
       int binUp=histScale->GetNbinsX(), binDown=1;
-      while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
-      while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
+      if ( minBin != histScale->GetNbinsX() ) while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
+      if ( minBin != 1 ) while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
 
       cout << "binsUp : " << binDown << " " << minBin << " " << binUp << endl;
       cout << "values : " << histScale->GetBinContent(binDown) << " " << histScale->GetBinContent(binDown+1) << " " << minVal << " " << histScale->GetBinContent( binUp-1 ) << " " << histScale->GetBinContent( binUp )<< endl;

@@ -53,7 +53,7 @@ int main( int argc, char* argv[] ) {
   
   if (vm.count("help")) {cout << desc; return 0;}
   //########################################
-  Style_Christophe();
+
   int err = 0;
   //Simplifies execution line for Christophe
 

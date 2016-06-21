@@ -51,9 +51,10 @@ if switch==0 :
 elif switch == 1 :
         configFiles=[ 
 		#Mesure des scales
-		['TestOptim.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['dataBranchWeightName=' ], 3 ],
+#		['TestOptim.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['dataBranchWeightName=' ], 3 ],
 #		['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco'], 3 ],
 #		['Test2VAR1.root', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', ['dataBranchWeightName=', 'MCBranchWeightName=', 'alphaSimEta=0.005 0.005 0.005 0.005 0.005 0.005', 'alphaSimPt=0 0 0 0 0', 'sigmaSimAlpha=0 0 0 0 0', 'sigmaSimEta=0 0 0 0 0 0', 'sigmaSimPt=0 0 0 0 0', 'etaBins=ETA6', 'ptBins=0 50000 100000 150000 200000 1000000', "var2=PT", "mode=2VAR", 'doSmearing=0' ], 0, 1 ],
+ 		['TestPT.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/Data_13TeV_Zee_25ns_Lkh1_0_corrected.root', 'MC_2015cPRE_corr', ['etaBins=PT6', 'var1=pt', 'branchVarNames=pt_1 pt_1', 'branchVarNames=pt_2 pt_2', 'doSmearing=0'] ],
 		]	
 
 spsPath="/sps/atlas/c/cgoudet/Calibration/PreRec/"
