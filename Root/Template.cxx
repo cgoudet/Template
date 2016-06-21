@@ -761,11 +761,11 @@ void Template::MakePlot( string path, string latexFileName ) {
 
     //fill the tabuilar with measured values
     for ( int i_bin = 0; i_bin < (int) etaBins.size()-1; i_bin++ ) {
-      unsigned int jMax =  is2Var ? ptBins.size()-1 : 2;
+      unsigned int jMax =  is2Var ? ptBins.size()-1 : 1;
       for ( unsigned int jBin=0; jBin<jMax; jBin++ ) {
       //Deal with bin description
       latex  << "$] " << etaBins[i_bin] << " , " << etaBins[i_bin+1] << " ]$ & " << i_bin ;
-      if ( m_setting.GetMode() == "2VAR" ) latex << "&$] " << ptBins[jBin] << " , " << ptBins[jBin+1] << " ]$ & " << jBin ;
+      if ( is2Var ) latex << "&$] " << ptBins[jBin] << " , " << ptBins[jBin+1] << " ]$ & " << jBin ;
 
       if ( isClosure ) {
 	string color = "";

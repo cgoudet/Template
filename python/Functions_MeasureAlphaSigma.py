@@ -3,13 +3,20 @@ import sys
 
 isAntinea=1
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
+<<<<<<< HEAD
 libPath= '/afs/in2p3.fr/home/'+user +'/Calibration/PlotFunctions/python/'
+=======
+libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
+>>>>>>> 58a7f542c90096e6dfe3383bef7f5ab0206252bd
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
 
 PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 58a7f542c90096e6dfe3383bef7f5ab0206252bd
 PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -60,8 +67,12 @@ FILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1' ]
 FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
 
-
-
+FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
+def FillDatasetContainer( container, datasets ) :
+    for dataset in datasets : 
+        if '.root' in dataset : container.append( dataset )
+        else : container += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
+    
 
 def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
@@ -80,14 +91,12 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
     configOptions=inVector[3]
     dataFiles = []
-    for dataset in FILESETS[ inVector[1] ] : 
-        if '.root' in dataset : dataFiles.append( dataset )
-        else : dataFiles += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
+    if inVector[1] in FILESETS : FillDatasetContainer( dataFiles, FILESETS[ inVector[1] ] )
+    else : dataFiles+=inVector[1].split(',')
 
     MCFiles=[]
-    for dataset in FILESETS[ inVector[2] ] : 
-        if '.root' in dataset : MCFiles.append( dataset )
-        else : MCFiles += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root')
+    if inVector[2] in FILESETS : FillDatasetContainer( MCFiles, FILESETS[ inVector[2] ] )
+    else : MCFiles+=inVector[2].split(',')
 
     outNameFile=inVector[0]
     doDistorded = 0
@@ -182,7 +191,7 @@ def CreateConfig( configName, inOptions = [] ) :
     defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
     defaultBinning['SIMSIGMAETA24']='2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2'
     defaultBinning['ETA68'] = '-2.47 -2.435 -2.4 -2.35 -2.3 -2.2 -2.1 -2.05 -2 -1.9 -1.8 -1.7625 -1.725 -1.6775 -1.63 -1.59 -1.55 -1.51 -1.47 -1.42 -1.37 -1.285 -1.2 -1.1 -1 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.285 1.37 1.42 1.47 1.51 1.55 1.59 1.63 1.6775 1.725 1.7625 1.8 1.9 2 2.05 2.1 2.2 2.3 2.35 2.4 2.435 2.47'
-
+    defaultBinning['PT6'] = '0 100 200 300 400 500 1000'
     options = {}
     options['ZMassMin'] = 80
     options['ZMassMax'] = 100
@@ -243,13 +252,13 @@ def CreateConfig( configName, inOptions = [] ) :
 
         if optKey in options :
             if optKey == 'branchVarNames' :
-                optValue.split( ' ' )
+                optValue = optValue.split( ' ' )
                 options[optKey][optValue[0]] = optValue[1]
                 pass
             else : options[optKey]=optValue
 
 #select a predefined binnin
-        if ( optKey=='ptBins' and 'PT' in optValue ) or ( optKey=='etaBins' and 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
+        if ( optKey=='ptBins' or optKey=='etaBins' ) and (  'PT' in optValue or 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
