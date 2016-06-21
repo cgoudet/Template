@@ -592,7 +592,11 @@ void Template::CreateDistordedTree( string outFileName ) {
     }
 
     TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
+    
+    cout<< " m_setting.GetNUseEvent(): "<<m_setting.GetNUseEvent()<<endl;
+
     TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap() );
+
     cout << "bootstrap name : " << bootTree->GetName() << endl;
     distordedFile.cd();
     bootTree->Write( "", TObject::kOverwrite );
@@ -816,15 +820,15 @@ void Template::MakePlot( string path, string latexFileName ) {
     }
   }
 
-  TFile *outZMassFile= new TFile ((path+"").c_str(), "RECREATE");
-  for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) {
-    for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
-      m_chiMatrix[i_eta][j_eta]->Save(outZMassFile, 0);
-    }
-  }
+  // TFile *outZMassFile= new TFile ((path+"outZMass.root").c_str(), "RECREATE");
+  // for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) {
+  //   for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
+  //     m_chiMatrix[i_eta][j_eta]->Save(outZMassFile, 0);
+  //   }
+  // }
 
-  outZMassFile->Close();
-  delete outZMassFile;
+  // outZMassFile->Close();
+  // delete outZMassFile;
 
   latex << "\\clearpage" << endl;
   latex << m_sStream.str() << endl;

@@ -54,7 +54,7 @@ int main( int argc, char* argv[] ) {
   //===================================================
   int err = 0;
 
-  double sigma, errSigma, inputC, rms;
+  double sigma, errSigma, inputC, rms, meanDataZ;
   unsigned int iConf, jConf, statConf, statTree, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
   unsigned long long runNumber;
@@ -73,6 +73,7 @@ int main( int argc, char* argv[] ) {
   outTree->Branch( "indepDistorded", &indepDistorded );
   outTree->Branch( "indepTemplates", &indepTemplates );
   outTree->Branch( "dataRMS", &rms );
+  outTree->Branch( "meanDataZ", &meanDataZ );
   outTree->Branch( "runNumber", &runNumber );
   outTree->Branch( "nBins", &nBins );
   outTree->Branch( "nOptim", &nOptim );
@@ -90,6 +91,7 @@ int main( int argc, char* argv[] ) {
   scalesTree->Branch( "indepDistorded", &indepDistorded );
   scalesTree->Branch( "indepTemplates", &indepTemplates );
   scalesTree->Branch( "dataRMS", &rms );
+  scalesTree->Branch( "meanDataZ", &meanDataZ );
   scalesTree->Branch( "runNumber", &runNumber );
   scalesTree->Branch( "nBins", &nBins );
   scalesTree->Branch( "nOptim", &nOptim );
@@ -176,6 +178,7 @@ int main( int argc, char* argv[] ) {
 	    if ( !chiMatrix ) continue;
 	    statConf = chiMatrix->GetStat();
 	    rms = chiMatrix->GetDataRMS();
+	    meanDataZ = chiMatrix->GetDataMean();
 	    if ( !statConf ) continue;
 	    outTree->Fill();
 	  }

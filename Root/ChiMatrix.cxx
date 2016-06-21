@@ -203,7 +203,8 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
   }
 
   outFile->cd();
-
+  double meanDataZMass=0.;
+  
   if ( justTemplate ) {
     for ( unsigned int i_alpha = 0; i_alpha <  m_MCZMass.size(); i_alpha++ ) {
       for ( unsigned int i_sigma = 0; i_sigma <  m_MCZMass.back().size(); i_sigma++ ) {
@@ -218,7 +219,11 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
      for ( unsigned int i = 0; i < m_chi2FitNonConstVar.size() ; i++ ) {
        m_chi2FitNonConstVar[i]->Write( "", TObject::kOverwrite );
      }
-    if ( m_dataZMass ) m_dataZMass->Write( "", TObject::kOverwrite );   
+    if ( m_dataZMass ) 
+      {
+	m_dataZMass->Write( "", TObject::kOverwrite );   
+	meanDataZMass=m_dataZMass->GetMean();
+      }
 
     string titleTree = m_name + "_infoTree";
     TTree *infoTree = new TTree( titleTree.c_str(), titleTree.c_str() );
@@ -226,6 +231,7 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
     infoTree->Branch( "sigma", &m_sigma );
     infoTree->Branch( "errAlpha", &m_errAlpha );
     infoTree->Branch( "errSigma", &m_errSigma );
+    infoTree->Branch( "meanDataZMass", &meanDataZMass );
     infoTree->Fill();
     infoTree->Write( "", TObject::kOverwrite );
     delete infoTree; infoTree=0;
@@ -674,8 +680,8 @@ void ChiMatrix::OptimizeRanges( ) {
       int minBin = histScale->GetMinimumBin();
       minVal = minVal==-99 ? histScale->GetBinContent(minBin) : min( minVal, histScale->GetBinContent(minBin) );
       int binUp=histScale->GetNbinsX(), binDown=1;
-      while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
-      while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
+      if ( minBin != histScale->GetNbinsX() ) while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
+      if ( minBin != 1 ) while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
 
       cout << "binsUp : " << binDown << " " << minBin << " " << binUp << endl;
       cout << "values : " << histScale->GetBinContent(binDown) << " " << histScale->GetBinContent(binDown+1) << " " << minVal << " " << histScale->GetBinContent( binUp-1 ) << " " << histScale->GetBinContent( binUp )<< endl;
