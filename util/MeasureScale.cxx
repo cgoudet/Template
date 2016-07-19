@@ -14,8 +14,6 @@ using std::vector;
 namespace po = boost::program_options;
 using std::ifstream;
 
-string FindDefaultTree( TFile* inFile );
-void Style_Christophe();
 
 int main( int argc, char* argv[] ) {
   po::options_description desc("LikelihoodProfiel Usage");
@@ -97,7 +95,7 @@ int main( int argc, char* argv[] ) {
       cout << "Template::Extraction failed : " << err << endl;
       return 1;
     }
-    err = Temp.Save();
+    err = Temp.Save(1);
     // if ( err ) {
     //   cout << "Template::Save failed : " << err << endl;
     //   return 2;
