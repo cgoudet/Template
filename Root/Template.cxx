@@ -439,8 +439,10 @@ int Template::ExtractFactors() {
       m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
       m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( is2Var ? m_setting.GetVar2().c_str() : ( iVar ? "C" : "#alpha") );
 
+      resultMatrix.Print();
+      resultErrMatrix.Print();
       for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
-	for ( int jBin = 1; jBin < resultMatrix.GetNcols(); jBin++ ) {
+	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
 	  if ( is2Var ) {
 	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, jBin+1, resultMatrix(iBin,jBin) );
 	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, jBin+1,  resultErrMatrix(iBin,jBin) );

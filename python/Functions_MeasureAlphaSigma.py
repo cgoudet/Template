@@ -258,7 +258,7 @@ def CreateConfig( configName, inOptions = [] ) :
             else : options[optKey]=optValue
 
 #select a predefined binnin
-        if ( optKey=='ptBins' or optKey=='etaBins' ) and (  'PT' in optValue or 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
+        if ( optKey in ['ptBins', 'etaBins', 'sigmaSimEta' ] ) and (  'PT' in optValue or 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
