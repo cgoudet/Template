@@ -10,6 +10,7 @@ from SideFunction import *
 configFiles=[]
 switch=0
 
+print "blabla"
 if switch==0 :
         configFiles=[ 
 # 		#Mesure des scales
