@@ -3,27 +3,19 @@ import sys
 
 isAntinea=1
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
-<<<<<<< HEAD
-libPath= '/afs/in2p3.fr/home/'+user +'/Calibration/PlotFunctions/python/'
-=======
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
->>>>>>> 58a7f542c90096e6dfe3383bef7f5ab0206252bd
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
 
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
-<<<<<<< HEAD
-
-=======
->>>>>>> 58a7f542c90096e6dfe3383bef7f5ab0206252bd
-PREFIXDATASETS="/sps/atlas/c/cgoudet/Calibration/DataxAOD/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
 FILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1/'] 
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled/']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/']
-FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
+#FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
 FILESETS['MC_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_1.root']
 FILESETS['MC_13TeV_Zee_25nsb_IBL_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_1.root']
 FILESETS['MC_13TeV_Zee_25nsb_Lkh1_scaled']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_1.root']
@@ -49,7 +41,7 @@ FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_
 FILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1']
 FILESETS['Data_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1_scaled']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1']
-FILESETS['Data_13TeV_Zee_25nsb_Lkh1']       =[ '/sps/atlas/c/cgoudet/Calibration/Test/Data_13TeV_Zee_25ns_rel201_0.root']
+FILESETS['Data_13TeV_Zee_25nsb_Lkh1']       =[ '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Archive/Data_13TeV_Zee_25ns_rel201_0.root']
 
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt30']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt30/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_pt20']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_pt20/']
@@ -74,14 +66,16 @@ def FillDatasetContainer( container, datasets ) :
         else : container += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
     
 
-def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
+def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
 
 #mode 
     # 0 MeasureScale
+    # 1 2Steps
     # 2 GenerateToyTemplates
-    # 3 Closure
-    # 4 MeasureScale + sigmaOnly with correction
-    # 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected
+    # 3 MeasureScale + sigmaOnly with correction
+    # 4 MeasureScale + alphaOnly with correction -> compare mode 3 to 0
+    #? 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected ??
+    # to perform a closure: doDistorded=1 and any mode different from 2
 
     global PREFIXPATH
     global FILESETS
@@ -106,13 +100,13 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
 
     configPath="Config/"
     batchPath="Batch/"
-    resultPath="Results/TestIndepTemplates/"
-    plotPath="Plots/TestIndepTemplates/"
+    resultPath="Results/"
+    plotPath="Plots/"
 
     configName = []
     if mode in [1, 4] : configName.append( PREFIXPATH + configPath + StripString( outNameFile ) + '_alpha.boost' )
     if mode in [0, 2, 3, 4] : configName.append( PREFIXPATH + configPath + StripString( outNameFile ) + '.boost' )
-    if mode in [ 1, 3, 4 ] : configName.append( PREFIXPATH + configPath + StripString( outNameFile ) + '_c.boost' )
+    if mode in [ 1, 3 ] : configName.append( PREFIXPATH + configPath + StripString( outNameFile ) + '_c.boost' )
 
     fileName = PREFIXPATH + batchPath + StripString( outNameFile ) + '.sh' 
 
@@ -128,7 +122,7 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
                 + 'cd /afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/ \n'
                 + 'source local_setup.sh \n'
                 + 'cd ${server} \n'
-                + 'cp -v /afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/obj/x86_64-slc6-gcc48-opt/Template/bin/MeasureScale . \n'
+                + 'cp -v /afs/in2p3.fr/home/'+user+'/Calibration/RootCoreBin/obj/x86_64-slc6-gcc49-opt/Template/bin/MeasureScale . \n'
                 )    
 
 
@@ -142,11 +136,8 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
     MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) for name in MCFiles ] )
 
 #Fill the command line
-#Modes  description
-# 0 Normal
-# 1 Corrects alpha and c
 
-
+#Perform a closure
     if doDistorded and mode != 2 : 
         batch.write( 'MeasureScale --configFile ' + StripString(configName[0], 1, 0) + dataLine.replace( '--dataFileName', '--MCFileName' ) + ' --outFileName ' + outNameFile + ' --createDistorded MC_distorded.root --noExtraction \n')
         dataLine = ' --dataFileName MC_distorded.root '
@@ -170,7 +161,7 @@ def CreateLauncher( inVector, mode = 4,optionLine=""  ) :
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
 
     
-    batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
+    if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
     batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
     batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
@@ -242,8 +233,8 @@ def CreateConfig( configName, inOptions = [] ) :
     options['branchVarNames']['PT_2']='pt_2'
     options['branchVarNames']['MASS']='m12'
     options['branchVarNames']['WEIGHT']='m12'
-    options['dataBranchWeightName']=''
-    options['MCBranchWeightName']=''
+    options['dataBranchWeightName']='weight'
+    options['MCBranchWeightName']='weight'
 
 
     for inOpt in inOptions :

@@ -5,7 +5,7 @@ import argparse
 import subprocess as sub
 import os
 import sys
-sys.path.append(os.path.abspath("/afs/in2p3.fr/home/c/cgoudet/private/Calibration/PlotFunctions/python"))
+sys.path.append(os.path.abspath("/afs/in2p3.fr/home/a/aguergui/public/Calibration/PlotFunctions/python"))
 from SideFunction import *
 
 """
@@ -58,19 +58,19 @@ systematics[-1].SetSuffixes( {'c' : '_c' } )
 systematics.append( Systematic( 'Mat', 'DataOff_13TeV_25ns_rel201_IBL') )
 systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201' )
 
-systematics.append( Systematic( 'Clos', '/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors') )
+systematics.append( Systematic( 'Clos', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
 systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_Clos', 'c' : 'Run1/ctErrZee_run1_Clos' } ) 
 systematics[-1].SetNomFile( '' )
 
-systematics.append( Systematic( 'Meth', '/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors') )
+systematics.append( Systematic( 'Meth', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
 systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_Meth', 'c' : 'Run1/ctErrZee_run1_MethMod' } ) 
 systematics[-1].SetNomFile( '' )
 
-systematics.append( Systematic( 'EW', '/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors') )
+systematics.append( Systematic( 'EW', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
 systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_EW', 'c' : 'Run1/ctErrZee_run1_EW' } ) 
@@ -90,16 +90,16 @@ def InversionStudy( directory ) :
 #===============================================================
 def applyCorrection( directory ) :
 
-    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/c/cgoudet/private/Calibration/Template/python/DataOff_13TeV_25ns.boost --noExtraction '
-    commandLine += ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) )
-    commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' ) )
+    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/a/aguergui/public/Calibration/Template/python/DataOff_13TeV_25ns.boost --noExtraction '
+    commandLine += ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) )
+    commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' ) )
     commandLine += ' --correctAlphaHistName measScale_alpha --correctSigmaHistName measScale_c '
     commandLine += ' --correctAlphaFileName ' + directory + 'DataOff_13TeV_25ns.root'
     commandLine += ' --correctSigmaFileName ' + directory + 'DataOff_13TeV_25ns_c.root'
     os.chdir( directory )
      
     os.system( commandLine )
-    content = listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' )
+    content = listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' )
     content = [ (f if 'corrected' in f else '' ) for f in content ]
     os.system( 'mv ' + ' '.join( content ) + ' ' + directory )
  
@@ -303,7 +303,7 @@ def createRestBoost( directory, ID, var ) :
 
     if ID =='residual' : #PreRec
         varName = 'ctZee' if var=='c' else 'alpha0'
-        options['rootFileName'] += ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root' ]*(2 if var =="c" else 1)
+        options['rootFileName'] += ['/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root' ]*(2 if var =="c" else 1)
         options['rootFileName'].reverse()
         options['objName'].append( 'PreRecommandations/' + varName + '_prerec_errSyst' )
         options['legend'] .append('Pre-recommandations, syst. unc. __FILL __NOPOINT' )
@@ -323,7 +323,7 @@ def createRestBoost( directory, ID, var ) :
     elif ID=='nominal' :
         print('nominal')
         varName = 'ctZee' if var=='c' else 'alphaTot'
-        options['rootFileName'] += ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root' ]*2
+        options['rootFileName'] += ['/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root' ]*2
         options['rootFileName'].reverse()
         options['objName'] += ['PreRecommandations/'+varName+'_prerec_errSyst', 'PreRecommandations/'+varName+'_prerec_errStat' ]
         options['legend']= [ 'Pre-recommandations, syst. unc. __FILL __NOPOINT', 'Pre-recommandations, stat. unc.', 'Run2' ]
@@ -357,7 +357,7 @@ def createRestBoost( directory, ID, var ) :
         optionsUnique['rangeUserY'] = '0 0.99'
 
     elif ID == 'run1Syst' :
-        options['rootFileName'] = ['/sps/atlas/c/cgoudet/Calibration/Run1/EnergyScaleFactors.root', directory+'EnergyScaleFactors.root']
+        options['rootFileName'] = ['/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root', directory+'EnergyScaleFactors.root']
         options['objName'] = [ 'Run1/' + ( 'ct' if var=='c' else 'alpha' ) + 'ErrZee_run1_totSyst', 'totSyst_' + var ]
         options['legend']= [ 'Run1', 'Run2' ]
         optionsUnique['rangeUserY'] = '0 0.99'
@@ -462,7 +462,7 @@ def main():
  #   print( "Parsed : ")
 #    for opt in args.__dict__: print(opt, getattr(args, opt))
 
-    if not '/' in args.directory : args.directory = '/sps/atlas/c/cgoudet/Calibration/ScaleResults/' + args.directory + '/'
+    if not '/' in args.directory : args.directory = '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/' + args.directory + '/'
 
 
 

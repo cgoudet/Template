@@ -643,7 +643,7 @@ void ChiMatrix::OptimizeRanges( ) {
     double &rangeMax = iScale ? m_sigmaMax : m_alphaMax;
     double allowedRangeMin = iScale ? max( 0., m_setting->GetSigmaMin()) : m_setting->GetAlphaMin();
     double allowedRangeMax = iScale ? m_setting->GetSigmaMax() : m_setting->GetAlphaMax();
-    cout << allowedRangeMin << endl;
+    cout <<"allowedRangeMin: "<< allowedRangeMin << endl;
     //    double scaleMin = rangeMax;
     //    double chiMin = -99;
 
@@ -654,6 +654,7 @@ void ChiMatrix::OptimizeRanges( ) {
     while ( true  ) {    
       if ( counter > 10 ) { cout << "reached 10 steps for optimization" << endl; exit(1); }
       foundOptim.reset();
+      cout<<"counter: "<<counter<<endl;
       counter++;
       FillScaleValues( 10 );
       ClearTemplates();
@@ -693,7 +694,7 @@ void ChiMatrix::OptimizeRanges( ) {
 	lowRightRange = histScale->GetXaxis()->GetBinCenter( binUp-1 ); 
       }
 
-      if ( binUp==histScale->GetNbinsX() && minBin>=histScale->GetNbinsX()-1 && rangeMax>allowedRangeMax-1e-10 ) foundOptim.set(0);
+      if ( binUp==histScale->GetNbinsX() && minBin>=histScale->GetNbinsX()-1 && rangeMax>allowedRangeMax-1e-10 ) foundOptim.set(0);//not really necessary, there for symmetry reasons with the binDown case
       else if ( binUp == minBin+1 ) rangeMax = histScale->GetXaxis()->GetBinCenter(binUp);
       else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) < m_setting->GetOptimizeRanges()+1
 		&& sqrt( histScale->GetBinContent(binUp) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
