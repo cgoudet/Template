@@ -66,13 +66,13 @@ def FillDatasetContainer( container, datasets ) :
         else : container += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
     
 
-def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
+def CreateLauncher( inVector, mode = 3,optionLine=""  ) :
 
 #mode 
     # 0 MeasureScale
     # 1 2Steps
     # 2 GenerateToyTemplates
-    # 3 MeasureScale + sigmaOnly with correction
+    # 3 MeasureScale + sigmaOnly with correction -> default
     # 4 MeasureScale + alphaOnly with correction -> compare mode 3 to 0
     #? 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected ??
     # to perform a closure: doDistorded=1 and any mode different from 2
@@ -160,7 +160,6 @@ def CreateLauncher( inVector, mode = 0,optionLine=""  ) :
         if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
 
-    
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
     batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
@@ -209,7 +208,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaSimPt']=''
     options['symBin']=0
     options['fitMethod']=2
-    options['nUseEl']=10
+    options['nUseEl']=1
     options['nUseEvent']=0
     options['nEventCut']=10
     options['thresholdMass']=70

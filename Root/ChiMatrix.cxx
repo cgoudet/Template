@@ -315,7 +315,7 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
 
 //=======================================
 void ChiMatrix::FillTemplates( ) {
-  //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
+  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
   if (! m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );  
   else if ( m_setting->GetIndepTemplates() == 1 ) {
     cout << "setting new Template seed ChiMatrix" << endl;
@@ -325,10 +325,13 @@ void ChiMatrix::FillTemplates( ) {
   else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );  
 
 
-  //cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
+  cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
 
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
+
+  cout<<"nUseEl (imax): "<<imax<<endl;
+
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     m_MCTree->GetEntry( iEvent );
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
@@ -355,7 +358,7 @@ void ChiMatrix::FillTemplates( ) {
 	  
       }}}
   }
-  //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates Done" << endl;
+  if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates Done" << endl;
 }
 	
 //==========================================
@@ -582,6 +585,8 @@ int ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
   if ( m_setting->GetOptimizeRanges() ) OptimizeRanges();
+  if ( m_setting->GetDebug() )  cout <<"after OptimizeRanges"<<endl;
+
   ClearTemplates();
   if ( m_quality.to_ulong() ) return 0;
 
@@ -589,15 +594,25 @@ int ChiMatrix::CreateTemplates( int nTemplates ) {
   int sigmaMaxBin = ( m_setting->GetDoSmearing() ) ? ( nTemplates ) ? nTemplates : m_setting->GetSigmaNBins() : 0;
 
   FillScaleValues( nTemplates );  
+
+  if ( m_setting->GetDebug() )  cout <<"after FillScaleValues"<<endl;
+
   for ( int i_alpha = 0; i_alpha <= alphaMaxBin; i_alpha++ ) {
     m_MCZMass.push_back( vector< TH1D* > () );
+
     for ( int i_sigma = 0; i_sigma <= sigmaMaxBin; i_sigma++ ) {
       m_MCZMass.back().push_back( 0 );
       m_MCZMass.back().back() = new TH1D( TString::Format( "%s_MCZMass_sc%d_sm%d", m_name.c_str() ,(int) (m_scaleValues[i_alpha]*1e6),  (int) (m_sigmaValues[i_sigma]*1e6) ), TString::Format( "MCZMass_sc%i_sm%d", (int) (m_scaleValues[i_alpha]*1e6), (int) (m_sigmaValues[i_sigma]*1e6) ), m_setting->GetZMassNBins(), m_setting->GetZMassMin(), m_setting->GetZMassMax() );  
+
       m_MCZMass.back().back()->GetXaxis()->SetTitle( "M_{ee}" );
     }}
 
+    if ( m_setting->GetDebug() )  cout <<"after end loop alpha c"<<endl;
+
   FillTemplates();
+
+  if ( m_setting->GetDebug() )  cout <<"after FillTemplates"<<endl;
+  
   FillChiMatrix();
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::CreateTemplate Done" << endl;
@@ -654,7 +669,6 @@ void ChiMatrix::OptimizeRanges( ) {
     while ( true  ) {    
       if ( counter > 10 ) { cout << "reached 10 steps for optimization" << endl; exit(1); }
       foundOptim.reset();
-      cout<<"counter: "<<counter<<endl;
       counter++;
       FillScaleValues( 10 );
       ClearTemplates();

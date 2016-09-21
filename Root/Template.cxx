@@ -99,7 +99,7 @@ Template::Template( const string &outFileName, const string &configFile,
 
   m_name = outFileName == ""  ? "TemplateDefault" : TString(outFileName).ReplaceAll(".root", "" );
   //  m_saveTemplateFileName =   TString( m_saveFileName ).ReplaceAll( ".root", "_template.root" ).Data();
-  
+
   if ( m_setting.GetDebug() )  cout << "Template : Constructor Done" << endl;  
 }
 
@@ -321,6 +321,7 @@ int Template::CreateTemplate() {
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
+
       m_chiMatrix[i_eta][j_eta]->CreateTemplates();
     }}  
 
@@ -358,104 +359,109 @@ int Template::ExtractFactors() {
   for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
     
     bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
-    if ( !isMeasuredVar ) continue;
+
+    cout << "m_vectHist.size(): " <<m_vectHist.size() <<endl;
+
+    cout <<"isMeasuredVar: "<<isMeasuredVar<<endl;
+
+  //   if ( !isMeasuredVar ) continue;
 
     
-    //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
-    int eta1Max = (int) etaBins.size() -1;
-    int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
+  //   //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
+  //   int eta1Max = (int) etaBins.size() -1;
+  //   int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
     
-    unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
-    unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
-    unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
-    unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
+  //   unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
+  //   unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
+  //   unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
+  //   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
     
-    //Create an histogram of inputs in case of closure
-    if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
-      if ( isMeasuredVar ) {
-	unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
-	string histName = CreateHistMatName( m_histNames[histBin], iVar );
-	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
-	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
-	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
-	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
-	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
-	}
+  //   //Create an histogram of inputs in case of closure
+  //   if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
+  //     if ( isMeasuredVar ) {
+  // 	unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
+  // 	string histName = CreateHistMatName( m_histNames[histBin], iVar );
+  // 	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
+  // 	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
+  // 	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
+  // 	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
+  // 	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
+  // 	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
+  // 	}
 	
-	histName = CreateHistMatName( m_histNames[histDevBin], iVar );
-	m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
-      }
-    }
+  // 	histName = CreateHistMatName( m_histNames[histDevBin], iVar );
+  // 	m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
+  //     }
+  //   }
     
 
-    //Create combined factor matrices
-    for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
-      m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
+  //   //Create combined factor matrices
+  //   for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
+  //     m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
 
 
     
-    //Run over all chiMatrices
-    for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
-      if ( m_setting.GetMode() == "1VAR" ) eta2Max =  (int) i_eta+1;
+  //   //Run over all chiMatrices
+  //   for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
+  //     if ( m_setting.GetMode() == "1VAR" ) eta2Max =  (int) i_eta+1;
 
-      for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
+  //     for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
+  // 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
 
-	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
-	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
-	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
+  // 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
+  // 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
+  // 	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
 
-	if ( m_setting.GetMode() == "1VAR" ) {
-	  //Symetrize coimbinMatrix if only 1VAR
-	  (*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
-	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
-	}
+  // 	if ( m_setting.GetMode() == "1VAR" ) {
+  // 	  //Symetrize coimbinMatrix if only 1VAR
+  // 	  (*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
+  // 	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
+  // 	}
 
-	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
-	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
-	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
-	      : sqrt((sigmaSimEta[i_eta]*sigmaSimEta[i_eta] + sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) )
-	    : ( !iVar ? (alphaSimPt[i_eta] + alphaSimEta[j_eta])/2. 
-		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
-	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
-	}
-      }
-    } //end loop on chiMatrix
+  // 	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
+  // 	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
+  // 	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
+  // 	      : sqrt((sigmaSimEta[i_eta]*sigmaSimEta[i_eta] + sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) )
+  // 	    : ( !iVar ? (alphaSimPt[i_eta] + alphaSimEta[j_eta])/2. 
+  // 		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
+  // 	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
+  // 	}
+  //     }
+  //   } //end loop on chiMatrix
 
-    if ( isMeasuredVar  ) {
-      bool is2Var = m_setting.GetMode() == "2VAR" ;
-      TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
-      TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
-      unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
-      cout << "inversion method : " << inversionMethod << endl;
-      if ( is2Var ) inversionMethod = iVar ? 14 : 13;
-      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
+  //   if ( isMeasuredVar  ) {
+  //     bool is2Var = m_setting.GetMode() == "2VAR" ;
+  //     TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
+  //     TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
+  //     unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
+  //     cout << "inversion method : " << inversionMethod << endl;
+  //     if ( is2Var ) inversionMethod = iVar ? 14 : 13;
+  //     InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
 
-      string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
-      if ( is2Var ) m_vectHist[iVar][histMeasBin] = new TH2D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0], ptBins.size()-1, (double*) &ptBins[0] ); 
-      else m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
+  //     string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
+  //     if ( is2Var ) m_vectHist[iVar][histMeasBin] = new TH2D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0], ptBins.size()-1, (double*) &ptBins[0] ); 
+  //     else m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
       
-      m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-      m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( is2Var ? m_setting.GetVar2().c_str() : ( iVar ? "C" : "#alpha") );
+  //     m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
+  //     m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( is2Var ? m_setting.GetVar2().c_str() : ( iVar ? "C" : "#alpha") );
 
-      resultMatrix.Print();
-      resultErrMatrix.Print();
-      for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
-	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
-	  if ( is2Var ) {
-	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, jBin+1, resultMatrix(iBin,jBin) );
-	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, jBin+1,  resultErrMatrix(iBin,jBin) );
-	  }
-	  else {
-	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, resultMatrix(iBin,0) );
-	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, resultErrMatrix(iBin,0) );
-	  }
-	}
-      }
-    }//end isMeasured
-    isChi2Done = true; 
-  }//end loop iVer
+  //     resultMatrix.Print();
+  //     resultErrMatrix.Print();
+  //     for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
+  // 	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
+  // 	  if ( is2Var ) {
+  // 	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, jBin+1, resultMatrix(iBin,jBin) );
+  // 	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, jBin+1,  resultErrMatrix(iBin,jBin) );
+  // 	  }
+  // 	  else {
+  // 	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, resultMatrix(iBin,0) );
+  // 	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, resultErrMatrix(iBin,0) );
+  // 	  }
+  // 	}
+  //     }
+  //   }//end isMeasured
+  //   isChi2Done = true; 
+   }//end loop iVar
   
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors Done" << endl;
   return 0;

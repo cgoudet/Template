@@ -417,7 +417,7 @@ def parseArgs():
         default=1, type=int )
     parser.add_argument(
         '--doCorrection', help='Tag for recreating systematics histos and plots',
-        default=1, type=int )
+        default=0, type=int )
 
     # Floats
     # Here I give only the long argument name

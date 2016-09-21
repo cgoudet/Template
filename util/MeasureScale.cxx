@@ -97,12 +97,13 @@ int main( int argc, char* argv[] ) {
       cout << "Template::Extraction failed : " << err << endl;
       return 1;
     }
-    err = Temp.Save();
-    // if ( err ) {
-    //   cout << "Template::Save failed : " << err << endl;
-    //   return 2;
-    // }
+    err = Temp.Save(1);
+     if ( err ) {
+       cout << "Template::Save failed : " << err << endl;
+       return 2;
+     }
   }
+
   if ( vm.count("makePlot") )  {
     string title = outFileName.substr( 0, outFileName.find_last_of( "." ) ) + ".tex";
     Temp.MakePlot( "", "" );
