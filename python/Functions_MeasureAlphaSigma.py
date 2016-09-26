@@ -68,6 +68,7 @@ def FillDatasetContainer( container, datasets ) :
 
 def CreateLauncher( inVector, mode = 3,optionLine=""  ) :
 
+    print "Mode: "+str(mode)
 #mode 
     # 0 MeasureScale
     # 1 2Steps
@@ -158,7 +159,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=""  ) :
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
 
         if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
-        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
+        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' \n')
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )

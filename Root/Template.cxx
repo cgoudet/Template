@@ -360,107 +360,104 @@ int Template::ExtractFactors() {
     
     bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
 
-    cout << "m_vectHist.size(): " <<m_vectHist.size() <<endl;
 
-    cout <<"isMeasuredVar: "<<isMeasuredVar<<endl;
-
-  //   if ( !isMeasuredVar ) continue;
+    if ( !isMeasuredVar ) continue;
 
     
-  //   //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
-  //   int eta1Max = (int) etaBins.size() -1;
-  //   int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
+    //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
+    int eta1Max = (int) etaBins.size() -1;
+    int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
     
-  //   unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
-  //   unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
-  //   unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
-  //   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
+    unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
+    unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
+    unsigned int matErrBin = SearchVectorBin( string("combinErr"), m_matrixNames );
+    unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
     
-  //   //Create an histogram of inputs in case of closure
-  //   if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
-  //     if ( isMeasuredVar ) {
-  // 	unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
-  // 	string histName = CreateHistMatName( m_histNames[histBin], iVar );
-  // 	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
-  // 	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-  // 	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
-  // 	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
-  // 	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
-  // 	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
-  // 	}
+    //Create an histogram of inputs in case of closure
+    if ( m_setting.GetMode() == "1VAR" && ((!m_dataFileNames.size() && m_setting.GetDoSimulation() ) || TString(m_setting.GetDataName()).Contains("distorded") )) {
+      if ( isMeasuredVar ) {
+  	unsigned int histBin = SearchVectorBin( string("inputScale"), m_histNames );
+  	string histName = CreateHistMatName( m_histNames[histBin], iVar );
+  	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
+  	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
+  	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
+  	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
+  	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
+  	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
+  	}
 	
-  // 	histName = CreateHistMatName( m_histNames[histDevBin], iVar );
-  // 	m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
-  //     }
-  //   }
+  	histName = CreateHistMatName( m_histNames[histDevBin], iVar );
+  	m_vectHist[iVar][histDevBin] = new TH2F( histName.c_str(), histName.c_str(), eta1Max , -0.5, eta1Max-0.5, eta2Max, -0.5, eta2Max - 0.5);
+      }
+    }
     
 
-  //   //Create combined factor matrices
-  //   for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
-  //     m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
+    //Create combined factor matrices
+    for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
+      m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
 
 
     
-  //   //Run over all chiMatrices
-  //   for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
-  //     if ( m_setting.GetMode() == "1VAR" ) eta2Max =  (int) i_eta+1;
+    //Run over all chiMatrices
+    for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
+      if ( m_setting.GetMode() == "1VAR" ) eta2Max =  (int) i_eta+1;
 
-  //     for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
-  // 	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
+      for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
+  	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
 
-  // 	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
-  // 	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
-  // 	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
+  	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
+  	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
+  	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
 
-  // 	if ( m_setting.GetMode() == "1VAR" ) {
-  // 	  //Symetrize coimbinMatrix if only 1VAR
-  // 	  (*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
-  // 	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
-  // 	}
+  	if ( m_setting.GetMode() == "1VAR" ) {
+  	  //Symetrize coimbinMatrix if only 1VAR
+  	  (*m_vectMatrix[iVar][matCombinBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta);
+  	  (*m_vectMatrix[iVar][matErrBin])(j_eta, i_eta) = (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta);
+  	}
 
-  // 	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
-  // 	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
-  // 	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
-  // 	      : sqrt((sigmaSimEta[i_eta]*sigmaSimEta[i_eta] + sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) )
-  // 	    : ( !iVar ? (alphaSimPt[i_eta] + alphaSimEta[j_eta])/2. 
-  // 		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
-  // 	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
-  // 	}
-  //     }
-  //   } //end loop on chiMatrix
+  	if ( m_vectHist[iVar][histDevBin] && !m_chiMatrix[i_eta][j_eta]->GetQuality() ) {
+  	  double alphaTh =  ( m_setting.GetMode() == "1VAR" ) ? 
+  	    ( !iVar ? (alphaSimEta[i_eta] + alphaSimEta[j_eta])/2. 
+  	      : sqrt((sigmaSimEta[i_eta]*sigmaSimEta[i_eta] + sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) )
+  	    : ( !iVar ? (alphaSimPt[i_eta] + alphaSimEta[j_eta])/2. 
+  		: sqrt((sigmaSimPt[i_eta]*sigmaSimPt[i_eta]+sigmaSimEta[j_eta]*sigmaSimEta[j_eta])/2.) );
+  	  m_vectHist[iVar][histDevBin]->SetBinContent( i_eta+1, j_eta+1,  ((*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) - alphaTh ) / (*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) );
+  	}
+      }
+    } //end loop on chiMatrix
 
-  //   if ( isMeasuredVar  ) {
-  //     bool is2Var = m_setting.GetMode() == "2VAR" ;
-  //     TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
-  //     TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
-  //     unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
-  //     cout << "inversion method : " << inversionMethod << endl;
-  //     if ( is2Var ) inversionMethod = iVar ? 14 : 13;
-  //     InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
+    if ( isMeasuredVar  ) {
+      bool is2Var = m_setting.GetMode() == "2VAR" ;
+      TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
+      TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
+      unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
+      cout << "inversion method : " << inversionMethod << endl;
+      if ( is2Var ) inversionMethod = iVar ? 14 : 13;
+      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
 
-  //     string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
-  //     if ( is2Var ) m_vectHist[iVar][histMeasBin] = new TH2D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0], ptBins.size()-1, (double*) &ptBins[0] ); 
-  //     else m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
+      string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
+      if ( is2Var ) m_vectHist[iVar][histMeasBin] = new TH2D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0], ptBins.size()-1, (double*) &ptBins[0] ); 
+      else m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 
       
-  //     m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
-  //     m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( is2Var ? m_setting.GetVar2().c_str() : ( iVar ? "C" : "#alpha") );
+      m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( m_setting.GetVar1().c_str() );
+      m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( is2Var ? m_setting.GetVar2().c_str() : ( iVar ? "C" : "#alpha") );
 
-  //     resultMatrix.Print();
-  //     resultErrMatrix.Print();
-  //     for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
-  // 	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
-  // 	  if ( is2Var ) {
-  // 	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, jBin+1, resultMatrix(iBin,jBin) );
-  // 	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, jBin+1,  resultErrMatrix(iBin,jBin) );
-  // 	  }
-  // 	  else {
-  // 	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, resultMatrix(iBin,0) );
-  // 	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, resultErrMatrix(iBin,0) );
-  // 	  }
-  // 	}
-  //     }
-  //   }//end isMeasured
-  //   isChi2Done = true; 
+      resultMatrix.Print();
+      resultErrMatrix.Print();
+      for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
+  	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
+  	  if ( is2Var ) {
+  	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, jBin+1, resultMatrix(iBin,jBin) );
+  	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, jBin+1,  resultErrMatrix(iBin,jBin) );
+  	  }
+  	  else {
+  	    m_vectHist[iVar][histMeasBin]->SetBinContent( iBin+1, resultMatrix(iBin,0) );
+  	    m_vectHist[iVar][histMeasBin]->SetBinError( iBin+1, resultErrMatrix(iBin,0) );
+  	  }
+  	}
+      }
+    }//end isMeasured
+    isChi2Done = true; 
    }//end loop iVar
   
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors Done" << endl;
@@ -686,7 +683,7 @@ void Template::CreateDistordedTree( string outFileName ) {
 
 //####################################################==
 void Template::MakePlot( string path, string latexFileName ) {
-  cout << "latexFile : " << path << "/" << latexFileName << endl;
+  
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot" << endl;
   if ( path.back() != '/' && path != "" ) path += "/";
 
@@ -696,7 +693,8 @@ void Template::MakePlot( string path, string latexFileName ) {
     else latexFileName = "latex.tex";
   }
 
-  cout << m_name << " " << latexFileName << endl;
+  cout << "latexFile : " << path << "/" << latexFileName << endl;
+
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
   unsigned int histInputBin = SearchVectorBin( string("inputScale"), m_histNames );   
 
@@ -737,40 +735,40 @@ void Template::MakePlot( string path, string latexFileName ) {
   bool is2Var = m_setting.GetMode() == "2VAR" ;
   bool isClosure = TString(m_setting.GetDataName()).Contains("_distorded");
 
-    TString tabularPattern = TString( 'l', 2 + (2 + isClosure ) *(m_setting.GetDoScale() + m_setting.GetDoSmearing() ) + ( is2Var ? 2 : 0 ) );
-    latex << "\\begin{center}" << endl;
-    latex << "\\begin{tabular}{|" << tabularPattern << "|}" << endl;
-    latex << "\\hline" << endl;
-    latex << "$" << m_setting.GetVar1() << "$& bin &";
-    if ( is2Var ) latex << "$" + m_setting.GetVar2() + "$&bin&" ;
-    if ( m_setting.GetDoScale() ) {
-      if ( isClosure ) latex << "$\\alpha_{input}$ & ";
-      latex << "$\\alpha$ & $\\Delta\\alpha$ " ;
-      if ( m_setting.GetDoSmearing() ) latex << " & ";
-    }
+  TString tabularPattern = TString( 'l', 2 + (2 + isClosure ) *(m_setting.GetDoScale() + m_setting.GetDoSmearing() ) + ( is2Var ? 2 : 0 ) );
+  latex << "\\begin{center}" << endl;
+  latex << "\\begin{tabular}{|" << tabularPattern << "|}" << endl;
+  latex << "\\hline" << endl;
+  latex << "$" << m_setting.GetVar1() << "$& bin &";
+  if ( is2Var ) latex << "$" + m_setting.GetVar2() + "$&bin&" ;
+  if ( m_setting.GetDoScale() ) {
+    if ( isClosure ) latex << "$\\alpha_{input}$ & ";
+    latex << "$\\alpha$ & $\\Delta\\alpha$ " ;
+    if ( m_setting.GetDoSmearing() ) latex << " & ";
+  }
 
-    if ( m_setting.GetDoSmearing() ) {
-      if ( isClosure ) latex << "$\\sigma_{input}$ & ";
-      latex << "$\\sigma$ & $\\Delta\\sigma$" ;
-    }
-    latex << "\\\\" << endl;
-    latex << "\\hline " << endl;
+  if ( m_setting.GetDoSmearing() ) {
+    if ( isClosure ) latex << "$\\sigma_{input}$ & ";
+    latex << "$\\sigma$ & $\\Delta\\sigma$" ;
+  }
+  latex << "\\\\" << endl;
+  latex << "\\hline " << endl;
 
-    vector< double > etaBins = m_setting.GetEtaBins();    
-    vector< double > ptBins;
-    vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
-    vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();    
-    if ( is2Var ) {
-      ptBins = m_setting.GetPtBins();    
-    }
+  vector< double > etaBins = m_setting.GetEtaBins();    
+  vector< double > ptBins;
+  vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
+  vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();    
+  if ( is2Var ) {
+    ptBins = m_setting.GetPtBins();    
+  }
 
-    vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
-    vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();    
+  vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
+  vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();    
 
-    //fill the tabuilar with measured values
-    for ( int i_bin = 0; i_bin < (int) etaBins.size()-1; i_bin++ ) {
-      unsigned int jMax =  is2Var ? ptBins.size()-1 : 1;
-      for ( unsigned int jBin=0; jBin<jMax; jBin++ ) {
+  //fill the tabuilar with measured values
+  for ( int i_bin = 0; i_bin < (int) etaBins.size()-1; i_bin++ ) {
+    unsigned int jMax =  is2Var ? ptBins.size()-1 : 1;
+    for ( unsigned int jBin=0; jBin<jMax; jBin++ ) {
       //Deal with bin description
       latex  << "$] " << etaBins[i_bin] << " , " << etaBins[i_bin+1] << " ]$ & " << i_bin ;
       if ( is2Var ) latex << "&$] " << ptBins[jBin] << " , " << ptBins[jBin+1] << " ]$ & " << jBin ;
@@ -796,31 +794,31 @@ void Template::MakePlot( string path, string latexFileName ) {
 	if ( m_setting.GetDoSmearing() ) latex << " & " << m_vectHist[1][histMeasBin]->GetBinContent( i_bin +1) << " & " << m_vectHist[1][histMeasBin]->GetBinError( i_bin +1);
       }
       latex << "\\\\" << endl;
-      }
-    }//end iBin
+    }
+  }//end iBin
 
-    cout << "tabular done" << endl;
-    latex << "\\hline";
-    latex << "\\end{tabular}" << endl;    
-    latex << "\\end{center}" << endl;
+  cout << "tabular done" << endl;
+  latex << "\\hline";
+  latex << "\\end{tabular}" << endl;    
+  latex << "\\end{center}" << endl;
 
-    vector< string > plotNames;
-    unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames ); 
+  vector< string > plotNames;
+  unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames ); 
 
-    for ( unsigned int iVar = 0; iVar< m_vectHist.size(); iVar++ ) {
-      for ( unsigned int iHist = 0; iHist< m_vectHist[0].size(); iHist++ ) {
-	if ( iHist != histMeasBin && iHist != histDevBin ) continue;
-	if ( m_vectHist[iVar][iHist] ) {
-	  string plotName = path + m_vectHist[iVar][iHist]->GetName();
-	  vector<TH1*> histPlot = { m_vectHist[iVar][iHist] };
-	  if ( m_vectHist[iVar][histInputBin] && iHist==histMeasBin ) histPlot.insert( histPlot.begin(), m_vectHist[iVar][histInputBin] );
-	  DrawPlot( histPlot, plotName );
-	  plotNames.push_back( plotName );
-	}
+  for ( unsigned int iVar = 0; iVar< m_vectHist.size(); iVar++ ) {
+    for ( unsigned int iHist = 0; iHist< m_vectHist[0].size(); iHist++ ) {
+      if ( iHist != histMeasBin && iHist != histDevBin ) continue;
+      if ( m_vectHist[iVar][iHist] ) {
+	string plotName = path + m_vectHist[iVar][iHist]->GetName();
+	vector<TH1*> histPlot = { m_vectHist[iVar][iHist] };
+	if ( m_vectHist[iVar][histInputBin] && iHist==histMeasBin ) histPlot.insert( histPlot.begin(), m_vectHist[iVar][histInputBin] );
+	DrawPlot( histPlot, plotName );
+	plotNames.push_back( plotName );
       }
     }
-       WriteLatexMinipage( latex, plotNames, 2 );
-       // }//end 1VAR
+  }
+  WriteLatexMinipage( latex, plotNames, 2 );
+  // }//end 1VAR
 
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) {
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
@@ -916,7 +914,9 @@ string Template::GetColorTabular( double inputVal, double measVal, double uncert
 //######################################################
 int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
-  if ( !correctionAlpha && !correctionSigma ) return 0;
+  cout<< "Template :: ApplyCorrection"<<endl;
+
+  if ( !correctionAlpha && !correctionSigma ){ cout<<"return"<<endl;return 0;}
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
   map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
   TLorentzVector e3, e4;

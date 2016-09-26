@@ -66,7 +66,7 @@ logPath="Log/"
 
 for confFile in range( 0, len( configFiles ) ) :
 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
-	else : mode = 0
+	else : mode = 3
 	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
 	
 	logFile = StripString( configFiles[confFile][0] )

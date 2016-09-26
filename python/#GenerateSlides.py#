@@ -56,7 +56,7 @@ systematics.append( Systematic( 'Inv', 'InversionStudy') )
 systematics[-1].SetSuffixes( {'c' : '_c' } )
 
 systematics.append( Systematic( 'Mat', 'DataOff_13TeV_25ns_rel201_IBL') )
-systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201_IBL' )
+systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201' )
 
 systematics.append( Systematic( 'Clos', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
@@ -81,7 +81,7 @@ specialID = ['nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
 def InversionStudy( directory ) :
     print('create inversion systematic' )
     commandLines = [ 'InversionStudy --inFileName ' + directory + 'DataOff_13TeV_25ns_c.root'
-                     + ' --outFileName ' + directory + 'InversionStudy_c.root'
+                     + ' --outFileName ' + directory + 'InversionStudy.root'
                      + ' --inputType ' + str(var) + ' --mode 12 '
                      for var in range(1,2) ]
     os.system( '\n'.join( commandLines ) )
@@ -90,23 +90,18 @@ def InversionStudy( directory ) :
 #===============================================================
 def applyCorrection( directory ) :
 
-#    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/a/aguergui/public/Calibration/Template/python/DataOff_13TeV_25ns.boost --noExtraction '
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/DataOff_13TeV_25ns.boost --noExtraction '
+    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/a/aguergDataOff_13TeV_25ns.boost --noExtraction '
     commandLine += ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) )
     commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' ) )
     commandLine += ' --correctAlphaHistName measScale_alpha --correctSigmaHistName measScale_c '
     commandLine += ' --correctAlphaFileName ' + directory + 'DataOff_13TeV_25ns.root'
     commandLine += ' --correctSigmaFileName ' + directory + 'DataOff_13TeV_25ns_c.root'
-
     os.chdir( directory )
-    
+     
     os.system( commandLine )
     content = listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data_13TeV_Zee_25ns_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC*.root' )
     content = [ (f if 'corrected' in f else '' ) for f in content ]
-    
-    commandLine= 'mv ' + ' '.join( content ) + ' ' + directory  
-
-    os.system( commandLine )
+    os.system( 'mv ' + ' '.join( content ) + ' ' + directory )
     
 
 #===========================================

@@ -130,10 +130,10 @@ int Setting::Configure( const string &configFile ) {
   map< string, bool > mapDefinedVar;
   for ( auto vBranch : minVarNames ) mapDefinedVar[vBranch]=false;
 
-  for ( auto branchVarName : branchVarNames ) {
+   for ( auto branchVarName : branchVarNames ) {
     vector< string > dumVect;
     ParseVector( branchVarName, dumVect );
-    if ( dumVect.size() !=2 ) {
+     if ( dumVect.size() !=2 ) {
       cout << "wrong string in branchVarNames : " << branchVarName << endl;
       exit(0);
     }

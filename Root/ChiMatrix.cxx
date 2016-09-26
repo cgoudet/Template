@@ -325,12 +325,10 @@ void ChiMatrix::FillTemplates( ) {
   else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );  
 
 
-  cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
+  //cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
 
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
-
-  cout<<"nUseEl (imax): "<<imax<<endl;
 
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     m_MCTree->GetEntry( iEvent );

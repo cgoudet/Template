@@ -10,12 +10,12 @@ configFiles=[
     ]
 
 inputC = [ 0.007 ]
-inputStat = [ 0 ]
-nIteration = 4000
+inputStat = [ 100000 ]
+nIteration = 1000
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl= 1
-fitPerJob= 25
+fitPerJob= 100
 
 plotPath= '/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else '/sps/atlas/c/cgoudet/Calibration/PreRec/'
 
@@ -36,7 +36,7 @@ for vInput in  inputC  :
                 configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
             logPath="Log/"
             launcherFile=CreateLauncher( configFiles[0], 2, optionLine )
-            launchLine='~/subHuge.sh ' + StripString( configFiles[0][0] ) + ' ' \
+            launchLine='~/sub28.sh ' + StripString( configFiles[0][0] ) + ' ' \
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.log ' \
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.err ' \
                 + launcherFile
