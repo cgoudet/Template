@@ -76,7 +76,7 @@ systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } )
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_EW', 'c' : 'Run1/ctErrZee_run1_EW' } ) 
 systematics[-1].SetNomFile( '' )
 
-specialID = ['nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
+specialID = [ 'fBrem', 'reweighting', 'cutFlow', 'nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
 
 def InversionStudy( directory ) :
     print('create inversion systematic' )
@@ -297,7 +297,7 @@ def createRestBoost( directory, ID, var ) :
     boostFile= directory + ID + '_' + var + '.boost'
     print( 'ID=', ID )
     options = {}
-    options['rootFileName'] = []
+    options['rootFileName'] = [ directory+systematics[0].GetNomFile()+fileSuffix+'.root' ]
     options['objName'] = []
     options['loadFiles'] = [ directory + 'Label.txt']
     options['legend']=[]
@@ -367,6 +367,47 @@ def createRestBoost( directory, ID, var ) :
         options['legend']= [ 'Run1', 'Run2' ]
         optionsUnique['rangeUserY'] = '0 0.99'
 
+    elif ID == 'cutFlow' : 
+        boostFile= directory + ID + '.boost'
+        options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/c/cgoudet/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
+                                    for datasetType in [ 'Data_13TeV_Zee_2015_Lkh1', 'MC_13TeV_Zee_2015b_Lkh1' ] 
+                                     ] 
+        options['objName'] = [ ' '.join( [ StripString(objName)+'_cutFlow' for objName in rootFile.split(' ') ] )
+                                for rootFile in options['rootFileName'] ]
+        options['legend']= [ 'Data', 'MC' ]
+        optionsUnique['rangeUserY'] = '0 0.99'
+
+    elif ID == 'reweighting' :
+        optionsUnique['inputType']=1        
+        options['rootFileName']=[]
+        boostFile= directory + ID + '.boost'
+        options['varWeight'] = ['X', 'SFID', 'SFIso', 'SFReco', 'puWeight', 'weight' ]
+        options['loadFiles'] = [ '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1.boost' ]*len(options['varWeight'])
+        options['legend']= options['varWeight']
+        options['varName']=['m12']
+        options['varMin'] = ['80']
+        options['varMax'] = ['100']
+        options['nComparedEvents'] = ['20']
+        optionsUnique['rangeUserY'] = '0 0.99'
+        optionsUnique['doRatio']=1
+        optionsUnique['normalize']=1
+
+    elif ID == 'fBrem' :
+        optionsUnique['inputType']=1        
+        options['rootFileName']=[]
+        boostFile= directory + ID + '.boost'
+        options['varWeight'] = ['weight' ]
+        options['loadFiles'] = [ '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_2015_Lkh1/Data_13TeV_Zee_2015_Lkh1_0.boost', '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_2015b_Lkh1/MC_13TeV_Zee_2015b_Lkh1.boost' ]
+        options['legend']= ['MC', 'Data' ]
+        options['varName']=['fBrem_1 fBrem_2']
+        options['varMin'] = ['-0.5 -0.5']
+        options['varMax'] = ['1 1']
+        options['nComparedEvents'] = ['30']
+        optionsUnique['rangeUserY'] = '0 0.99'
+        optionsUnique['doRatio']=1
+        optionsUnique['normalize']=1
+        
+
 #Defining default cases of options if not defined
     if len( options['objName'] ) < len( options['rootFileName'] ) : options['objName'] += [ 'measScale_' + var  ]*(len(options['rootFileName']) - len(options['objName']))
 
@@ -419,7 +460,7 @@ def parseArgs():
         default=1, type=int )
     parser.add_argument(
         '--doSyst', help='Tag for recreating systematics histos and plots',
-        default=1, type=int )
+        default=0, type=int )
     parser.add_argument(
         '--doCorrection', help='Tag for recreating systematics histos and plots',
         default=1, type=int )

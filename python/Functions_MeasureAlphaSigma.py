@@ -36,6 +36,7 @@ FILESETS['MC_13TeV_Zee_25ns_Lkh1_noIso']  =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns
 FILESETS['Data_13TeV_Zee_25ns_Lkh1_noIso']  =[ PREFIXDATASETS + 'Data_13TeV_Zee_25ns_Lkh1_doIso0']
 
 FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
+FILESETS['ClosureData'] = [ '/sps/atlas/c/cgoudet/Calibration/Closure/MC_distorded.root' ]
 #    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
 
 FILESETS['Data_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'Data_13TeV_Zee_50ns_Lkh1']
