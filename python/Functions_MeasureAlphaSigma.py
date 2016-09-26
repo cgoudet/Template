@@ -7,8 +7,8 @@ libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
-
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}

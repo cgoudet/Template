@@ -56,7 +56,7 @@ systematics.append( Systematic( 'Inv', 'InversionStudy') )
 systematics[-1].SetSuffixes( {'c' : '_c' } )
 
 systematics.append( Systematic( 'Mat', 'DataOff_13TeV_25ns_rel201_IBL') )
-systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201_IBL' )
+systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201' )
 
 systematics.append( Systematic( 'Clos', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
@@ -369,7 +369,7 @@ def createRestBoost( directory, ID, var ) :
 
     elif ID == 'cutFlow' : 
         boostFile= directory + ID + '.boost'
-        options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/c/cgoudet/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
+        options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/a/aguerguichon/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
                                     for datasetType in [ 'Data_13TeV_Zee_2015_Lkh1', 'MC_13TeV_Zee_2015b_Lkh1' ] 
                                      ] 
         options['objName'] = [ ' '.join( [ StripString(objName)+'_cutFlow' for objName in rootFile.split(' ') ] )
@@ -382,7 +382,7 @@ def createRestBoost( directory, ID, var ) :
         options['rootFileName']=[]
         boostFile= directory + ID + '.boost'
         options['varWeight'] = ['X', 'SFID', 'SFIso', 'SFReco', 'puWeight', 'weight' ]
-        options['loadFiles'] = [ '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1.boost' ]*len(options['varWeight'])
+        options['loadFiles'] = [ '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_25ns_Lkh1/MC_13TeV_Zee_25ns_Lkh1.boost' ]*len(options['varWeight'])
         options['legend']= options['varWeight']
         options['varName']=['m12']
         options['varMin'] = ['80']
@@ -397,7 +397,7 @@ def createRestBoost( directory, ID, var ) :
         options['rootFileName']=[]
         boostFile= directory + ID + '.boost'
         options['varWeight'] = ['weight' ]
-        options['loadFiles'] = [ '/sps/atlas/c/cgoudet/Calibration/DataxAOD/Data_13TeV_Zee_2015_Lkh1/Data_13TeV_Zee_2015_Lkh1_0.boost', '/sps/atlas/c/cgoudet/Calibration/DataxAOD/MC_13TeV_Zee_2015b_Lkh1/MC_13TeV_Zee_2015b_Lkh1.boost' ]
+        options['loadFiles'] = [ '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data_13TeV_Zee_2015_Lkh1/Data_13TeV_Zee_2015_Lkh1_0.boost', '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_2015b_Lkh1/MC_13TeV_Zee_2015b_Lkh1.boost' ]
         options['legend']= ['MC', 'Data' ]
         options['varName']=['fBrem_1 fBrem_2']
         options['varMin'] = ['-0.5 -0.5']
@@ -460,7 +460,7 @@ def parseArgs():
         default=1, type=int )
     parser.add_argument(
         '--doSyst', help='Tag for recreating systematics histos and plots',
-        default=0, type=int )
+        default=1, type=int )
     parser.add_argument(
         '--doCorrection', help='Tag for recreating systematics histos and plots',
         default=1, type=int )
