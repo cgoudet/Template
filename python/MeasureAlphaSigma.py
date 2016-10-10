@@ -14,7 +14,7 @@ switch=0
 if switch==0 :
         configFiles=[ 
 # 		Mesure des scales
- 		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA24'] ], #nominal
+ 		['DataOff_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA68'] ], #nominal
  		['DataOff_13TeV_25ns_syst.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['debug=1'] ],
 		['DataOff_13TeV_25ns_2Steps.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', [], 1 ],
  		['DataOff_13TeV_25ns_dataScaled.root', 'Data_13TeV_Zee_25ns_Lkh1_scaled', 'MC_13TeV_Zee_25ns_Lkh1', [] ],
@@ -76,7 +76,7 @@ for confFile in range( 0, len( configFiles ) ) :
 	
 	logFile = StripString( configFiles[confFile][0] )
 	
-	launchLine='~/sub28.sh ' + logFile + ' ' \
+	launchLine='~/sub1.sh ' + logFile + ' ' \
 	    + spsPath + logPath + logFile + '.log ' \
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile

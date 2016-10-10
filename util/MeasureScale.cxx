@@ -55,6 +55,7 @@ int main( int argc, char* argv[] ) {
   int err = 0;
   //Simplifies execution line for Christophe
 
+
   TFile *correctAlphaFile=0, *correctSigmaFile=0;
   TH1D *correctAlphaHist=0, *correctSigmaHist=0;
   if ( vm.count( "correctAlphaFileName" ) && vm.count( "correctAlphaHistName" ) )  {
@@ -68,11 +69,23 @@ int main( int argc, char* argv[] ) {
 
 
   Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, MCFileNames, MCTreeNames  );
+
+  if (outFileName == 0) { cout<<"Error: cannot open file\n"<<endl;}
+  else cout<<"file: "<<outFileName<<" ok\n";
+
   Temp.ApplyCorrection( correctAlphaHist, correctSigmaHist );
+
+
+
+  cout<< "After ApplyCorrection"<<endl;
+  
   if ( vm.count("createDistorded") ) { 
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
+
+  cout<<"After createDistorded"<<endl;
+
 
   if ( vm.count("loadFull") ) {
     err = Temp.Load( loadFullFileName, false);
@@ -93,13 +106,13 @@ int main( int argc, char* argv[] ) {
     err = Temp.ExtractFactors();
     if ( err ) {
       cout << "Template::Extraction failed : " << err << endl;
-      return 1;
-    }
+      return 1;  
+   }
     err = Temp.Save(1);
-    // if ( err ) {
-    //   cout << "Template::Save failed : " << err << endl;
-    //   return 2;
-    // }
+    if ( err ) {
+       cout << "Template::Save failed : " << err << endl;
+       return 2;
+     }
   }
 
   if ( vm.count("makePlot") )  {
@@ -111,5 +124,6 @@ int main( int argc, char* argv[] ) {
 
   return 0;
 }
+
 
 

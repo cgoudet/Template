@@ -600,7 +600,7 @@ void Template::CreateDistordedTree( string outFileName ) {
     
     cout<< " m_setting.GetNUseEvent(): "<<m_setting.GetNUseEvent()<<endl;
 
-    TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap() );
+    TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap(), 1);
 
     cout << "bootstrap name : " << bootTree->GetName() << endl;
     distordedFile.cd();
@@ -916,7 +916,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
   cout<< "Template :: ApplyCorrection"<<endl;
 
-  if ( !correctionAlpha && !correctionSigma ){ cout<<"return"<<endl;return 0;}
+  if ( !correctionAlpha && !correctionSigma ){ cout<<"return: no correction possible"<<endl;return 0;}
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
   map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
   TLorentzVector e3, e4;

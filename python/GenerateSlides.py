@@ -165,7 +165,7 @@ def createSystematicFiles( directory, systList ) :
     return output
 
 #=============================================
-def createLatex( directory, introFiles=[], concluFiles=[], mode=0 ) :
+def createLatex( directory, introFiles=[], concluFiles=[], mode=1 ) :
     latexFileName = directory + 'latex.tex'
     print( 'latexFileName : ', latexFileName )
     latex = open( latexFileName, "w" )
@@ -184,7 +184,7 @@ def createLatex( directory, introFiles=[], concluFiles=[], mode=0 ) :
                              + '\\item MC is {\\bf not }smeared with pre-rec.\\end{itemize}'
                              )
     slideText['residual'] = ( 'Scales are measured with 2015 13TeV data at 25ns : \n'
-                             + '\\begin{itemize}\item Data are corrected with energy scale from pre-recommandations + tempetature, '
+                             + '\\begin{itemize}\item Data are corrected with energy scale from pre-recommandations + temperature, '
                              + '\\item MC is {\\bf not }smeared with pre-rec.\\end{itemize}'
                              )
     slideText['correction'] = ( 'The lineshape of the $Z$ is compared after application of 2015 corrections between data and MC.\n' )
@@ -297,7 +297,12 @@ def createRestBoost( directory, ID, var ) :
     boostFile= directory + ID + '_' + var + '.boost'
     print( 'ID=', ID )
     options = {}
-    options['rootFileName'] = [ directory+systematics[0].GetNomFile()+fileSuffix+'.root' ]
+
+    if ID=='residual' and var!='c':
+        options['rootFileName'] = [ directory+"DataOff_13TeV_25ns_dataScaled.root" ]
+
+    else:
+        options['rootFileName'] = [ directory+systematics[0].GetNomFile()+fileSuffix+'.root' ]
     options['objName'] = []
     options['loadFiles'] = [ directory + 'Label.txt']
     options['legend']=[]

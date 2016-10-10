@@ -7,8 +7,8 @@ libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
-#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -67,7 +67,7 @@ def FillDatasetContainer( container, datasets ) :
         else : container += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
     
 
-def CreateLauncher( inVector, mode = 3,optionLine=""  ) :
+def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     print "Mode: "+str(mode)
 #mode 
@@ -159,7 +159,10 @@ def CreateLauncher( inVector, mode = 3,optionLine=""  ) :
         corrLine=''
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
 
-        if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
+#        if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
+        if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
+
+
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' \n')
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
@@ -199,7 +202,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaMin']=0
     options['sigmaMax']=0.15
     options['sigmaNBins']=20
-    options['debug']=0
+    options['debug']=1
     options['constVarFit']="SIGMA"
     options['selection']=''
     options['doSimulation']=0

@@ -59,7 +59,7 @@ int main( int argc, char* argv[] ) {
   double nOptim;
   unsigned long long runNumber;
   cout << "Opening " << outFileName << endl;
-  TFile *outFile = new TFile( outFileName.c_str(), "RECREATE" );
+  TFile *outFile = new TFile( outFileName.c_str(), "UPDATE" );
 
   TTree *outTree = new TTree( "ConfigurationsCTree","ConfigurationsCTree" );
   outTree->SetDirectory( 0 );
