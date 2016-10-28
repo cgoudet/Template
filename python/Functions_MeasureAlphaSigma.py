@@ -12,6 +12,16 @@ PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/s
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
+
+FILESETS['MC15c_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1/'] 
+FILESETS['Data16_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/'] 
+
+FILESETS['Data1615_13TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/', PREFIXDATASETS + 'Data15_13TeV_Zee_Lkh1/'] 
+
+FILESETS['Data16_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/'] 
+
+
+#================================================================
 FILESETS['MC_13TeV_Zee_50ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1/'] 
 FILESETS['MC_13TeV_Zee_50ns_Lkh1_scaled']=[ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_scaled/']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/']
@@ -64,7 +74,7 @@ FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
-        else : container += listFiles( addSlash(dataset) + ( 'MC_' if 'MC_' in dataset else 'Data_' ) + '*.root' )
+        else : container += listFiles( addSlash(dataset) + ( 'MC' if 'MC' in dataset else 'Data' ) + '*.root' )
     
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :

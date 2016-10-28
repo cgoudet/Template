@@ -12,7 +12,8 @@
 #include "PlotFunctions/DrawPlot.h"
 #include "TAxis.h"
 #include <sstream>
-
+#include <stdexcept>
+using std::logic_error;
 using std::stringstream;
 using std::string;
 using std::cout;
@@ -332,6 +333,14 @@ void ChiMatrix::FillTemplates( ) {
 
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     m_MCTree->GetEntry( iEvent );
+    double phi_1 = m_mapVar1["PHI"];
+    double phi_2 = m_mapVar2["PHI"];
+    double eta_1 = m_mapVar1["ETA_TRK"];
+    double eta_2 = m_mapVar2["ETA_TRK"];
+    double initPt_1 = m_mapVar1["PT"];
+    double initPt_2 = m_mapVar2["PT"];
+    double weight = m_mapVarEvent["weight"];
+
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
       double randVal1 =  m_rand.Gaus();
       double randVal2 =  m_rand.Gaus();
@@ -344,15 +353,15 @@ void ChiMatrix::FillTemplates( ) {
 	  double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 	  double factor2Sigma = 1 + randVal2 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 
-	  double pt_1 = m_mapVar1["PT"] * factor1Alpha * factor1Sigma;
-	  double pt_2 = m_mapVar2["PT"] * factor2Alpha * factor2Sigma;
+	  double pt_1 = initPt_1 * factor1Alpha * factor1Sigma;
+	  double pt_2 = initPt_2 * factor2Alpha * factor2Sigma;
 	  TLorentzVector dum_el1, dum_el2;
-	  dum_el1.SetPtEtaPhiM( pt_1, m_mapVar1["ETA_TRK"], m_mapVar1["PHI"], 0.511 );
-	  dum_el2.SetPtEtaPhiM( pt_2, m_mapVar2["ETA_TRK"], m_mapVar2["PHI"], 0.511 );
+	  dum_el1.SetPtEtaPhiM( pt_1, eta_1, phi_1, 0.511 );
+	  dum_el2.SetPtEtaPhiM( pt_2, eta_2, phi_2, 0.511 );
 	  TLorentzVector Z = dum_el1 + dum_el2;
 
 	  if ( Z.M()/1000. < m_setting->GetZMassMin() || Z.M()/1000. > m_setting->GetZMassMax() ) continue;
-	  m_MCZMass[i_alpha][i_sigma]->Fill( Z.M() /1000., m_mapVarEvent["WEIGHT"] );
+	  m_MCZMass[i_alpha][i_sigma]->Fill( Z.M() /1000., weight );
 	  
       }}}
   }
@@ -582,7 +591,15 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
 int ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
-  if ( m_setting->GetOptimizeRanges() ) OptimizeRanges();
+  if ( m_setting->GetOptimizeRanges() ) {
+    try{
+      OptimizeRanges();
+    }
+    catch ( logic_error e ) {
+      m_quality.set( 7, 1 );
+      return 0;
+    }
+  }
   if ( m_setting->GetDebug() )  cout <<"after OptimizeRanges"<<endl;
 
   ClearTemplates();
@@ -665,7 +682,7 @@ void ChiMatrix::OptimizeRanges( ) {
 
     double upRightRange=allowedRangeMax, lowRightRange=allowedRangeMin, minVal=-99, upLeftRange=allowedRangeMin, lowLeftRange=allowedRangeMax;
     while ( true  ) {    
-      if ( counter > 10 ) { cout << "reached 10 steps for optimization" << endl; exit(1); }
+      if ( counter > 10 ) throw logic_error( "ChiMatrix::OptimizeRanges : No many optimization steps" );
       foundOptim.reset();
       counter++;
       FillScaleValues( 10 );
@@ -1053,7 +1070,16 @@ void ChiMatrix::CreateMCTree() {
 int ChiMatrix::LinkMCTree( ) {
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree" << endl;
   if ( !m_MCTree ) CreateMCTree();
-  m_MCTree->SetBranchStatus( "*", 1);
+  m_MCTree->SetBranchStatus( "*", 0);
+
+  m_MCTree->SetBranchStatus( "pt_1"  , 1);
+  m_MCTree->SetBranchStatus( "eta_1" , 1);
+  m_MCTree->SetBranchStatus( "phi_1" , 1);
+  m_MCTree->SetBranchStatus( "pt_2"  , 1);
+  m_MCTree->SetBranchStatus( "eta_2" , 1);
+  m_MCTree->SetBranchStatus( "phi_2" , 1);
+  m_MCTree->SetBranchStatus( "weight", 1);
+
   m_MCTree->SetBranchAddress( "pt_1"  , &m_mapVar1["PT"] );
   m_MCTree->SetBranchAddress( "eta_1" , &m_mapVar1["ETA_TRK"] );
   m_MCTree->SetBranchAddress( "phi_1" , &m_mapVar1["PHI"] );
@@ -1061,6 +1087,8 @@ int ChiMatrix::LinkMCTree( ) {
   m_MCTree->SetBranchAddress( "eta_2" , &m_mapVar2["ETA_TRK"] );
   m_MCTree->SetBranchAddress( "phi_2" , &m_mapVar2["PHI"] );
   m_MCTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
+
+
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree done" << endl;  
   return 0;
 }

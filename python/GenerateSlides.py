@@ -298,8 +298,9 @@ def createRestBoost( directory, ID, var ) :
     print( 'ID=', ID )
     options = {}
 
-    if ID=='residual' and var!='c':
-        options['rootFileName'] = [ directory+"DataOff_13TeV_25ns_dataScaled.root" ]
+    if ID=='residual':
+        if var=='c':options['rootFileName'] = [ directory+"DataOff_13TeV_25ns_dataScaled_c.root" ]
+        else: options['rootFileName'] = [ directory+"DataOff_13TeV_25ns_dataScaled.root" ]
 
     else:
         options['rootFileName'] = [ directory+systematics[0].GetNomFile()+fileSuffix+'.root' ]

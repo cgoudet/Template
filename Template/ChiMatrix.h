@@ -290,7 +290,7 @@ private :
    */
   double m_sigmaMax;
 
-  bitset<7> m_quality;
+  bitset<8> m_quality;
 
   unsigned int  m_eta1Bin;
   unsigned int  m_eta2Bin;
