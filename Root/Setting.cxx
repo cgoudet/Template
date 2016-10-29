@@ -5,6 +5,7 @@
 #include "TTree.h"
 #include <boost/program_options.hpp>
 #include "PlotFunctions/SideFunctions.h"
+#include "PlotFunctions/SideFunctionsTpp.h"
 
 namespace po = boost::program_options;
 using std::ifstream;
@@ -93,11 +94,10 @@ int Setting::Configure( const string &configFile ) {
   po::store(po::parse_config_file(ifs, configOptions), vm);
   po::notify( vm );
   
-
-  m_doSmearing = (bool) doSmearing;
-  m_doScale = (bool) doScale;
-  m_debug = (bool) debug;
-  m_symBin = (bool) symBin;
+  m_doSmearing = static_cast<bool>(doSmearing);
+  m_doScale = static_cast<bool>(doScale);
+  m_debug = static_cast<bool>(debug);
+  m_symBin = static_cast<bool>(symBin);
 
   ParseVector( etaBins, m_etaBins );
   ParseVector( ptBins, m_ptBins );
@@ -133,10 +133,7 @@ int Setting::Configure( const string &configFile ) {
    for ( auto branchVarName : branchVarNames ) {
     vector< string > dumVect;
     ParseVector( branchVarName, dumVect );
-     if ( dumVect.size() !=2 ) {
-      cout << "wrong string in branchVarNames : " << branchVarName << endl;
-      exit(0);
-    }
+    if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
     m_branchVarNames[dumVect[0]] = dumVect[1];
     unsigned int bin=SearchVectorBin( dumVect[0], minVarNames );
     if ( bin != minVarNames.size() ) mapDefinedVar[minVarNames[bin]]=true;
@@ -422,10 +419,22 @@ void Setting::Print() {
   PrintVector( m_ptBins );
 
 }
-
+//##########################################################
 void Setting::PrintVector( vector<double> vector ) {
   for ( unsigned int i = 0; i < vector.size(); i++ ) {
     cout << vector[i] << " ";
   }
   cout << endl;
 }
+//##########################################################
+void Setting::SetSigmaSimEta( const vector<double> &sigmaSimEta ) {
+  m_sigmaSimEta.clear();
+  copy( sigmaSimEta.begin(), sigmaSimEta.end(), back_inserter(m_sigmaSimEta) );
+}
+//##########################################################
+void Setting::SetAlphaSimEta( const vector<double> &alphaSimEta ) {
+  m_alphaSimEta.clear();
+  copy( alphaSimEta.begin(), alphaSimEta.end(), back_inserter(m_alphaSimEta) );
+}
+//##########################################################
+//##########################################################

@@ -10,6 +10,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include "PlotFunctions/SideFunctions.h"
+#include "PlotFunctions/SideFunctionsTpp.h"
 #include "TProfile.h"
 #include "TMath.h"
 #include "TH2D.h"

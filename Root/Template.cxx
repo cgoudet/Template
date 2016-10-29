@@ -2,6 +2,7 @@
 #include <iostream>
 #include "TLorentzVector.h"
 #include "PlotFunctions/SideFunctions.h"
+#include "PlotFunctions/SideFunctionsTpp.h"
 #include <fstream>
 #include "TCanvas.h"
 #include "time.h"
@@ -629,7 +630,7 @@ void Template::CreateDistordedTree( string outFileName ) {
   dataTree->SetDirectory(0);
   int counterEvent=0;
 
-  map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
+  map< string, double > mapDouble = m_mapBranches.GetMapDouble(); 
   cout << "nFiles distorded : " << m_MCFileNames.size() << endl;
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
@@ -650,7 +651,6 @@ void Template::CreateDistordedTree( string outFileName ) {
 	factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-      //	if ( iEvent < 100 ) cout << factor1 << " " << factor2 << endl; 	//TOREMOVE
       mapDouble[mapVarNames["PT_1"]] *= factor1;
       mapDouble[mapVarNames["PT_2"]] *= factor2;
       mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
@@ -918,7 +918,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
   if ( !correctionAlpha && !correctionSigma ){ cout<<"return: no correction possible"<<endl;return 0;}
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
-  map< string, double > &mapDouble = m_mapBranches.GetMapDouble(); 
+  map< string, double > mapDouble = m_mapBranches.GetMapDouble(); 
   TLorentzVector e3, e4;
 
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {

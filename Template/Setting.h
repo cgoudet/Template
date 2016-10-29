@@ -93,8 +93,8 @@ class Setting
   void SetMCName( string MCName )           { m_MCName = MCName; };
   void SetDataName( string DataName )       { m_dataName = DataName; };
   void SetConstVarFit( string constVarFit = "SIGMA" );
-  void SetSigmaSimEta( vector<double> sigmaSimEta ) { if ( sigmaSimEta.size() == m_etaBins.size()-1 ) m_sigmaSimEta = sigmaSimEta; }
-  void SetAlphaSimEta( vector<double> alphaSimEta ) { if ( alphaSimEta.size() == m_etaBins.size()-1 ) m_alphaSimEta = alphaSimEta; }
+  void SetSigmaSimEta( const vector<double> &sigmaSimEta );
+  void SetAlphaSimEta( const vector<double> &alphaSimEta );
   void SetNUseEvent( unsigned int nUseEvent ) { m_nUseEvent = nUseEvent; }
   void SetNUseEl( unsigned int nUseEl ) { m_nUseEl = nUseEl; }
   void SetIndepDistorded( unsigned long indepDistorded ) { m_indepDistorded = indepDistorded; }
