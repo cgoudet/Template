@@ -339,7 +339,7 @@ void ChiMatrix::FillTemplates( ) {
     double eta_2 = m_mapVar2["ETA_TRK"];
     double initPt_1 = m_mapVar1["PT"];
     double initPt_2 = m_mapVar2["PT"];
-    double weight = m_mapVarEvent["weight"];
+    double weight = m_mapVarEvent["WEIGHT"];
 
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
       double randVal1 =  m_rand.Gaus();
