@@ -5,7 +5,7 @@ from __future__ import print_function
 import subprocess as sub
 import os
 import sys
-sys.path.append(os.path.abspath("/afs/in2p3.fr/home/c/cgoudet/private/Calibration/PlotFunctions/python"))
+sys.path.append(os.path.abspath("/afs/in2p3.fr/home/a/aguergui/public/Calibration/PlotFunctions/python"))
 from SideFunction import *
 
 #=========================================
@@ -18,7 +18,7 @@ def createBoost( inFiles, var, ID, addOptions={} ):
     options['legend'] = [ StripString( inFile ) for inFile in inFiles ]
     optionsUnique = {}
     optionsUnique['inputType']=0
-    optionsUnique['plotDirectory'] = '/sps/atlas/c/cgoudet/Plots/'
+    optionsUnique['plotDirectory'] = '/sps/atlas/a/aguerguichon/cgoudet/Plots/'
     optionsUnique['doTabular'] = 1
     optionsUnique['doRatio']=2
 
