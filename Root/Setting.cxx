@@ -20,7 +20,7 @@ using std::runtime_error;
 using namespace ChrisLib;
 
 //######## CONSTRUCTORS
-Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),
+TemplateMethod::Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),
 		     m_doScale(false), m_alphaMin(-1e-2), m_alphaMax(1e-2), m_alphaNBins(10),
 		     m_doSmearing(false), m_sigmaMin(0), m_sigmaMax(0.1), m_sigmaNBins(10),
 		     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
@@ -34,14 +34,14 @@ Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin
 }
 
 //########### SETTER
-void Setting::SetConstVarFit( string constVarFit ) { 
+void TemplateMethod::Setting::SetConstVarFit( string constVarFit ) { 
   if ( constVarFit == "ALPHA" || constVarFit == "SIGMA" ) m_constVarFit = constVarFit; 
   else cout << constVarFit << " is not ALPHA or SIGMA" << endl;
 }
 
 
 //############METHODS
-int Setting::Configure( const string &configFile ) {
+int TemplateMethod::Setting::Configure( const string &configFile ) {
   if ( m_debug )  cout << "Setting : Configure( " << configFile << " )" << endl;
   string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, dataBranchWeightName, MCBranchWeightName;
   int debug, doSmearing, doScale,  symBin;
@@ -171,7 +171,7 @@ int Setting::Configure( const string &configFile ) {
 }
 
 //====================================================
-int Setting::Save( TFile *outFile ) {
+int TemplateMethod::Setting::Save( TFile *outFile ) {
   if ( m_debug ) cout << "Setting::Save" << endl;
 
   if ( !outFile ) {
@@ -239,7 +239,7 @@ int Setting::Save( TFile *outFile ) {
 }
 
 //======================================================
-int Setting::Load( const string &inFileName, bool justTemplate ) {
+int TemplateMethod::Setting::Load( const string &inFileName, bool justTemplate ) {
   if ( m_debug ) cout << "Setting::Load" << endl;
 
   TFile *inFile = TFile::Open( inFileName.c_str() );
@@ -354,7 +354,7 @@ int Setting::Load( const string &inFileName, bool justTemplate ) {
 }
 
 //=========================================
-int Setting::Symmetrize( vector<double> &outVector ) {
+int TemplateMethod::Setting::Symmetrize( vector<double> &outVector ) {
 
   for ( vector<double>::iterator vec = outVector.begin(); vec != outVector.end(); vec++ ) {
     *vec = fabs( *vec );
@@ -363,7 +363,7 @@ int Setting::Symmetrize( vector<double> &outVector ) {
 }
 
 //==========================================
-int Setting::SymmetrizedSim( vector<double> &outVector ) {
+int TemplateMethod::Setting::SymmetrizedSim( vector<double> &outVector ) {
 
   vector< double > vecResult;
   for ( unsigned int i = outVector.size() /2; i< outVector.size(); i++ ) {
@@ -377,7 +377,7 @@ int Setting::SymmetrizedSim( vector<double> &outVector ) {
 }
 
 //=================================
-void Setting::Print() {
+void TemplateMethod::Setting::Print() {
 
   cout << "m_mode : "<< m_mode << endl << endl;
   cout << "m_var1 : " << m_var1 << endl;
@@ -423,19 +423,19 @@ void Setting::Print() {
 
 }
 //##########################################################
-void Setting::PrintVector( vector<double> vector ) {
+void TemplateMethod::Setting::PrintVector( vector<double> vector ) {
   for ( unsigned int i = 0; i < vector.size(); i++ ) {
     cout << vector[i] << " ";
   }
   cout << endl;
 }
 //##########################################################
-void Setting::SetSigmaSimEta( const vector<double> &sigmaSimEta ) {
+void TemplateMethod::Setting::SetSigmaSimEta( const vector<double> &sigmaSimEta ) {
   m_sigmaSimEta.clear();
   copy( sigmaSimEta.begin(), sigmaSimEta.end(), back_inserter(m_sigmaSimEta) );
 }
 //##########################################################
-void Setting::SetAlphaSimEta( const vector<double> &alphaSimEta ) {
+void TemplateMethod::Setting::SetAlphaSimEta( const vector<double> &alphaSimEta ) {
   m_alphaSimEta.clear();
   copy( alphaSimEta.begin(), alphaSimEta.end(), back_inserter(m_alphaSimEta) );
 }

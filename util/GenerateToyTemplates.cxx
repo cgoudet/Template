@@ -8,6 +8,7 @@
 #include <fstream>
 
 using namespace ChrisLib;
+using namespace TemplateMethod;
 using std::cout;
 using std::endl;
 using std::vector;

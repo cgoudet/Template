@@ -24,10 +24,10 @@ using TMath::Power;
 using std::find;
 using namespace std::chrono;
 using namespace ChrisLib;
-
+using namespace TemplateMethod;
 
 //########## CONSTRUCTOR
-Template::Template() : m_setting(), m_rand(), m_name()
+TemplateMethod::Template::Template() : m_setting(), m_rand(), m_name()
 {
   TH1::AddDirectory( false );
   gErrorIgnoreLevel = kError;
@@ -46,7 +46,7 @@ Template::Template() : m_setting(), m_rand(), m_name()
 
 }
 
-Template::Template( const string &outFileName, const string &configFile,  
+TemplateMethod::Template::Template( const string &outFileName, const string &configFile,  
 		    vector<string> dataFileNames, vector<string> dataTreeNames,
 		    vector<string> MCFileNames, vector<string> MCTreeNames )
   : Template()
@@ -104,7 +104,7 @@ Template::Template( const string &outFileName, const string &configFile,
   if ( m_setting.GetDebug() )  cout << "Template : Constructor Done" << endl;  
 }
 
-Template::~Template() {
+TemplateMethod::Template::~Template() {
   //Clear the ChiMatrix vector
   ClearChiMatrix();
   CleanHistVect();  
@@ -113,7 +113,7 @@ Template::~Template() {
 
 
 //######## METHODS
-int Template::Configure( const string &configFile ) { 
+int TemplateMethod::Template::Configure( const string &configFile ) { 
   if ( m_setting.GetDebug() )  cout << "Template : Configure( " << configFile << " )" << endl;
 
   int err = m_setting.Configure( configFile ); 
@@ -127,7 +127,7 @@ int Template::Configure( const string &configFile ) {
 }
 
 //######################==
-int  Template::Load( const string &inFileName, bool justTemplate ) {
+int  TemplateMethod::Template::Load( const string &inFileName, bool justTemplate ) {
   if ( m_setting.GetDebug() ) cout << "Template::LoadTemplate"<< endl;
 
   TFile *inFile = TFile::Open( inFileName.c_str() );
@@ -239,7 +239,7 @@ int  Template::Load( const string &inFileName, bool justTemplate ) {
 }
 
 //######################==
-int Template::Save( bool saveChiMatrix ) {
+int TemplateMethod::Template::Save( bool saveChiMatrix ) {
   if ( m_setting.GetDebug() ) cout << "Template::Save()" << endl;
 
   //create the output TFile
@@ -281,7 +281,7 @@ int Template::Save( bool saveChiMatrix ) {
 }
 
 //######################=
-int Template::CreateTemplate() {
+int TemplateMethod::Template::CreateTemplate() {
   if ( m_setting.GetDebug() ) cout << "Template::CreateTemplate" << endl;
   //Decide which variables to extract and how to cut the detector
   vector<double> etaBins = m_setting.GetEtaBins();
@@ -331,7 +331,7 @@ int Template::CreateTemplate() {
 }
 
 //############################
-int Template::ExtractFactors() {
+int TemplateMethod::Template::ExtractFactors() {
   if ( m_setting.GetDebug() )  cout << "Template : ExtractFactors" << endl;
 
   if ( ! m_chiMatrix.size() ) { 
@@ -466,7 +466,7 @@ int Template::ExtractFactors() {
   }
     
 //###########################################==
-void Template::FillDistrib( bool isData ) {
+void TemplateMethod::Template::FillDistrib( bool isData ) {
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib " << isData << endl;
   clock_t tStart = clock(); 
 
@@ -552,7 +552,7 @@ void Template::FillDistrib( bool isData ) {
   
 }
 //###############################==
-void Template::CreateDistordedTree( string outFileName ) {
+void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   cout << "Template : CreateDistordedTree" << endl;
 
   vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
@@ -682,7 +682,7 @@ void Template::CreateDistordedTree( string outFileName ) {
 }
 
 //####################################################==
-void Template::MakePlot( string path, string latexFileName ) {
+void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot" << endl;
   if ( path.back() != '/' && path != "" ) path += "/";
@@ -851,7 +851,7 @@ void Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
 //#################################################=
-int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl ) {
+int TemplateMethod::Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
@@ -889,7 +889,7 @@ int Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl ) {
 }
 
 //#################################################
-void Template::ClearChiMatrix() {
+void TemplateMethod::Template::ClearChiMatrix() {
   while ( m_chiMatrix.size() ) {
     while ( m_chiMatrix.back().size() ) {
       if ( m_chiMatrix.back().back() ) delete m_chiMatrix.back().back();
@@ -901,7 +901,7 @@ void Template::ClearChiMatrix() {
 }
 
 //###################################################"
-string Template::GetColorTabular( double inputVal, double measVal, double uncertVal ) {
+string TemplateMethod::Template::GetColorTabular( double inputVal, double measVal, double uncertVal ) {
 
   double nSigma = fabs( inputVal - measVal ) / uncertVal;
 
@@ -912,7 +912,7 @@ string Template::GetColorTabular( double inputVal, double measVal, double uncert
 }
 
 //######################################################
-int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
+int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
   cout<< "Template :: ApplyCorrection"<<endl;
 
@@ -995,7 +995,7 @@ int Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 }
 
 //############################################
-string Template::FindDefaultTree( TFile* inFile ) { 
+string TemplateMethod::Template::FindDefaultTree( TFile* inFile ) { 
   if ( !inFile ) return "";
 
   vector<string> listTreeNames;
@@ -1032,7 +1032,7 @@ string Template::FindDefaultTree( TFile* inFile ) {
 }
 
 //######################################"
-TMatrixD* Template::GetMatrix( string matrixName ) {
+TMatrixD* TemplateMethod::Template::GetMatrix( string matrixName ) {
   if ( matrixName == "alpha" ) return m_vectMatrix[0][SearchVectorBin( string("combin"), m_matrixNames )];
   else if ( matrixName == "sigma" ) return m_vectMatrix[1][SearchVectorBin( string("combin"), m_matrixNames )];
   else if ( matrixName == "errAlpha" ) return m_vectMatrix[0][SearchVectorBin( string("combinErr"), m_matrixNames )];
@@ -1041,13 +1041,13 @@ TMatrixD* Template::GetMatrix( string matrixName ) {
 }
 
 ///###########################################
-ChiMatrix* Template::GetChiMatrix( unsigned int iMatrix, unsigned int jMatrix ) {
+ChiMatrix* TemplateMethod::Template::GetChiMatrix( unsigned int iMatrix, unsigned int jMatrix ) {
   if ( iMatrix < m_chiMatrix.size() && jMatrix < m_chiMatrix[iMatrix].size() ) return m_chiMatrix[iMatrix][jMatrix];
   else return 0;
 }
 
 //##########################################
-TH1 *Template::GetResults( string resultName ) {
+TH1 *TemplateMethod::Template::GetResults( string resultName ) {
   if ( resultName == "alpha" ) return m_vectHist[0][SearchVectorBin( string("measScale"), m_histNames )];
   else if ( resultName == "sigma" ) return m_vectHist[1][SearchVectorBin( string("measScale"), m_histNames )];
   else return 0;
@@ -1055,7 +1055,7 @@ TH1 *Template::GetResults( string resultName ) {
 
 
 //##############################################
-void Template::CleanHistVect( int jVar ) {
+void TemplateMethod::Template::CleanHistVect( int jVar ) {
   for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
     if ( jVar != -1 && jVar != (int) iVar ) continue;
     for ( unsigned int iHist = 0; iHist < m_vectHist[0].size(); iHist++ ) {
@@ -1065,7 +1065,7 @@ void Template::CleanHistVect( int jVar ) {
 }
 
 //###################################################"
-void Template::CleanMatrixVect( int jVar) {
+void TemplateMethod::Template::CleanMatrixVect( int jVar) {
   for ( unsigned int iVar = 0; iVar < m_vectMatrix.size(); iVar++ ) {
     if ( jVar != -1 && jVar != (int) iVar ) continue;
     for ( unsigned int iHist = 0; iHist < m_vectMatrix[0].size(); iHist++ ) {
@@ -1075,12 +1075,12 @@ void Template::CleanMatrixVect( int jVar) {
     }}
 }
 //###############################################
-string Template::CreateHistMatName( string objName, unsigned int iVar ) {
+string TemplateMethod::Template::CreateHistMatName( string objName, unsigned int iVar ) {
   return objName + ( iVar ? "_c" : "_alpha" );
 }
 
 //#############################
-double Template::GetWeight( bool isData ) {
+double TemplateMethod::Template::GetWeight( bool isData ) {
   double weight=1;
   vector<string> dumVect = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( unsigned int iName = 0; iName < dumVect.size(); iName++ ) {

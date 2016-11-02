@@ -13,7 +13,7 @@ using std::endl;
 using std::vector;
 namespace po = boost::program_options;
 using std::ifstream;
-
+using namespace TemplateMethod;
 
 int main( int argc, char* argv[] ) {
   po::options_description desc("LikelihoodProfiel Usage");

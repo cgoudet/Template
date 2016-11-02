@@ -26,7 +26,7 @@ using std::bitset;
 using namespace std::chrono;
 using namespace ChrisLib;
 
-ChiMatrix::ChiMatrix() : m_alpha(-99), m_sigma(-99),
+TemplateMethod::ChiMatrix::ChiMatrix() : m_alpha(-99), m_sigma(-99),
 			 m_rand(),
 			 m_errAlpha(-99), m_errSigma(-99),  
 			 m_alphaMin( -0.5 ), m_alphaMax( 0 ), m_sigmaMin( 0 ), m_sigmaMax( 0.05 ), m_quality(), m_eta1Bin(0), m_eta2Bin(0)
@@ -45,7 +45,7 @@ ChiMatrix::ChiMatrix() : m_alpha(-99), m_sigma(-99),
   m_MCTree = 0;
 }
 
-ChiMatrix::ChiMatrix( string name ) : ChiMatrix()
+TemplateMethod::ChiMatrix::ChiMatrix( string name ) : ChiMatrix()
 {
   m_name = name;
   //Get the m_etaBin from the name
@@ -56,7 +56,7 @@ ChiMatrix::ChiMatrix( string name ) : ChiMatrix()
   if ( m_name == "ChiMatrix_0_0" ) cout << "rand seed : " << m_rand.GetSeed() << endl;
 }
 
-ChiMatrix::ChiMatrix( string name, Setting &configSetting ) : ChiMatrix( name )
+TemplateMethod::ChiMatrix::ChiMatrix( string name, Setting &configSetting ) : ChiMatrix( name )
 {
   m_setting = &configSetting;
 
@@ -70,7 +70,7 @@ ChiMatrix::ChiMatrix( string name, Setting &configSetting ) : ChiMatrix( name )
 
 }
 
-ChiMatrix::~ChiMatrix() {
+TemplateMethod::ChiMatrix::~ChiMatrix() {
   m_setting = 0;
   if ( m_chiMatrix ) delete m_chiMatrix; m_chiMatrix = 0;
   if ( m_dataZMass ) delete m_dataZMass; m_dataZMass = 0;
@@ -88,7 +88,7 @@ ChiMatrix::~ChiMatrix() {
 }
 
 //############## SETTER
-void ChiMatrix::SetSetting( Setting &setting ) {
+void TemplateMethod::ChiMatrix::SetSetting( Setting &setting ) {
   if ( m_setting->GetDebug() ) cout << "Setting::SetSetting" <<endl;
 
   if  ( m_setting && m_setting != &setting )  delete m_setting;
@@ -98,7 +98,7 @@ void ChiMatrix::SetSetting( Setting &setting ) {
 }
 
 //############## METHOD
-int ChiMatrix::Load( TFile *inFile, bool justTemplate ) {
+int TemplateMethod::ChiMatrix::Load( TFile *inFile, bool justTemplate ) {
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::LoadTemplate : " << m_name<< endl;
 
   ClearTemplates();
@@ -192,7 +192,7 @@ int ChiMatrix::Load( TFile *inFile, bool justTemplate ) {
 }
 
 //========================
-int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
+int  TemplateMethod::ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::Save" << endl;
   if ( m_quality.to_ulong() ) return 0;
 
@@ -246,7 +246,7 @@ int  ChiMatrix::Save( TFile *outFile, bool justTemplate ) {
 }
 
 //============
-int ChiMatrix::FillChiMatrix(  ) {
+int TemplateMethod::ChiMatrix::FillChiMatrix(  ) {
   if ( m_setting->GetDebug() ) cout << m_name << " :FillChiMatrix" <<endl;
 
   if ( IsGoodQuality() )     return 0;
@@ -294,7 +294,7 @@ int ChiMatrix::FillChiMatrix(  ) {
 }
 
 //==========
-void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight ) {
+void TemplateMethod::ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight ) {
   //if ( m_setting->GetDebug() ) cout << m_name << " : FillDistrib" <<endl;
   //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
 
@@ -317,7 +317,7 @@ void ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData
 }
 
 //=======================================
-void ChiMatrix::FillTemplates( ) {
+void TemplateMethod::ChiMatrix::FillTemplates( ) {
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
   if (! m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );  
   else if ( m_setting->GetIndepTemplates() == 1 ) {
@@ -372,7 +372,7 @@ void ChiMatrix::FillTemplates( ) {
 	
 //==========================================
 
-void ChiMatrix::FitChi2() {
+void TemplateMethod::ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << m_name << "::FitChi2()" << endl;
 
   if ( m_quality.to_ulong() ) {
@@ -493,7 +493,7 @@ void ChiMatrix::FitChi2() {
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FitChi2() done " << endl << endl;;
 }
 //====================================================
-void ChiMatrix::MakePlot( stringstream &ss, string path ) {
+void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot " << m_name << endl;
   if ( m_quality.to_ulong() ) return;
 
@@ -590,7 +590,7 @@ void ChiMatrix::MakePlot( stringstream &ss, string path ) {
 
 
 //=========================================
-int ChiMatrix::CreateTemplates( int nTemplates ) {
+int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
   if ( m_setting->GetOptimizeRanges() ) {
@@ -637,7 +637,7 @@ int ChiMatrix::CreateTemplates( int nTemplates ) {
 }
 
 //==============================
-void ChiMatrix::FillScaleValues( int nTemplates ) {
+void TemplateMethod::ChiMatrix::FillScaleValues( int nTemplates ) {
   //  if ( m_setting->GetDebug() ) cout << "FillScaleValues" << endl;
   m_scaleValues.clear();
   m_sigmaValues.clear();
@@ -664,7 +664,7 @@ void ChiMatrix::FillScaleValues( int nTemplates ) {
 
 
 //===========================================
-void ChiMatrix::OptimizeRanges( ) {
+void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::OptimizeRanges() " << m_name << endl;
 
   TH1D *histScale = 0;
@@ -807,7 +807,7 @@ void ChiMatrix::OptimizeRanges( ) {
 }
 
 //==========================================
-void ChiMatrix::ClearTemplates() {
+void TemplateMethod::ChiMatrix::ClearTemplates() {
 
  while( m_MCZMass.size() ) {
     while ( m_MCZMass.back().size() ) {    
@@ -820,7 +820,7 @@ void ChiMatrix::ClearTemplates() {
 
 }
 //==========
-unsigned int ChiMatrix::IsGoodQuality() {
+unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
   //  cout << "ChiMatrix::IsGoodQuality" << endl;
   int nentries = (int) m_setting->GetNEventCut();
   //If m_quality already set to false put false again
@@ -841,7 +841,7 @@ unsigned int ChiMatrix::IsGoodQuality() {
 
 
 //==========================
-double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
+double TemplateMethod::ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 
   if ( MCHist->GetNbinsX() != m_dataZMass->GetNbinsX() 
        || MCHist->GetXaxis()->GetXmin() != m_dataZMass->GetXaxis()->GetXmin() 
@@ -864,7 +864,7 @@ double ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
 }
 
 //==============================
-TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
+TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double chiMinUp ) {
   TF1 *quadraticFit = new TF1( "quadraticFit", "[0] + (x-[2])*(x-[2])/[1]/[1]",-1, 1);
   TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   //TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*TMath::Abs((x-[2]))*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
@@ -978,7 +978,7 @@ TF1* ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double chiMinLow, double
 
 
 //===================================
-void ChiMatrix::CreateMCTree() {
+void TemplateMethod::ChiMatrix::CreateMCTree() {
   //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::CreateMCTree()" << endl;
 
   m_mapVar1["PT"] = 0;
@@ -1004,7 +1004,7 @@ void ChiMatrix::CreateMCTree() {
 }
 
 //====================================
-int ChiMatrix::LinkMCTree( ) {
+int TemplateMethod::ChiMatrix::LinkMCTree( ) {
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree" << endl;
   if ( !m_MCTree ) CreateMCTree();
   m_MCTree->SetBranchStatus( "*", 0);
