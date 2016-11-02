@@ -26,7 +26,7 @@ using std::vector;
 using boost::multi_array;
 using boost::extents;
 namespace po = boost::program_options;
-
+using namespace ChrisLib;
 void Style_Christophe();
 
 int main( int argc, char* argv[] ) {

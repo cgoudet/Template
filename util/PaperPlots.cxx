@@ -13,7 +13,7 @@ using std::endl;
 using std::vector;
 namespace po = boost::program_options;
 using std::ifstream;
-
+using namespace ChrisLib;
 
 
 

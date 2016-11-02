@@ -24,6 +24,7 @@ using std::max;
 using std::min;
 using std::bitset;
 using namespace std::chrono;
+using namespace ChrisLib;
 
 ChiMatrix::ChiMatrix() : m_alpha(-99), m_sigma(-99),
 			 m_rand(),
@@ -706,22 +707,23 @@ void ChiMatrix::OptimizeRanges( ) {
 
 
       int minBin = histScale->GetMinimumBin();
+      int nBins= histScale->GetNbinsX();
       minVal = minVal==-99 ? histScale->GetBinContent(minBin) : min( minVal, histScale->GetBinContent(minBin) );
-      int binUp=histScale->GetNbinsX(), binDown=1;
-      if ( minBin != histScale->GetNbinsX() ) while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
+      int binUp=nBins, binDown=1;
+      if ( minBin != nBins ) while( histScale->GetBinContent(binUp-1) - histScale->GetBinContent(minBin) > chiOptim ) binUp--;
       if ( minBin != 1 ) while( histScale->GetBinContent(binDown+1) - histScale->GetBinContent(minBin) > chiOptim ) binDown++;
 
       cout << "binsUp : " << binDown << " " << minBin << " " << binUp << endl;
       cout << "values : " << histScale->GetBinContent(binDown) << " " << histScale->GetBinContent(binDown+1) << " " << minVal << " " << histScale->GetBinContent( binUp-1 ) << " " << histScale->GetBinContent( binUp )<< endl;
       cout << "centers : " << histScale->GetXaxis()->GetBinCenter(binDown) << " " << histScale->GetXaxis()->GetBinCenter(binDown+1) << " " << histScale->GetXaxis()->GetBinCenter(minBin) << " " << histScale->GetXaxis()->GetBinCenter(binUp-1) << " " << histScale->GetXaxis()->GetBinCenter(binUp) << endl;
 
-      if ( binUp != histScale->GetNbinsX() ) {
+      if ( binUp != nBins ) {
 	//The main dichotomy code suppose that once the dichotomy started, the optimized value of scale is between the last and before the last bin
 	upRightRange = histScale->GetXaxis()->GetBinCenter( binUp );
 	lowRightRange = histScale->GetXaxis()->GetBinCenter( binUp-1 ); 
       }
 
-      if ( binUp==histScale->GetNbinsX() && minBin>=histScale->GetNbinsX()-1 && rangeMax>allowedRangeMax-1e-10 ) foundOptim.set(0);//not really necessary, there for symmetry reasons with the binDown case
+      if ( binUp==nBins && minBin>=nBins-1 && rangeMax>allowedRangeMax-1e-10 ) foundOptim.set(0);//not really necessary, there for symmetry reasons with the binDown case
       else if ( binUp == minBin+1 ) rangeMax = histScale->GetXaxis()->GetBinCenter(binUp);
       else if ( sqrt( histScale->GetBinContent(binUp) - minVal ) < m_setting->GetOptimizeRanges()+1
 		&& sqrt( histScale->GetBinContent(binUp) - minVal ) > m_setting->GetOptimizeRanges()-1 ) {
@@ -1028,80 +1030,80 @@ int ChiMatrix::LinkMCTree( ) {
   return 0;
 }
 
-//====================================
-bool StartOptimizeHist( const TH1D * const hist,
-		   const double chiOptim;
-		   const double allowedMinRange,
-		   const double allowedMaxRange,
-		   double &upLimit,
-		   double &downLimit,
-	  ) {
+// //====================================
+// bool StartOptimizeHist( const TH1D * const hist,
+// 			const double chiOptim,
+// 			const double allowedMinRange,
+// 			const double allowedMaxRange,
+// 			double &upLimit,
+// 			double &downLimit
+// 			) {
 
-  double dChi2m = (chiOptim-1)*(chiOptim-1);
+//   double dChi2m = (chiOptim-1)*(chiOptim-1);
 
-  int minBin = histScale->GetMinimumBin();
-  int nBins = histScale->GetNbinsX();
+//   int minBin = histScale->GetMinimumBin();
+//   int nBins = histScale->GetNbinsX();
 
-  if ( upLimit < allowedMaxRange*(1-1e-5) 
-       && ( minBin == nBins || (histScale->GetBinContent( nBins ) - histScale->GetBinContent( minBin ) < dChi2m) )
-       ) { 
-    upLimit=min( allowedMaxRange, 2*upLimit-downLimit );
-    return 0;
-  }
-  else if ( downLimit > allowedMinRange*(1+1e-5)
-	    && ( minBin == 1 || ( histScale->GetBinContent(1)-histScale->GetBinContent(minBin) <dChi2m ) )
-	    ) {
-    downLimit = max( allowedMinRange, 2*downLimit-upLimit );
-    return 0;
-  }
-  else return 1;
-}
+//   if ( upLimit < allowedMaxRange*(1-1e-5) 
+//        && ( minBin == nBins || (histScale->GetBinContent( nBins ) - histScale->GetBinContent( minBin ) < dChi2m) )
+//        ) { 
+//     upLimit=min( allowedMaxRange, 2*upLimit-downLimit );
+//     return 0;
+//   }
+//   else if ( downLimit > allowedMinRange*(1+1e-5)
+// 	    && ( minBin == 1 || ( histScale->GetBinContent(1)-histScale->GetBinContent(minBin) <dChi2m ) )
+// 	    ) {
+//     downLimit = max( allowedMinRange, 2*downLimit-upLimit );
+//     return 0;
+//   }
+//   else return 1;
+// }
 
 
-bool OptimizeRangesUp( const TH1D *histScale, 
-		     const double chiOptim ,
-		     // const double allowedMinBin,
-		     // const double allowedMaxBin,
-		     double &minChi,
-		     double &minScale,
-		     double &upScale,
-		     double &downScale,
-		     double &stepWidth
-		     ) {
+// bool OptimizeRangesUp( const TH1D *histScale, 
+// 		     const double chiOptim ,
+// 		     // const double allowedMinBin,
+// 		     // const double allowedMaxBin,
+// 		     double &minChi,
+// 		     double &minScale,
+// 		     double &upScale,
+// 		     double &downScale,
+// 		     double &stepWidth
+// 		     ) {
 
-  int minBin = histScale->GetMinimumBin();
-  int nBins = histScale->GetNbinsX();
+//   int minBin = histScale->GetMinimumBin();
+//   int nBins = histScale->GetNbinsX();
 
-  double chi2Max=(chiOptim+1)*(chiOptim+1);
-  double chi2Min=(chiOptim-1)*(chiOptim-1);
+//   double chi2Max=(chiOptim+1)*(chiOptim+1);
+//   double chi2Min=(chiOptim-1)*(chiOptim-1);
 
-  if ( minChi == -99 || minChi<histScale->GetBinContent(minBin) ) {
-    minChi = histScale->GetBinContent(minBin);
-    minScale = histScale->GetXaxis()->GetBinCenter(minBin);
-  }
+//   if ( minChi == -99 || minChi<histScale->GetBinContent(minBin) ) {
+//     minChi = histScale->GetBinContent(minBin);
+//     minScale = histScale->GetXaxis()->GetBinCenter(minBin);
+//   }
 
-  bitset<2> foundSide("00");
+//   bitset<2> foundSide("00");
 
-  int binUp = nBins;
-  if ( histScale->GetBinContent(nBins) > chi2Min && histScale->GetBinContent(nBins) > chi2Max ) return true;
-  if ( histScale->GetBinContent( nBins ) < chi2Min ) {
-    stepWidth/=2.;
-    upScale+=stepWidth;
-    return false;
-  }
-  else { 
-    while ( histScale->GetBinContent(binUp-1) - minChi > chi2Max ) --binUp;
-    if ( histScale->GetBinContent(binUp-1) - minChi > chi2Min ) {
-      upScale = histScale->GetXaxis()->GetBinCenter(binUp-1);
-      return true;
-    }
-    else {
-      stepWidth=histScale->GetXaxis()->GetBinWidth(binUp)/2.;
-      upScale-=stepWidth;
-      return false;
-    }
-  }
-}
+//   int binUp = nBins;
+//   if ( histScale->GetBinContent(nBins) > chi2Min && histScale->GetBinContent(nBins) > chi2Max ) return true;
+//   if ( histScale->GetBinContent( nBins ) < chi2Min ) {
+//     stepWidth/=2.;
+//     upScale+=stepWidth;
+//     return false;
+//   }
+//   else { 
+//     while ( histScale->GetBinContent(binUp-1) - minChi > chi2Max ) --binUp;
+//     if ( histScale->GetBinContent(binUp-1) - minChi > chi2Min ) {
+//       upScale = histScale->GetXaxis()->GetBinCenter(binUp-1);
+//       return true;
+//     }
+//     else {
+//       stepWidth=histScale->GetXaxis()->GetBinWidth(binUp)/2.;
+//       upScale-=stepWidth;
+//       return false;
+//     }
+//   }
+// }
 
   //     if ( binUp != histScale->GetNbinsX() ) {
   // 	//The main dichotomy code suppose that once the dichotomy started, the optimized value of scale is between the last and before the last bin
@@ -1190,4 +1192,4 @@ bool OptimizeRangesUp( const TH1D *histScale,
   // }
 
 
-}
+//}

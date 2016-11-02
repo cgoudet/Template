@@ -1,12 +1,13 @@
 #include "Template/Setting.h"
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
 #include "TTree.h"
 #include <boost/program_options.hpp>
 #include "PlotFunctions/SideFunctions.h"
 #include "PlotFunctions/SideFunctionsTpp.h"
 
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <stdexcept>
 namespace po = boost::program_options;
 using std::ifstream;
 
@@ -15,6 +16,8 @@ using std::endl;
 using std::string;
 using std::vector;
 using std::stringstream;
+using std::runtime_error;
+using namespace ChrisLib;
 
 //######## CONSTRUCTORS
 Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),

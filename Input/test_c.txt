@@ -1,0 +1,2 @@
+/sps/atlas/a/aguerguichon/Calibration/Test/EnergyScaleFactors.root				totSyst_c	dum 0
+/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/DataOff_13TeV_1615_c.root			measScale_c centVal_c 0	

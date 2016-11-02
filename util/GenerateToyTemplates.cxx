@@ -7,7 +7,7 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 
-
+using namespace ChrisLib;
 using std::cout;
 using std::endl;
 using std::vector;

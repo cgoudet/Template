@@ -254,7 +254,7 @@ class Template
    */
   TRandom3 m_rand;
 
-  MapBranches m_mapBranches;
+  ChrisLib::MapBranches m_mapBranches;
   string m_name;
 
   /**\brief 2D vector containing usefull histograms for alpha and c

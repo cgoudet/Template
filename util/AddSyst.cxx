@@ -7,7 +7,7 @@
 #include "TH1D.h"
 #include "PlotFunctions/SideFunctions.h"
 
-
+using namespace ChrisLib;
 using std::string;
 using std::cout;
 using std::endl;
