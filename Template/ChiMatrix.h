@@ -221,6 +221,14 @@ namespace TemplateMethod {
     unsigned int IsGoodQuality();
 
 
+    bool OptimizeVect( std::vector<double> &y, 
+		       const std::vector<double> &x, 
+		       const double allowedMaxRange,
+		       double &width,
+		       double &limit,
+		       double &minChi );
+
+    
     /** \brief Name og the object
 
 	Each ChiMatrix object must have a different name in order for the histograms not to overwrite each other.
