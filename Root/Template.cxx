@@ -13,7 +13,8 @@
 #include <chrono>
 #include "PlotFunctions/DrawPlot.h"
 #include <algorithm>
-
+#include <stdexcept>
+using std::invalid_argument;
 using std::swap;
 using boost::extents;
 using std::cout;
@@ -67,15 +68,13 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
 
     for ( unsigned int iFile = 0; iFile < fileNames.size(); iFile++ ) {
-      
+      cout << "iFile : " << iFile << endl;
       TFile *dumFile = new TFile( fileNames[iFile].c_str() );
-      if ( !dumFile ) {
-	cout << fileNames[iFile] << " does not exist. Exiting" << endl;
-	exit( 0 );
-      }
+      if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
       if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile );
+      cout << "defaultTree" << endl;
       TTree *dumTree = (TTree*) dumFile->Get( treeNames[iFile].c_str() );
       if ( !dumTree ) {
 	cout << treeNames[iFile] << " in " << fileNames[iFile] << " does not exist. Exiting" << endl;
@@ -263,14 +262,14 @@ int TemplateMethod::Template::Save( bool saveChiMatrix ) {
     return 2;
   }
 
-  if ( saveChiMatrix ) {  
-    for ( auto vChiMatrixLine : m_chiMatrix ) {
-      for ( auto vChiMatrix : vChiMatrixLine ) {
-	vChiMatrix->Save(outFile, 1);   
-	vChiMatrix->Save(outFile, 0);   
-      }
-    }
-  }
+  // if ( saveChiMatrix ) {  
+  //   for ( auto vChiMatrixLine : m_chiMatrix ) {
+  //     for ( auto vChiMatrix : vChiMatrixLine ) {
+  // 	vChiMatrix->Save(outFile, 1);   
+  // 	vChiMatrix->Save(outFile, 0);   
+  //     }
+  //   }
+  // }
 
   outFile->Close();
   delete outFile;
@@ -315,6 +314,7 @@ int TemplateMethod::Template::CreateTemplate() {
       cout << "Error : No data and simulation off" << endl;
       return 2;
     }
+    cout << "create distorded" << endl;
   }
   //If data events haven't been filled
   else  FillDistrib( true );  
@@ -687,7 +687,6 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot" << endl;
   if ( path.back() != '/' && path != "" ) path += "/";
 
-
   if ( latexFileName == "" ) {
     if ( m_name != "" ) latexFileName = m_name + ".tex";
     else latexFileName = "latex.tex";
@@ -826,15 +825,6 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
     }
   }
 
-  // TFile *outZMassFile= new TFile ((path+"outZMass.root").c_str(), "RECREATE");
-  // for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) {
-  //   for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
-  //     m_chiMatrix[i_eta][j_eta]->Save(outZMassFile, 0);
-  //   }
-  // }
-
-  // outZMassFile->Close();
-  // delete outZMassFile;
 
   latex << "\\clearpage" << endl;
   latex << m_sStream.str() << endl;

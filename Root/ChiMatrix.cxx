@@ -600,13 +600,13 @@ int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
   if ( m_setting->GetOptimizeRanges() ) {
-    try{
+    //    try{
       OptimizeRanges();
-    }
-    catch ( logic_error e ) {
-      m_quality.set( 7, 1 );
-      return 0;
-    }
+    // }
+    // catch ( logic_error e ) {
+    //   m_quality.set( 7, 1 );
+    //   return 0;
+    // }
   }
   if ( m_setting->GetDebug() )  cout <<"after OptimizeRanges"<<endl;
 
@@ -714,14 +714,19 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
       vector<double>::iterator minY = min_element( histValues.begin(), histValues.end() );
       if ( chiMin > *minY || chiMin==-99 ) chiMin = *minY;
       for_each( histValues.begin(), histValues.end(), [chiMin]( double &val ) { val-=chiMin; } );
-      
+      copy( histValues.begin(), histValues.end(), ostream_iterator<double>(cout,"\t" ));
+      cout << endl;
+
       vector<double> &scales = iScale ? m_sigmaValues : m_scaleValues;
+      copy( scales.begin(), scales.end(), ostream_iterator<double>(cout,"\t" ));
+      cout << endl;
 
       isUp = OptimizeVect( histValues, 
 				scales,
 				allowedRangeMax, 
 				widthUp,
 				rangeMax );
+      cout << "isUp : " << isUp << " " << allowedRangeMax << " " << widthUp << " " << rangeMax << " " << widthUp << endl;
 
       reverse( histValues.begin(), histValues.end() );
       reverse( scales.begin(), scales.end() );
@@ -731,7 +736,7 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 				  widthDown,
 				  rangeMin );
 
-      
+      cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
       if ( histScale ) delete histScale; histScale=0;
     }
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
@@ -974,33 +979,37 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
 
   if ( x.size() != y.size() ) throw runtime_error( "ChiMatrix::StartOptimizeHist : Function sampling not of the same size." );
   
+  const double chiOptimDiff=0.2;
   const double chiOptim = m_setting->GetOptimizeRanges();
-  const double dChi2Min = (chiOptim-1)*(chiOptim-1);
-  const double dChi2Max = (chiOptim+1)*(chiOptim+1);
+  const double dChi2Min = (chiOptim-chiOptimDiff)*(chiOptim-chiOptimDiff);
+  const double dChi2Max = (chiOptim+chiOptimDiff)*(chiOptim+chiOptimDiff);
   if ( x.back() == allowedMaxRange && y.back()<dChi2Min ) return true;
   
   vector<double>::iterator minY = min_element( y.begin(), y.end() );
   unsigned minBin = distance( y.begin(), minY );
 
   vector<double>::iterator binUp = find_if( y.begin()+minBin, y.end(), [dChi2Max]( const double d) { return d>dChi2Max; } );
+    unsigned indexBinUp = distance(y.begin(), binUp ); 
+
   if ( y.back()>dChi2Min && y.back()<dChi2Max ) return true;
   else if ( binUp == y.end() ) {//We suppose the searced value is between the highest point and the width
+    cout << "remonte : " << width << " " << x.back() << endl;
     width/=2.;
     if ( fabs( width ) > fabs( limit - allowedMaxRange ) ) limit = allowedMaxRange;
-    else limit = *binUp + width;
+    else limit = x.back() + width;
+    cout << "limit : " << limit << endl;
     return false;
   }
   else if ( distance( y.begin()+minBin, binUp ) == 1 ) {
-    limit=*binUp;
+    limit=x[indexBinUp];
     return false;
   }
   else if ( *(binUp-1) >dChi2Min ) {
-    limit = *(binUp-1);
+    limit = x[indexBinUp-1];
     return true;
   }
   else {
-    unsigned indexBinUp = distance(y.begin(), binUp ); 
-    width = fabs(x[indexBinUp] - x[indexBinUp-1]);
+    width = (x[indexBinUp] - x[indexBinUp-1])/2.;
     limit = (x[indexBinUp] + x[indexBinUp-1])/2.;
     return false;
   }
