@@ -225,8 +225,8 @@ namespace TemplateMethod {
 		       const std::vector<double> &x, 
 		       const double allowedMaxRange,
 		       double &width,
-		       double &limit,
-		       double &minChi );
+		       double &limit );
+
 
     
     /** \brief Name og the object
