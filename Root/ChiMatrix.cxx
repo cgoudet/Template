@@ -979,7 +979,7 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
 
   if ( x.size() != y.size() ) throw runtime_error( "ChiMatrix::StartOptimizeHist : Function sampling not of the same size." );
   
-  const double chiOptimDiff=0.2;
+  const double chiOptimDiff=0.5;
   const double chiOptim = m_setting->GetOptimizeRanges();
   const double dChi2Min = (chiOptim-chiOptimDiff)*(chiOptim-chiOptimDiff);
   const double dChi2Max = (chiOptim+chiOptimDiff)*(chiOptim+chiOptimDiff);
@@ -993,11 +993,9 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
 
   if ( y.back()>dChi2Min && y.back()<dChi2Max ) return true;
   else if ( binUp == y.end() ) {//We suppose the searced value is between the highest point and the width
-    cout << "remonte : " << width << " " << x.back() << endl;
     width/=2.;
     if ( fabs( width ) > fabs( limit - allowedMaxRange ) ) limit = allowedMaxRange;
     else limit = x.back() + width;
-    cout << "limit : " << limit << endl;
     return false;
   }
   else if ( distance( y.begin()+minBin, binUp ) == 1 ) {

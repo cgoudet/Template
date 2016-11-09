@@ -555,23 +555,22 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
 void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   cout << "Template : CreateDistordedTree" << endl;
 
-  vector< double > alphaSimEta = m_setting.GetAlphaSimEta();
-  vector< double > alphaSimPt = m_setting.GetAlphaSimPt();
-  vector< double > sigmaSimEta = m_setting.GetSigmaSimEta();
-  vector< double > sigmaSimPt = m_setting.GetSigmaSimPt();
-  map< string, string > mapVarNames = m_setting.GetBranchVarNames();
+  const vector< double > &alphaSimEta = m_setting.GetAlphaSimEta();
+  const vector< double > &alphaSimPt = m_setting.GetAlphaSimPt();
+  const vector< double > &sigmaSimEta = m_setting.GetSigmaSimEta();
+  const vector< double > &sigmaSimPt = m_setting.GetSigmaSimPt();
+  const map< string, string > &mapVarNames = m_setting.GetBranchVarNames();
 
   if ( alphaSimEta.size()!= sigmaSimEta.size() 
        || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
        || alphaSimPt.size() != sigmaSimPt.size()
        || ( m_setting.GetPtBins().size() && (sigmaSimPt.size() !=  m_setting.GetPtBins().size()-1) )
        ) {
-    cout << "simulation vector sizes not ok" << endl;
     cout << (alphaSimEta.size()!= sigmaSimEta.size()) << " " << alphaSimEta.size() << " " << sigmaSimEta.size() << endl ;
     cout << ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) ) << endl ;
     cout << (alphaSimPt.size() != sigmaSimPt.size()) << " " << alphaSimPt.size() << " " << sigmaSimPt.size() << endl ;
     cout << ( m_setting.GetPtBins().size() && (sigmaSimPt.size() !=  m_setting.GetPtBins().size()-1) ) << endl;
-    exit(0);
+    throw invalid_argument( "Template::CreateDistordedTree Simulation vector sizes do not match" );
   }
 
   if ( m_setting.GetIndepDistorded() ) {
@@ -582,8 +581,6 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
     }
     else m_rand.SetSeed(  m_setting.GetIndepDistorded() );
   }
-
-  // cout <<"IndepDistorded Seed: "<<m_rand.GetSeed()<<endl;
 
   if ( m_setting.GetBootstrap() ) {
     cout << "bootstrap" << endl;
@@ -621,23 +618,20 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   
   
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
-  cout << "outFileName : " << outFileName << endl;
-  string treeName = outFileName;
-  StripString( treeName );
+  cout << "outDistordedFileName : " << outFileName << endl;
+  string treeName = StripString(outFileName);
 
   TTree *dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
   dataTree->SetDirectory(0);
   int counterEvent=0;
 
-  map< string, double > mapDouble = m_mapBranches.GetMapDouble(); 
-  cout << "nFiles distorded : " << m_MCFileNames.size() << endl;
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
     TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
     m_mapBranches.LinkTreeBranches( MCTree, dataTree );
     cout << "Nevents : " << MCTree->GetEntries() << endl;
-    for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); iEvent++ ) {
+    for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); ++iEvent ) {
       MCTree->GetEntry( iEvent );
 
       unsigned int i_eta = 0, j_eta = 0;
@@ -651,12 +645,16 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 	factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-      mapDouble[mapVarNames["PT_1"]] *= factor1;
-      mapDouble[mapVarNames["PT_2"]] *= factor2;
-      mapDouble[mapVarNames["MASS"]] *= sqrt( factor1*factor2 );
+      string branchName = mapVarNames.at( "PT_1" );
+      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor1 );
+      branchName = mapVarNames.at( "PT_2" );
+      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor2 );
+      branchName = mapVarNames.at( "MASS" );
+      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*sqrt(factor2*factor1) );
+
       dataTree->Fill();
       
-      counterEvent++;
+      ++counterEvent;
     }
     delete MCTree; MCTree=0;
     MCFile->Close();
@@ -674,7 +672,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   m_dataFileNames.push_back( distorded->GetName() );
   m_dataTreeNames.push_back( dataTree->GetName() );
 
-  cout << "deleting" << endl;
+
   delete dataTree; dataTree = 0;
   distorded->Close();
   delete distorded; distorded = 0;
