@@ -559,7 +559,6 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   const vector< double > &alphaSimPt = m_setting.GetAlphaSimPt();
   const vector< double > &sigmaSimEta = m_setting.GetSigmaSimEta();
   const vector< double > &sigmaSimPt = m_setting.GetSigmaSimPt();
-  const map< string, string > &mapVarNames = m_setting.GetBranchVarNames();
 
   if ( alphaSimEta.size()!= sigmaSimEta.size() 
        || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
@@ -645,13 +644,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 	factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-      string branchName = mapVarNames.at( "PT_1" );
-      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor1 );
-      branchName = mapVarNames.at( "PT_2" );
-      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor2 );
-      branchName = mapVarNames.at( "MASS" );
-      m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*sqrt(factor2*factor1) );
-
+      RescaleMapVar( factor1, factor2 );
       dataTree->Fill();
       
       ++counterEvent;
@@ -900,14 +893,23 @@ string TemplateMethod::Template::GetColorTabular( double inputVal, double measVa
 }
 
 //######################################################
+void TemplateMethod::Template::RescaleMapVar( double factor1, double factor2 ) {
+  const map< string, string > &mapVarNames = m_setting.GetBranchVarNames();
+  string branchName = mapVarNames.at( "PT_1" );
+  m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor1 );
+  branchName = mapVarNames.at( "PT_2" );
+  m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*factor2 );
+  branchName = mapVarNames.at( "MASS" );
+  m_mapBranches.SetVal( branchName, m_mapBranches.GetVal(branchName)*sqrt(factor2*factor1) );
+  
+}
+//######################################################
 int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
 
   cout<< "Template :: ApplyCorrection"<<endl;
 
   if ( !correctionAlpha && !correctionSigma ){ cout<<"return: no correction possible"<<endl;return 0;}
   map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
-  map< string, double > mapDouble = m_mapBranches.GetMapDouble(); 
-  TLorentzVector e3, e4;
 
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {
 
@@ -943,13 +945,7 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 	  ( 1 + m_rand.Gaus() * correctionSigma->GetBinContent( correctionSigma->FindFixBin( m_mapBranches.GetVal(mapBranchNames[string( correctionSigma->GetXaxis()->GetTitle()) +"_2" ]) ) ))
 	  : ( 1 - correctionAlpha->GetBinContent( correctionAlpha->FindFixBin( m_mapBranches.GetVal(mapBranchNames[string( correctionAlpha->GetXaxis()->GetTitle()) +"_2" ]) ) ) );
 	
-	
-	mapDouble[mapBranchNames["PT_1"]] *= factor1;
-	mapDouble[mapBranchNames["PT_2"]] *= factor2;
-	
-	e3.SetPtEtaPhiM( m_mapBranches.GetVal(mapBranchNames["PT_1"]), m_mapBranches.GetVal(mapBranchNames["ETA_TRK_1"]), m_mapBranches.GetVal(mapBranchNames["PHI_1"]), 0.511 );
-	e4.SetPtEtaPhiM( m_mapBranches.GetVal(mapBranchNames["PT_2"]), m_mapBranches.GetVal(mapBranchNames["ETA_TRK_2"]), m_mapBranches.GetVal(mapBranchNames["PHI_2"]), 0.511 );
-	mapDouble[mapBranchNames["MASS"]] = (e3+e4).M()*1e-3;
+	RescaleMapVar( factor1, factor2 );	
 	
 	dumTree->Fill();
       }

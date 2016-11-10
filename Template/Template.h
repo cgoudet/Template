@@ -178,6 +178,9 @@ namespace TemplateMethod {
 
 
   private :
+    /**\brief Change the electrons pt and Z mass with scales
+     */
+    void RescaleMapVar( double factor1, double factor2 );
 
     /**\brief Properly delete 2D vectors of pointers to ChiMatrix
      */
