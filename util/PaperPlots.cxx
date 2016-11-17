@@ -58,8 +58,8 @@ TH1*  DoMeeVsMu( vector<string> &datasetNames ) {
     unsigned int nentries = inTree->GetEntries();
     totEntries+=nentries;
     for ( unsigned int iEntry = 0; iEntry<nentries; iEntry++ ) {
-      meanMass += mapBranch.GetVal("m12");
-      profile->Fill( mapBranch.GetVal("mu"), mapBranch.GetVal("m12"), mapBranch.GetVal("weight") );
+      meanMass += mapBranch.GetDouble("m12");
+      profile->Fill( mapBranch.GetDouble("mu"), mapBranch.GetDouble("m12"), mapBranch.GetDouble("weight") );
     }
   }
 
