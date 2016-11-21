@@ -73,7 +73,7 @@ The Template framework allows to automatically generate those configuration file
 >     ['DataOff_13TeV_Window.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5'] ]   
 > The 1st line corresponds to the nominal measurement, the second line to the measurement reducing the Z mass fit range for the window systematic.  
 
-More information on the different modes can be found in Functions_MeasureAlphaSigma in CreateLauncher def. The default mode is 0, which is the one to be used for the scale factors measurement.    
+More information on the different modes can be found in Functions_MeasureAlphaSigma in CreateLauncher def. The default mode is 3, which is the one to be used for the scale factors measurement.    
 
 
 ###Submitting the job
