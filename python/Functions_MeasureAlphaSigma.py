@@ -1,4 +1,4 @@
-OBimport os
+import os
 import sys
 
 isAntinea=1
@@ -96,7 +96,7 @@ FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
-        else : container += listFiles( addSlash(dataset) + ( 'MC' if 'MC' in dataset else 'Data' ) + '*.root' )
+        else : container += listFiles( AddSlash(dataset) + ( 'MC' if 'MC' in dataset else 'Data' ) + '*.root' )
     
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
