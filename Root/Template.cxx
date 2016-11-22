@@ -948,7 +948,8 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 	  TH1 *hist = iCorrection ? correctionSigma : correctionAlpha;
 	  string varName = string( hist->GetXaxis()->GetTitle() ) + "_" + to_string(i+1);
 	  double scale = hist->GetBinContent( hist->FindFixBin( m_mapBranches.GetDouble( mapBranchNames[varName] ) ) );
-	  factors[i] = 1 + m_rand.Gaus() - scale;
+	  if ( iCorrection ) scale*=m_rand.Gaus();
+	  factors[i] = 1 - scale;
 	}
 	
 	RescaleMapVar( factors.front(), factors.back() );	

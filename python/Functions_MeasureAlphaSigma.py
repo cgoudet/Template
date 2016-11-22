@@ -201,7 +201,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     batch.write( 'rm *distorded* \n' )
     batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
     batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
-    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()
     return fileName
