@@ -307,10 +307,6 @@ namespace TemplateMethod {
 
     TTree *m_MCTree;
     ChrisLib::MapBranches m_mapBranch;
-    map< string, double > m_mapVar1;
-    map< string, double > m_mapVar2;
-    map< string, double > m_mapVarEvent;
-
   };
 }
 #endif
