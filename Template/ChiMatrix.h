@@ -1,6 +1,8 @@
 #ifndef CHIMATRIX_H
 #define CHIMATRIX_H
 
+#include "PlotFunctions/MapBranches.h"
+
 #include "TRandom.h"
 #include "Setting.h"
 #include "TH1D.h"
@@ -11,7 +13,6 @@
 #include <map>
 #include <bitset>
 #include <sstream>
-
 using std::stringstream;
 using std::bitset;
 using std::map;
@@ -65,15 +66,14 @@ namespace TemplateMethod {
     int ExtractFactor( );
 
     /**\brief Fill event in data histogram or in MC Ntuple
-       \param e1 First electron
-       \param e2 Second electron
+       \param mass ZMass in MeV
        \param isData Is input event data
        \param weight Weight to apply to the event
 
        - if isData, fill the data mass distribution
        - id !isData, Create a temporary MC TTree to hold event variables ad fill it
     */
-    void FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight = 1 );
+    void FillDistrib( double mass, bool isData, double weight = 1 );
 
     /**\brief Load templates
        \param inFileName input root file name
@@ -306,6 +306,7 @@ namespace TemplateMethod {
     unsigned int  m_eta2Bin;
 
     TTree *m_MCTree;
+    ChrisLib::MapBranches m_mapBranch;
     map< string, double > m_mapVar1;
     map< string, double > m_mapVar2;
     map< string, double > m_mapVarEvent;

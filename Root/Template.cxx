@@ -531,18 +531,18 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
 
-
+      const double mass = (ei.front()+ei.back()).M();
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
 	int foundBin = FindBin( i_eta, j_eta );
-	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( ei.front(), ei.back(), isData,  weight );
+	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData,  weight );
       }
       else {
 	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( ei.front(), ei.back(), isData, weight/2. );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData, weight/2. );
 	FindBin( i_eta, j_eta );
-	m_chiMatrix[i_eta][j_eta]->FillDistrib( ei.front(), ei.back(), isData, weight/2. );
+	m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData, weight/2. );
       }
       counterEntry++;
     }//end loop iEvent

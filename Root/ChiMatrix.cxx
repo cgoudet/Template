@@ -299,25 +299,16 @@ int TemplateMethod::ChiMatrix::FillChiMatrix(  ) {
   return 0;
 }
 
-//==========
-void TemplateMethod::ChiMatrix::FillDistrib( TLorentzVector &e1, TLorentzVector &e2, bool isData, double weight ) {
+//==============================================================================
+void TemplateMethod::ChiMatrix::FillDistrib( double mass, bool isData, double weight ) {
   //if ( m_setting->GetDebug() ) cout << m_name << " : FillDistrib" <<endl;
   //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
-
-  
-  if ( isData ) {
-    m_dataZMass->Fill( (e1+e2).M() / 1000., weight );
-  }
+  if ( isData ) m_dataZMass->Fill( mass / 1000., weight );
   else {
-
+    LinkMCTree();
     if ( !m_MCTree ) CreateMCTree();
-    m_mapVar1["PT"] = e1.Pt();
-    m_mapVar1["ETA_TRK"] = e1.Eta();
-    m_mapVar1["PHI"] = e1.Phi();
-    m_mapVar2["PT"] = e2.Pt();
-    m_mapVar2["ETA_TRK"] = e2.Eta();
-    m_mapVar2["PHI"] = e2.Phi();
-    m_mapVarEvent["WEIGHT"]=weight;
+    m_mapBranch.SetVal( "mass", mass/1000. );
+    m_mapBranch.SetVal( "weight", weight );    
     m_MCTree->Fill();
   }
 }
@@ -333,43 +324,25 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
   }
   else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );  
 
-
-  //cout<<"IndepTemplates Seed:  "<<m_rand.GetSeed()<<endl;
-
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
 
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     m_MCTree->GetEntry( iEvent );
-    double phi_1 = m_mapVar1["PHI"];
-    double phi_2 = m_mapVar2["PHI"];
-    double eta_1 = m_mapVar1["ETA_TRK"];
-    double eta_2 = m_mapVar2["ETA_TRK"];
-    double initPt_1 = m_mapVar1["PT"];
-    double initPt_2 = m_mapVar2["PT"];
-    double weight = m_mapVarEvent["WEIGHT"];
+    const double mass = m_mapBranch.GetDouble("mass");
+    const double weight = m_mapBranch.GetDouble("weight");
 
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
-      double randVal1 =  m_rand.Gaus();
-      double randVal2 =  m_rand.Gaus();
+      const double randVal1 =  m_rand.Gaus();
       for ( int i_alpha = 0; i_alpha < (int) m_MCZMass.size(); i_alpha++ ) {	            
 	for ( int i_sigma = 0; i_sigma < (int) m_MCZMass[i_alpha].size(); i_sigma++ ) {
 	  	  
-	  double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
-	  double factor2Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) :m_scaleValues[i_alpha]  );
+	  const double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
+	  const double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 
-	  double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
-	  double factor2Sigma = 1 + randVal2 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
-
-	  double pt_1 = initPt_1 * factor1Alpha * factor1Sigma;
-	  double pt_2 = initPt_2 * factor2Alpha * factor2Sigma;
-	  TLorentzVector dum_el1, dum_el2;
-	  dum_el1.SetPtEtaPhiM( pt_1, eta_1, phi_1, 0.511 );
-	  dum_el2.SetPtEtaPhiM( pt_2, eta_2, phi_2, 0.511 );
-	  TLorentzVector Z = dum_el1 + dum_el2;
-
-	  if ( Z.M()/1000. < m_setting->GetZMassMin() || Z.M()/1000. > m_setting->GetZMassMax() ) continue;
-	  m_MCZMass[i_alpha][i_sigma]->Fill( Z.M() /1000., weight );
+	  const double newMass =  mass * (1+factor1Alpha)*(1+factor1Sigma)/1000.;
+	  if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;
+	  m_MCZMass[i_alpha][i_sigma]->Fill( newMass, weight );
 	  
       }}}
   }
@@ -599,15 +572,7 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
 int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
-  if ( m_setting->GetOptimizeRanges() ) {
-    //    try{
-      OptimizeRanges();
-    // }
-    // catch ( logic_error e ) {
-    //   m_quality.set( 7, 1 );
-    //   return 0;
-    // }
-  }
+  if ( m_setting->GetOptimizeRanges() ) OptimizeRanges();
   if ( m_setting->GetDebug() )  cout <<"after OptimizeRanges"<<endl;
 
   ClearTemplates();
@@ -919,25 +884,13 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
 //===================================
 void TemplateMethod::ChiMatrix::CreateMCTree() {
   //  if ( m_setting->GetDebug() ) cout << "ChiMatrix::CreateMCTree()" << endl;
-
-  m_mapVar1["PT"] = 0;
-  m_mapVar1["ETA_TRK"] = 0;
-  m_mapVar1["PHI"] = 0;
-  m_mapVar2["PT"] = 0;
-  m_mapVar2["ETA_TRK"] = 0;
-  m_mapVar2["PHI"] = 0;
-  m_mapVarEvent["WEIGHT"]=1;
+  double dum=0;
   
   if ( m_MCTree ) { delete m_MCTree; m_MCTree = 0; }
   m_MCTree = new TTree( m_name + TString("_MCTree" ), m_name + TString("_MCTree" ) );
   m_MCTree->SetDirectory(0);
-  m_MCTree->Branch( "pt_1"  , &m_mapVar1["PT"] );
-  m_MCTree->Branch( "eta_1" , &m_mapVar1["ETA_TRK"] );
-  m_MCTree->Branch( "phi_1" , &m_mapVar1["PHI"] );
-  m_MCTree->Branch( "pt_2"  , &m_mapVar2["PT"] );
-  m_MCTree->Branch( "eta_2" , &m_mapVar2["ETA_TRK"] );
-  m_MCTree->Branch( "phi_2" , &m_mapVar2["PHI"] );
-  m_MCTree->Branch( "weight", &m_mapVarEvent["WEIGHT"] );
+  m_MCTree->Branch( "mass"  , &dum );
+  m_MCTree->Branch( "weight", &dum );
 
   // if ( m_setting->GetDebug() ) cout << "ChiMatrix::CreateMCTree() Done" << endl;
 }
@@ -945,26 +898,10 @@ void TemplateMethod::ChiMatrix::CreateMCTree() {
 //====================================
 int TemplateMethod::ChiMatrix::LinkMCTree( ) {
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree" << endl;
-  if ( !m_MCTree ) CreateMCTree();
-  m_MCTree->SetBranchStatus( "*", 0);
-
-  m_MCTree->SetBranchStatus( "pt_1"  , 1);
-  m_MCTree->SetBranchStatus( "eta_1" , 1);
-  m_MCTree->SetBranchStatus( "phi_1" , 1);
-  m_MCTree->SetBranchStatus( "pt_2"  , 1);
-  m_MCTree->SetBranchStatus( "eta_2" , 1);
-  m_MCTree->SetBranchStatus( "phi_2" , 1);
-  m_MCTree->SetBranchStatus( "weight", 1);
-
-  m_MCTree->SetBranchAddress( "pt_1"  , &m_mapVar1["PT"] );
-  m_MCTree->SetBranchAddress( "eta_1" , &m_mapVar1["ETA_TRK"] );
-  m_MCTree->SetBranchAddress( "phi_1" , &m_mapVar1["PHI"] );
-  m_MCTree->SetBranchAddress( "pt_2"  , &m_mapVar2["PT"] );
-  m_MCTree->SetBranchAddress( "eta_2" , &m_mapVar2["ETA_TRK"] );
-  m_MCTree->SetBranchAddress( "phi_2" , &m_mapVar2["PHI"] );
-  m_MCTree->SetBranchAddress( "weight", &m_mapVarEvent["WEIGHT"] );
-
-
+  if ( m_MCTree && m_mapBranch.IsLinked() ) return 0;
+  CreateMCTree();
+  m_mapBranch.ClearMaps();
+  m_mapBranch.LinkTreeBranches( m_MCTree );
   //  if ( m_setting->GetDebug() ) cout << "Template::LinkTree done" << endl;  
   return 0;
 }
