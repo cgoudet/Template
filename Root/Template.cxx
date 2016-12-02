@@ -27,9 +27,10 @@ using std::find;
 using namespace std::chrono;
 using namespace ChrisLib;
 using namespace TemplateMethod;
+using std::runtime_error;
 
 //########## CONSTRUCTOR
-TemplateMethod::Template::Template() : m_setting(), m_rand(), m_name()
+TemplateMethod::Template::Template() : m_setting(), m_rand(), m_mapBranches(), m_name()
 {
   TH1::AddDirectory( false );
   gErrorIgnoreLevel = kError;
@@ -69,7 +70,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
 
     for ( unsigned int iFile = 0; iFile < fileNames.size(); iFile++ ) {
-      cout << "iFile : " << iFile << endl;
+      cout << "iFile : " << fileNames[iFile] << endl;
       TFile *dumFile = new TFile( fileNames[iFile].c_str() );
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
@@ -478,17 +479,17 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   unsigned int nEntry = ( isData && m_setting.GetNUseEvent() ) ? m_setting.GetNUseEvent() : 0;
   unsigned int nFiles = ( isData ) ? m_dataFileNames.size() : m_MCFileNames.size();
   unsigned long int counterEntry = 0;
-  TFile *inputFile = 0;
-  TTree *inputTree = 0;
-  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
+
+  const map<string, string> &mapBranchNames = m_setting.GetBranchVarNames();
 
   cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
   cout << "nFiles : " << nFiles << endl;
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
-    inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
+    TFile *inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
     cout << "openFile : " << inputFile->GetName() << endl;
-    inputTree = (TTree*) inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() );
+
+    TTree *inputTree = static_cast<TTree*>(inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() ));
     
     if ( m_setting.GetSelection() != "" && 
 	 ( !m_setting.GetApplySelection() 
@@ -496,13 +497,9 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
 	   || ( m_setting.GetApplySelection()==2 && !isData ) )
 	   ) {
       TTree* dumTree = inputTree->CopyTree( m_setting.GetSelection().c_str() );
-      if ( !dumTree->GetEntries() ) {
-	cout << "selectionTree has no events." << endl;
-	exit(1);
-      }
-      delete inputTree;
-      inputTree = dumTree;
+      if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
+ 
     cout << "inputTree : " << inputTree->GetName() << endl;
     inputTree->SetDirectory( 0 );
     if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
@@ -517,21 +514,13 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       inputTree->GetEntry( iEvent );
       if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       
-      vector<TLorentzVector> ei(2);
-      for ( unsigned i=0; i<ei.size(); ++i ) {
-	double pt =  m_mapBranches.GetDouble(mapBranchNames["PT_"+to_string(i+1)]);
-	double eta =  m_mapBranches.GetDouble(mapBranchNames["ETA_TRK_"+to_string(i+1)]);
-	double phi =  m_mapBranches.GetDouble(mapBranchNames["PHI_"+to_string(i+1)]);
-	ei[i].SetPtEtaPhiM( pt, eta, phi, 0.511 );
-      }
-
+      double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
 
       //##############################
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
 
-      const double mass = (ei.front()+ei.back()).M();
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
 	int foundBin = FindBin( i_eta, j_eta );
@@ -577,46 +566,32 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
     throw invalid_argument( "Template::CreateDistordedTree Simulation vector sizes do not match" );
   }
 
-  if ( m_setting.GetIndepDistorded() ) {
-    if ( m_setting.GetIndepDistorded() == 1 ) {
-      high_resolution_clock::time_point t1 = high_resolution_clock::now();
-      m_rand.SetSeed( t1.time_since_epoch().count() );
-      cout << "RandomSeed : " << m_rand.GetSeed() << endl;
-    }
-    else m_rand.SetSeed(  m_setting.GetIndepDistorded() );
+  if ( m_setting.GetIndepDistorded() == 1 ) {
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    m_rand.SetSeed( t1.time_since_epoch().count() );
   }
+  else if ( m_setting.GetIndepDistorded() ) m_rand.SetSeed(  m_setting.GetIndepDistorded() );
 
   if ( m_setting.GetBootstrap() ) {
     cout << "bootstrap" << endl;
     vector< TTree* > vectorTree;
-    for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
+    for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); ++iFile ) {
       TFile inFile( m_MCFileNames[iFile].c_str() );
-      TTree *MCTree = (TTree*) inFile.Get( m_MCTreeNames[iFile].c_str() );
+      TTree *MCTree = static_cast<TTree*>(inFile.Get( m_MCTreeNames[iFile].c_str() ));
       MCTree->SetDirectory( 0 );
-      vectorTree.push_back(0);
-      vectorTree.back() = MCTree;
+      vectorTree.push_back(MCTree);
       inFile.Close("R");
     }
 
     TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
-    
-    cout<< " m_setting.GetNUseEvent(): "<<m_setting.GetNUseEvent()<<endl;
-
     TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap(), 1);
-
-    cout << "bootstrap name : " << bootTree->GetName() << endl;
     distordedFile.cd();
     bootTree->Write( "", TObject::kOverwrite );
-    m_MCFileNames.clear();
-    m_MCFileNames.push_back( distordedFile.GetName() );
-    m_MCTreeNames.clear();
-    m_MCTreeNames.push_back( bootTree->GetName() );
+    m_MCFileNames = { distordedFile.GetName() };
+    m_MCTreeNames = { bootTree->GetName() };
 
     delete bootTree; bootTree=0;
-    while ( vectorTree.size() ) {
-      delete vectorTree.back();
-      vectorTree.pop_back();
-    }
+    DeleteContainer( vectorTree );
     distordedFile.Close( "R" );
   }//end boosttrap
   
@@ -624,7 +599,6 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
   cout << "outDistordedFileName : " << outFileName << endl;
   string treeName = StripString(outFileName);
-
   TTree *dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
   dataTree->SetDirectory(0);
@@ -632,9 +606,8 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
-    TTree *MCTree = (TTree*) MCFile->Get( m_MCTreeNames[iFile].c_str() );
+    TTree *MCTree = static_cast<TTree*>(MCFile->Get( m_MCTreeNames[iFile].c_str() ));
     m_mapBranches.LinkTreeBranches( MCTree, dataTree );
-    cout << "Nevents : " << MCTree->GetEntries() << endl;
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); ++iEvent ) {
       MCTree->GetEntry( iEvent );
 
@@ -659,18 +632,12 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
     delete MCFile; MCFile=0;
   }
   cout << "tree entries : " << dataTree->GetEntries() << endl;
-
   TFile *distorded = new TFile( outFileName.c_str(), "RECREATE" );
   cout << "Writting in : " << outFileName.c_str() << endl;
   dataTree->Write( "", TObject::kOverwrite );
-    
 
-  m_dataFileNames.clear();
-  m_dataTreeNames.clear();
-  m_dataFileNames.push_back( distorded->GetName() );
-  m_dataTreeNames.push_back( dataTree->GetName() );
-
-
+  m_dataFileNames = { distorded->GetName() };
+  m_dataTreeNames = { dataTree->GetName() };
   delete dataTree; dataTree = 0;
   distorded->Close();
   delete distorded; distorded = 0;
@@ -900,11 +867,7 @@ string TemplateMethod::Template::GetColorTabular( double inputVal, double measVa
 //######################################################
 void TemplateMethod::Template::RescaleMapVar( double factor1, double factor2 ) {
   const map< string, string > &mapVarNames = m_setting.GetBranchVarNames();
-  string branchName = mapVarNames.at( "PT_1" );
-  m_mapBranches.SetVal( branchName, m_mapBranches.GetDouble(branchName)*factor1 );
-  branchName = mapVarNames.at( "PT_2" );
-  m_mapBranches.SetVal( branchName, m_mapBranches.GetDouble(branchName)*factor2 );
-  branchName = mapVarNames.at( "MASS" );
+  string branchName = mapVarNames.at( "MASS" );
   m_mapBranches.SetVal( branchName, m_mapBranches.GetDouble(branchName)*sqrt(factor2*factor1) );
   
 }

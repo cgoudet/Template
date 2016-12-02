@@ -124,7 +124,7 @@ int TemplateMethod::Setting::Configure( const string &configFile ) {
   m_ptBins.erase( unique( m_ptBins.begin(), m_ptBins.end() ), m_ptBins.end() );  
 
   //create a vector with all the mandatory variables.
-  vector<string> minVarNames = { "ETA_TRK_1", "ETA_TRK_2", "PHI_1", "PHI_2", "MASS", "PT_1", "PT_2", m_var1 + "_1", m_var1 + "_2" };
+  vector<string> minVarNames = { "MASS", m_var1 + "_1", m_var1 + "_2" };
   if ( m_var2 != "" ) {
     minVarNames.push_back( m_var2 + "_1" );
     minVarNames.push_back( m_var2 + "_2" );
