@@ -303,11 +303,10 @@ int TemplateMethod::ChiMatrix::FillChiMatrix(  ) {
 void TemplateMethod::ChiMatrix::FillDistrib( double mass, bool isData, double weight ) {
   //if ( m_setting->GetDebug() ) cout << m_name << " : FillDistrib" <<endl;
   //  cout << "GetIndepTempaltes : " << m_setting->GetIndepTemplates() << endl;
-  if ( isData ) m_dataZMass->Fill( mass / 1000., weight );
+  if ( isData ) m_dataZMass->Fill( mass, weight );
   else {
     LinkMCTree();
-    if ( !m_MCTree ) CreateMCTree();
-    m_mapBranch.SetVal( "mass", mass/1000. );
+    m_mapBranch.SetVal( "mass", mass );
     m_mapBranch.SetVal( "weight", weight );    
     m_MCTree->Fill();
   }
@@ -340,8 +339,15 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 	  const double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
 	  const double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 
-	  const double newMass =  mass * (1+factor1Alpha)*(1+factor1Sigma)/1000.;
+	  const double newMass =  mass*factor1Alpha*factor1Sigma;
+	  // if ( iEvent<100 ) {
+	  // cout << "mass : " << mass << endl;
+	  // cout << "factoralpha : " << factor1Alpha << endl;
+	  // cout << "factor1Sigma : " << factor1Sigma << endl;
+	  // cout << "newMass :  " << newMass << endl;
+	  // }
 	  if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;
+
 	  m_MCZMass[i_alpha][i_sigma]->Fill( newMass, weight );
 	  
       }}}
@@ -726,20 +732,21 @@ void TemplateMethod::ChiMatrix::ClearTemplates() {
 //==========
 unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
   //  cout << "ChiMatrix::IsGoodQuality" << endl;
-  int nentries = (int) m_setting->GetNEventCut();
+  int nentries = static_cast<int>(m_setting->GetNEventCut());
   //If m_quality already set to false put false again
   if ( m_quality.to_ulong() ) return false;
 
   vector< double > etaBins( m_setting->GetEtaBins());
 
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
-  if ( m_MCZMass.front().front()->GetEntries() < nentries ) m_quality.set( 4, 1 );
+  if ( m_MCZMass[0][0]->GetEntries() < nentries ) m_quality.set( 4, 1 );
   if ( m_dataZMass->GetEntries() < nentries ) m_quality.set( 5, 1 );
   if ( m_setting->GetVar1() == "ETA_TRK" || m_setting->GetVar1() == "ETA_CALO" || m_setting->GetVar1() == "ETA_CLUSTER" ) {
     double mTh=27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin]+etaBins[m_eta1Bin+1]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) ;
     if (  mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
   }
 
+  cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;
   return m_quality.to_ulong();
 }
 

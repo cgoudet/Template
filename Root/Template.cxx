@@ -75,8 +75,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
-      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile );
-      cout << "defaultTree" << endl;
+      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "_selectionTree" );
       TTree *dumTree = (TTree*) dumFile->Get( treeNames[iFile].c_str() );
       if ( !dumTree ) {
 	cout << treeNames[iFile] << " in " << fileNames[iFile] << " does not exist. Exiting" << endl;
@@ -258,11 +257,11 @@ int TemplateMethod::Template::Save( bool saveChiMatrix ) {
   }
   cout << "saving setting" << endl;
   //Save Setting variables
-  err = m_setting.Save( outFile );
-  if ( err ) {
-    cout << "Setting::Save() failed : " << err << endl;
-    return 2;
-  }
+  //  err = m_setting.Save( outFile );
+  // if ( err ) {
+  //   cout << "Setting::Save() failed : " << err << endl;
+  //   return 2;
+  // }
 
   // if ( saveChiMatrix ) {  
   //   for ( auto vChiMatrixLine : m_chiMatrix ) {
@@ -398,8 +397,6 @@ int TemplateMethod::Template::ExtractFactors() {
     //Create combined factor matrices
     for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
-
-
     
     //Run over all chiMatrices
     for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
@@ -407,7 +404,7 @@ int TemplateMethod::Template::ExtractFactors() {
 
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
   	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-
+	cout << "alpah : " << i_eta << " " << j_eta << " " << m_chiMatrix[i_eta][j_eta]->GetQuality() << " " << m_chiMatrix[i_eta][j_eta]->GetScale(iVar) << endl;
   	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
   	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
   	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
@@ -506,9 +503,6 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
     m_mapBranches.LinkTreeBranches( inputTree, 0 );
     cout << "branches linked" << endl;
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
-
-      //if ( iEvent < 500000 ) continue;
-
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
@@ -516,7 +510,6 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
-
       //##############################
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
@@ -947,44 +940,7 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
   return 0;
 }
 
-//############################################
-string TemplateMethod::Template::FindDefaultTree( TFile* inFile ) { 
-  if ( !inFile ) return "";
-
-  vector<string> listTreeNames;
-
-  TIter nextkey( inFile->GetListOfKeys());
-  cout<<"File: "<<inFile->GetName();
-  
-  TKey *key=0;
-  while ((key = (TKey*)nextkey())) {
-    if (strcmp( "TTree",key->GetClassName())) continue;
-    listTreeNames.push_back( key->GetName() );
-  }
-  if ( key ) delete key;
-
-  if ( listTreeNames.size() == 1 ) return listTreeNames.front();
-  if ( !listTreeNames.size() ) {
-    cout << "No TTree in this file. exiting" << endl;
-    exit( 0 );
-  }
-
-  for ( auto treeName : listTreeNames ) { 
-    cout << treeName << endl;
-    if ( TString( treeName ).Contains( "_selectionTree" ) ) return treeName;
-  }
-  // string dumString = inFile->GetName();
-  // dumString = dumString.substr( dumString.find_last_of( "/" ) + 1);
-  // dumString = dumString.substr( 0, dumString.find_last_of( "." ) );
-  // dumString += "_selectionTree";
-
-  // if ( find( listTreeNames.begin(), listTreeNames.end(), dumString ) != listTreeNames.end() )  return dumString;
-  // else if ( 
-  return listTreeNames.front();
-
-}
-
-//######################################"
+// //######################################"
 TMatrixD* TemplateMethod::Template::GetMatrix( string matrixName ) {
   if ( matrixName == "alpha" ) return m_vectMatrix[0][SearchVectorBin( string("combin"), m_matrixNames )];
   else if ( matrixName == "sigma" ) return m_vectMatrix[1][SearchVectorBin( string("combin"), m_matrixNames )];
@@ -1021,15 +977,11 @@ void TemplateMethod::Template::CleanHistVect( int jVar ) {
 void TemplateMethod::Template::CleanMatrixVect( int jVar) {
   for ( unsigned int iVar = 0; iVar < m_vectMatrix.size(); iVar++ ) {
     if ( jVar != -1 && jVar != (int) iVar ) continue;
-    for ( unsigned int iHist = 0; iHist < m_vectMatrix[0].size(); iHist++ ) {
+    for ( unsigned int iHist = 0; iHist < m_vectMatrix[iVar].size(); iHist++ ) {
 
       if ( m_vectMatrix[iVar][iHist] ) delete m_vectMatrix[iVar][iHist];
       m_vectMatrix[iVar][iHist] = 0;
     }}
-}
-//###############################################
-string TemplateMethod::Template::CreateHistMatName( string objName, unsigned int iVar ) {
-  return objName + ( iVar ? "_c" : "_alpha" );
 }
 
 //#############################

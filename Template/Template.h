@@ -196,10 +196,6 @@ namespace TemplateMethod {
     */
     void CleanMatrixVect( int jVar = -1 );
 
-    /**\brief Look for TTree within a TFile
-       \param inFile root file to look into
-    */
-    string FindDefaultTree( TFile* inFile ); 
 
     /**\brief Get color to use for printing in latex file
        \param inputVal theoretical value
@@ -219,7 +215,7 @@ namespace TemplateMethod {
        \param objName name of the object we want to create
        \param iVar Tells if the object is created for alpha (iVar=0) or for C (iVar=1)
     */
-    string CreateHistMatName( string objName, unsigned int iVar );
+    static string CreateHistMatName( string objName, unsigned int iVar ) { return objName + ( iVar ? "_c" : "_alpha" ); }
 
     /**\brief Find the configuration to put an event into
        \return 0 OK
