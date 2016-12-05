@@ -34,7 +34,7 @@ namespace TemplateMethod {
        - The mapping is made with the label of the attribute : adding a property in the config file, or changing orders of properties, will not perturb the reading.
        - Perform checks on read values : binFitRange, mode, vector sizes for simulation, 
     */
-    int Configure( const string &configFile  );
+    void Configure( const string &configFile  );
   
   
     double GetAlphaMin()        const { return m_alphaMin;       };
@@ -62,14 +62,11 @@ namespace TemplateMethod {
     unsigned int GetFitMethod() const { return m_fitMethod;      };
     unsigned int GetNUseEl()    const { return m_nUseEl;         };
     unsigned int GetNEventCut() const { return m_nEventCut;      };
-    string GetVar1() const { return m_var1; };
-    string GetVar2() const { return m_var2; };
     double GetThresholdMass() const { return m_thresholdMass; };
     unsigned long GetIndepDistorded() const { return m_indepDistorded; };
     unsigned long GetIndepTemplates() const { return m_indepTemplates; };
     unsigned int GetInversionMethod() const { return m_inversionMethod; }
     unsigned long GetBootstrap() const { return m_bootstrap; }
-    bool GetDoPileup() const { return m_doPileup;}
     bool GetDoWeight() const { return m_doWeight; }
     unsigned int GetApplySelection() const { return m_applySelection; }
  
@@ -143,8 +140,6 @@ namespace TemplateMethod {
        - 2VAR : Electrons are separated in eta and pt bins
     */
     string  m_mode;
-    string m_var1;
-    string m_var2;
     /**\brief Z mass lower bound
      */
     double m_ZMassMin;
@@ -265,7 +260,6 @@ namespace TemplateMethod {
     unsigned long m_indepTemplates;
     unsigned int m_inversionMethod;
     unsigned long m_bootstrap;
-    bool m_doPileup;
     bool m_doWeight;
     map<string,string> m_branchVarNames;
     vector< string > m_dataBranchWeightNames;

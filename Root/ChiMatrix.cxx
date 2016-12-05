@@ -741,9 +741,9 @@ unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
   if ( m_MCZMass[0][0]->GetEntries() < nentries ) m_quality.set( 4, 1 );
   if ( m_dataZMass->GetEntries() < nentries ) m_quality.set( 5, 1 );
-  if ( m_setting->GetVar1() == "ETA_TRK" || m_setting->GetVar1() == "ETA_CALO" || m_setting->GetVar1() == "ETA_CLUSTER" ) {
+  if ( m_setting->GetThresholdMass() >0 ) {
     double mTh=27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin]+etaBins[m_eta1Bin+1]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) ;
-    if (  mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
+    if ( mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
   }
 
   cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;

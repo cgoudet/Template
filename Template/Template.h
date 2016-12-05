@@ -82,7 +82,7 @@ namespace TemplateMethod {
 
        Examples of configuration files given in configFiles directory
     */
-    int Configure( const string &configFile );
+    void Configure( const string &configFile );
 
     /**\brief Compute alpha_ij and sigma_ij
        \return 0 OK
@@ -178,6 +178,8 @@ namespace TemplateMethod {
 
 
   private :
+    void FillBranchesToLink();
+
     /**\brief Change the electrons pt and Z mass with scales
      */
     void RescaleMapVar( double factor1, double factor2 );
@@ -285,6 +287,7 @@ namespace TemplateMethod {
     stringstream m_sStream;
 
     double GetWeight( bool isData );
+    std::list<std::string> m_branchesToLink;
   };
 }
 //#########################################
