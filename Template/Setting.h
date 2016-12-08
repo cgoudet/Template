@@ -67,7 +67,6 @@ namespace TemplateMethod {
     unsigned long GetIndepTemplates() const { return m_indepTemplates; };
     unsigned int GetInversionMethod() const { return m_inversionMethod; }
     unsigned long GetBootstrap() const { return m_bootstrap; }
-    bool GetDoWeight() const { return m_doWeight; }
     unsigned int GetApplySelection() const { return m_applySelection; }
  
     double GetOptimizeRanges()  const { return m_optimizeRanges; };
@@ -79,7 +78,8 @@ namespace TemplateMethod {
     vector< double > const &GetSigmaSimPt()  const { return m_sigmaSimPt;  };
     vector< string > const &GetDataBranchWeightNames() const { return m_dataBranchWeightNames; }
     vector< string > const &GetMCBranchWeightNames() const { return m_MCBranchWeightNames; }
-    map< string, string> const &GetBranchVarNames() const { return m_branchVarNames;}
+    map< string, string> const &GetDataBranchVarNames() const { return m_dataBranchVarNames;}
+    map< string, string> const &GetMCBranchVarNames() const { return m_MCBranchVarNames;}
 
     void SetInversionMethod( unsigned int inversionMethod ) { m_inversionMethod = inversionMethod; }
     void SetDebug( bool debug )               { m_debug = debug; };
@@ -98,7 +98,6 @@ namespace TemplateMethod {
     void SetIndepDistorded( unsigned long indepDistorded ) { m_indepDistorded = indepDistorded; }
     void SetIndepTemplates( unsigned long indepTemplates ) { m_indepTemplates = indepTemplates; }
     void SetBootstrap( unsigned long bootstrap ) {m_bootstrap = bootstrap;}
-    void SetDoWeight( bool doWeight ) { m_doWeight = doWeight; };
 
     /**\brief Save the content into a file
        \param outFile output TFile
@@ -132,6 +131,7 @@ namespace TemplateMethod {
     void PrintVector( vector<double> vect );
     int Symmetrize( vector<double> &outVector );
     int SymmetrizedSim( vector<double> &outVector );
+    void TestBranches( const vector<string> &inVect, const vector<string> constraint, const bool isData );
 
     /**\brief Define the mode of the run
 
@@ -260,8 +260,9 @@ namespace TemplateMethod {
     unsigned long m_indepTemplates;
     unsigned int m_inversionMethod;
     unsigned long m_bootstrap;
-    bool m_doWeight;
-    map<string,string> m_branchVarNames;
+
+    map<string,string> m_dataBranchVarNames;
+    map<string,string> m_MCBranchVarNames;
     vector< string > m_dataBranchWeightNames;
     vector< string > m_MCBranchWeightNames;
   };

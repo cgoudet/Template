@@ -58,12 +58,12 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
 {
   //Setup the setting attribute
   Configure( configFile );
-  FillBranchesToLink();
+
 
   for ( unsigned int iType = 0; iType < 2; iType++ ) {
     if ( !iType && !dataFileNames.size() ) continue;
     if ( iType && !MCFileNames.size() ) continue;
-    
+    FillBranchesToLink( !iType );    
     vector<string> &fileNames = iType ? MCFileNames : dataFileNames;
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
 
@@ -347,7 +347,7 @@ int TemplateMethod::Template::ExtractFactors() {
   vector<double> sigmaSimEta = m_setting.GetSigmaSimEta();
   vector<double> sigmaSimPt  = m_setting.GetSigmaSimPt();
 
-  string xVar = m_setting.GetBranchVarNames().at( "ETA_CALO_1" );
+  string xVar = m_setting.GetMCBranchVarNames().at( "ETA_CALO_1" );
   ReplaceString( "_1" )( xVar );
   bool isChi2Done = false;
   for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
@@ -433,7 +433,7 @@ int TemplateMethod::Template::ExtractFactors() {
       
       m_vectHist[iVar][histMeasBin]->GetXaxis()->SetTitle( xVar.c_str() );
       string yTitle = ( iVar ? "C" : "#alpha");
-      if ( is2Var ) yTitle = ReplaceString("_2")( m_setting.GetBranchVarNames().at( "ETA_CALO_2" ) );
+      if ( is2Var ) yTitle = ReplaceString("_2")( m_setting.GetMCBranchVarNames().at( "ETA_CALO_2" ) );
       m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( yTitle.c_str() );
 
       resultMatrix.Print();
@@ -471,7 +471,8 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   unsigned int nFiles = ( isData ) ? m_dataFileNames.size() : m_MCFileNames.size();
   unsigned long int counterEntry = 0;
 
-  const map<string, string> &mapBranchNames = m_setting.GetBranchVarNames();
+  const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+  FillBranchesToLink( isData );
 
   cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
   cout << "nFiles : " << nFiles << endl;
@@ -510,14 +511,14 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
 
       unsigned int i_eta = 0, j_eta = 0;
       if ( m_setting.GetMode() == "1VAR" ) {    
-	int foundBin = FindBin( i_eta, j_eta );
+	int foundBin = FindBin( i_eta, j_eta, 0, mapBranchNames );
 	if ( !foundBin ) m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData,  weight );
       }
       else {
-	if ( FindBin(  i_eta, j_eta ) || FindBin( i_eta, j_eta ) ) continue;
-	FindBin( i_eta, j_eta );
+	if ( FindBin( i_eta, j_eta, 0, mapBranchNames ) || FindBin( i_eta, j_eta, 1, mapBranchNames ) ) continue;
+	FindBin( i_eta, j_eta, 0, mapBranchNames );
 	m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData, weight/2. );
-	FindBin( i_eta, j_eta );
+	FindBin( i_eta, j_eta, 1, mapBranchNames );
 	m_chiMatrix[i_eta][j_eta]->FillDistrib( mass, isData, weight/2. );
       }
       counterEntry++;
@@ -590,6 +591,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   m_setting.SetDataName( dataTree->GetName() );
   dataTree->SetDirectory(0);
   int counterEvent=0;
+  const map<string,string> &mapBranchNames = m_setting.GetMCBranchVarNames();
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
     TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
@@ -599,17 +601,18 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
       MCTree->GetEntry( iEvent );
 
       unsigned int i_eta = 0, j_eta = 0;
-      if ( FindBin( i_eta, j_eta ) ) continue;
-      if ( m_setting.GetMode() == "2VAR" && FindBin( i_eta, j_eta, 1 ) ) continue;
+      if ( FindBin( i_eta, j_eta, 0, mapBranchNames ) ) continue;
+      if ( m_setting.GetMode() == "2VAR" && FindBin( i_eta, j_eta, 1, mapBranchNames ) ) continue;
 
       double factor1=1, factor2=1;
       for ( unsigned int iSwap = 0; iSwap < (m_setting.GetMode()=="2VAR" ? 2 : 1); iSwap++ ) {
-	FindBin( i_eta, j_eta, iSwap );
+	FindBin( i_eta, j_eta, iSwap, mapBranchNames );
 	factor1 *= ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
 	factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-      RescaleMapVar( factor1, factor2 );
+      
+      RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
       dataTree->Fill();
       
       ++counterEvent;
@@ -646,8 +649,8 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
 
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
   unsigned int histInputBin = SearchVectorBin( string("inputScale"), m_histNames );   
-  const string var1Name = m_setting.GetBranchVarNames().at( "ETA_CALO_1" );;
-  const string var2Name = m_setting.GetMode() != "1VAR" ? m_setting.GetBranchVarNames().at( "ETA_CALO_2" ) : "";
+  const string var1Name = m_setting.GetMCBranchVarNames().at( "ETA_CALO_1" );;
+  const string var2Name = m_setting.GetMode() != "1VAR" ? m_setting.GetMCBranchVarNames().at( "ETA_CALO_2" ) : "";
   //Prepare a latex file to store plots
   fstream latex;
   TString dumName;
@@ -667,7 +670,7 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   dumName.ReplaceAll("_", "\\_");
   latex << "Variable1 : " << dumName << " \\newline" << endl;
   if ( m_setting.GetMode() != "1VAR" )  {
-    dumName = m_setting.GetBranchVarNames().at( "ETA_CALO_2" );
+    dumName = m_setting.GetMCBranchVarNames().at( "ETA_CALO_2" );
     dumName.ReplaceAll("_", "\\_");
     latex << "Variable2 : " << dumName << endl;
   }
@@ -791,19 +794,18 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
 //#################################################=
-int TemplateMethod::Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl ) {
+ int TemplateMethod::Template::FindBin( unsigned int &i_eta, unsigned int &j_eta, const bool swapEl, const map<string,string> &mapBranchNames ) {
   vector< double > etaBins = m_setting.GetEtaBins();
   vector< double > ptBins = m_setting.GetPtBins();
-  map<string, string> mapBranchNames = m_setting.GetBranchVarNames();
 
   i_eta = 0;
   j_eta = 0;
 
   string varName =  "ETA_CALO_" + to_string( 1 + (m_setting.GetMode() == "2VAR" && swapEl));
-  double eta1 = m_mapBranches.GetDouble( mapBranchNames[varName]);
+  double eta1 = m_mapBranches.GetDouble( mapBranchNames.at(varName));
 
   varName = ( m_setting.GetMode() == "2VAR" ) ? "PT_" + to_string( 1 + swapEl) : "ETA_CALO_2";
-  double eta2 = m_mapBranches.GetDouble( mapBranchNames[varName] );
+  double eta2 = m_mapBranches.GetDouble( mapBranchNames.at(varName) );
 
   if ( m_setting.GetDoSymBin() ) {
     eta1 = fabs(eta1);
@@ -851,11 +853,8 @@ string TemplateMethod::Template::GetColorTabular( double inputVal, double measVa
 }
 
 //######################################################
-void TemplateMethod::Template::RescaleMapVar( double factor1, double factor2 ) {
-  const map< string, string > &mapVarNames = m_setting.GetBranchVarNames();
-  string branchName = mapVarNames.at( "MASS" );
-  m_mapBranches.SetVal( branchName, m_mapBranches.GetDouble(branchName)*sqrt(factor2*factor1) );
-  
+void TemplateMethod::Template::RescaleMapVar( double factor1, double factor2, const string &key ) {
+  m_mapBranches.SetVal( key, m_mapBranches.GetDouble(key)*sqrt(factor2*factor1) );
 }
 //######################################################
 int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
@@ -863,12 +862,13 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
   cout<< "Template :: ApplyCorrection"<<endl;
 
   if ( !correctionAlpha && !correctionSigma ){ cout<<"return: no correction possible"<<endl;return 0;}
-  const map<string, string> &mapBranchNames = m_setting.GetBranchVarNames();
+
 
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {
 
     if (  iCorrection && !correctionSigma ) continue;
     if ( !iCorrection && !correctionAlpha ) continue;
+    const map<string, string> &mapBranchNames = iCorrection ? m_setting.GetMCBranchVarNames() : m_setting.GetDataBranchVarNames();
     cout << "correcting : " << iCorrection << endl;
     //correctionAlpha is applied on the data
 
@@ -900,7 +900,7 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 	  factors[i] = 1 + m_rand.Gaus() - scale;
 	}
 	
-	RescaleMapVar( factors.front(), factors.back() );	
+	RescaleMapVar( factors.front(), factors.back(), mapBranchNames.at("MASS") );	
 	
 	dumTree->Fill();
       }
@@ -987,18 +987,14 @@ double TemplateMethod::Template::GetWeight( bool isData ) {
   return weight;
 }
 //==============================
-void TemplateMethod::Template::FillBranchesToLink() {
+void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   m_branchesToLink.clear();
-  const map<string, string> &mapBranchNames = m_setting.GetBranchVarNames();
+  const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
   for ( auto it=mapBranchNames.begin(); it!=mapBranchNames.end(); ++it )
     m_branchesToLink.push_back( it->second );
 
-  const vector<string> dataWeight = m_setting.GetDataBranchWeightNames();
-  for ( auto it=dataWeight.begin(); it!=dataWeight.end(); ++it )
-    m_branchesToLink.push_back( *it );
-
-  const vector<string> MCWeight = m_setting.GetMCBranchWeightNames();
-  for ( auto it=MCWeight.begin(); it!=MCWeight.end(); ++it )
+  const vector<string> weightNames = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
+  for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
 
 }

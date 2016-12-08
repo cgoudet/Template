@@ -1,7 +1,7 @@
 import os
 import sys
 
-isAntinea=1
+isAntinea=0
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
@@ -74,6 +74,10 @@ FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
 
 FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
+
+
+FILESETS['photonsAllSyst_h013']=['/sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD_h013_Full/ntuple/*.root']
+
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
@@ -205,8 +209,8 @@ def CreateConfig( configName, inOptions = [] ) :
     options['ZMassMax'] = 100
     options['ZMassNBins'] = 20
     options['mode'] = "1VAR"
-    options['var1'] = "ETA_CALO"
-    options['var2'] = ""
+#    options['var1'] = "ETA_CALO"
+#    options['var2'] = ""
     options['doScale'] = 1
     options['alphaMin']=-0.10
     options['alphaMax']=0.10
@@ -229,29 +233,32 @@ def CreateConfig( configName, inOptions = [] ) :
     options['nUseEl']=1
     options['nUseEvent']=0
     options['nEventCut']=10
-    options['thresholdMass']=70
+    options['thresholdMass']=0
     options['indepDistorded']=0
     options['indepTemplates']=0
     options['inversionMethod']=11
     options['bootstrap']=0
-    options['doPileup']=1
-    options['doWeight']=1
+#    options['doWeight']=1
     options['etaBins']=defaultBinning['ETA68']
     options['ptBins']=''
     options['applySelection']=0
-    options['branchVarNames']={}
-    options['branchVarNames']['ETA_CALO_1']='eta_calo_1'
-    options['branchVarNames']['ETA_CALO_2']='eta_calo_2' 
-    options['branchVarNames']['PHI_1']='phi_1' 
-    options['branchVarNames']['PHI_2']='phi_2' 
-    options['branchVarNames']['ETA_TRK_1']='eta_1'
-    options['branchVarNames']['ETA_TRK_2']='eta_2'
-    options['branchVarNames']['PT_1']='pt_1'
-    options['branchVarNames']['PT_2']='pt_2'
-    options['branchVarNames']['MASS']='m12'
-    options['branchVarNames']['WEIGHT']='m12'
+    options['dataBranchVarNames']={}
+    options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'
+    options['dataBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
+    # options['branchVarNames']['PT_1']='pt_1'
+    # options['branchVarNames']['PT_2']='pt_2'
+    options['dataBranchVarNames']['MASS']='m12'
+    options['dataBranchVarNames']['WEIGHT']='weight'
     options['dataBranchWeightName']='weight'
     options['MCBranchWeightName']='weight'
+
+    options['MCBranchVarNames']={}
+    options['MCBranchVarNames']['ETA_CALO_1']='eta_calo_1'
+    options['MCBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
+    # options['branchVarNames']['PT_1']='pt_1'
+    # options['branchVarNames']['PT_2']='pt_2'
+    options['MCBranchVarNames']['MASS']='m12'
+    options['MCBranchVarNames']['WEIGHT']='weight'
 
 
     for inOpt in inOptions :
@@ -259,7 +266,7 @@ def CreateConfig( configName, inOptions = [] ) :
         optValue= inOpt[inOpt.find('=')+1:]
 
         if optKey in options :
-            if optKey == 'branchVarNames' :
+            if optKey in ['dataBranchVarNames', 'MCBranchVarNames' ]  :
                 optValue = optValue.split( ' ' )
                 options[optKey][optValue[0]] = optValue[1]
                 pass
@@ -270,7 +277,26 @@ def CreateConfig( configName, inOptions = [] ) :
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
-            if iLabel == 'branchVarNames' : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
+            if 'BranchVarNames' in iLabel : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
             else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         
     return
+
+#==================================
+def LaunchNPScale( inputs ) :
+    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/NPNames.txt' )
+    commonOptions = [ 'thresholdMass=0', 'ZMassMin=105', 'ZMassMax=160', 'ZMassNBins=55', 
+                      'doSemaring=1', 'doScale=1', 'fitMethod=2', 'etaBins=105 160' ]
+
+    mandatoryVariables = [ 'ETA_CALO_1', 'ETA_CALO_2', 'MASS' ]
+    
+    for NP in NPFile :
+        NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
+        if NP=='' : continue
+        isUp = '1up' in NP
+        options = commonOptions
+        nomOptions = [ ( 'data' if isUp else 'MC') + 'BranchVarNames=' + var + ' ' + NP + '_m_yy' for var in mandatoryVariables ]
+        fluctOptions = [ ('data'if not isUp else 'MC') + 'BranchVarNames=' +var + ' m_yy' for var in mandatoryVariables ]
+        options+=nomOptions+fluctOptions
+        inputs.append( [ NP+'.root', 'photonsAllSyst_h013', 'photonsAllSyst_h013', options, 0 ] )
+        return

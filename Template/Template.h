@@ -178,11 +178,11 @@ namespace TemplateMethod {
 
 
   private :
-    void FillBranchesToLink();
+    void FillBranchesToLink( bool isData );
 
     /**\brief Change the electrons pt and Z mass with scales
      */
-    void RescaleMapVar( double factor1, double factor2 );
+    void RescaleMapVar( double factor1, double factor2, const std::string &key );
 
     /**\brief Properly delete 2D vectors of pointers to ChiMatrix
      */
@@ -224,7 +224,7 @@ namespace TemplateMethod {
 
        Bin numbers of the configuration are put into i_eta and j_eta.
     */
-    int FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl=0 );
+    int FindBin( unsigned int &i_eta, unsigned int &j_eta, const bool swapEl, const std::map<std::string,std::string> &mapBranchNames );
 
     /**\brief Fill a ZMass distributions
        \param isData Tell wich role has the input tree

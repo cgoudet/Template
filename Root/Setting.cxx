@@ -28,7 +28,7 @@ TemplateMethod::Setting::Setting() : m_mode("1VAR"), m_ZMassMin(80), m_ZMassMax(
 				     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
 				     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
 				     m_optimizeRanges( 5 ), m_symBin(0), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(10), m_thresholdMass( 70 ),
-				     m_indepDistorded( 0 ), m_indepTemplates( 0 ), m_inversionMethod(0), m_bootstrap( 0 ), m_doWeight( true )
+				     m_indepDistorded( 0 ), m_indepTemplates( 0 ), m_inversionMethod(0), m_bootstrap( 0 )
 {
   m_etaBins.clear();
   m_ptBins.clear();
@@ -43,11 +43,33 @@ void TemplateMethod::Setting::SetConstVarFit( string constVarFit ) {
 
 
 //############METHODS
+void TemplateMethod::Setting:: TestBranches( const vector<string> &inVect, const vector<string> constraint, const bool isData ) {
+  map< string, bool > mapDefinedVar;
+  for ( auto &vBranch : constraint ) mapDefinedVar[vBranch]=false;
+
+  for ( auto &branchVarName : inVect ) {
+    vector< string > dumVect;
+    ParseVector( branchVarName, dumVect );
+    if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
+    if ( isData ) m_dataBranchVarNames[dumVect[0]] = dumVect[1];
+    else m_MCBranchVarNames[dumVect[0]] = dumVect[1];
+    vector<string>::const_iterator pos = find(constraint.begin(), constraint.end(), dumVect[0] );
+    if ( pos != constraint.end() ) mapDefinedVar[*pos]=true;
+  }
+
+  for ( auto &vDefined : mapDefinedVar ) {
+    if ( vDefined.second ) continue;
+    throw runtime_error( "TemplateMethod::Setting::Configure : " + vDefined.first + " needed and not linked to any branch" );
+  }
+  
+}
+
+//===================================================================
 void TemplateMethod::Setting::Configure( const string &configFile ) {
   if ( m_debug )  cout << "Setting : Configure( " << configFile << " )" << endl;
   string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, dataBranchWeightName, MCBranchWeightName;
   int debug, doSmearing, doScale,  symBin;
-  vector< string > branchVarNames;
+  vector< string > dataBranchVarNames, MCBranchVarNames;
 
   po::options_description configOptions("configOptions");
   configOptions.add_options()
@@ -84,9 +106,9 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
     ( "indepTemplates", po::value<unsigned long>(&m_indepTemplates), "" )
     ( "inversionMethod", po::value<unsigned int>(&m_inversionMethod), "" )
     ( "bootstrap", po::value<unsigned long>( &m_bootstrap ), "" )
-    ( "doWeight", po::value<bool>( &m_doWeight ), "" )
     ( "applySelection", po::value<unsigned int>( &m_applySelection ), "" )
-    ( "branchVarNames", po::value< vector< string > >( &branchVarNames )->multitoken(), "" )
+    ( "dataBranchVarNames", po::value< vector< string > >( &dataBranchVarNames )->multitoken(), "" )
+    ( "MCBranchVarNames", po::value< vector< string > >( &MCBranchVarNames )->multitoken(), "" )
     ( "dataBranchWeightName", po::value< string >( &dataBranchWeightName ), "" )
     ( "MCBranchWeightName", po::value< string >( &MCBranchWeightName ), "" )
     ;
@@ -129,22 +151,8 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
     minVarNames.push_back( "PT_2" );
   }
 
-  map< string, bool > mapDefinedVar;
-  for ( auto vBranch : minVarNames ) mapDefinedVar[vBranch]=false;
-
-   for ( auto branchVarName : branchVarNames ) {
-    vector< string > dumVect;
-    ParseVector( branchVarName, dumVect );
-    if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
-    m_branchVarNames[dumVect[0]] = dumVect[1];
-    unsigned int bin=SearchVectorBin( dumVect[0], minVarNames );
-    if ( bin != minVarNames.size() ) mapDefinedVar[minVarNames[bin]]=true;
-  }
-
-  for ( auto vDefined : mapDefinedVar ) {
-    if ( vDefined.second ) continue;
-    throw runtime_error( "TemplateMethod::Setting::Configure : " + vDefined.first + " needed and not linked to any branch" );
-  }
+  TestBranches( dataBranchVarNames, minVarNames, 1 );
+  TestBranches( MCBranchVarNames, minVarNames, 0 );
 
   ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
   ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
@@ -407,7 +415,6 @@ void TemplateMethod::Setting::Print() {
   cout << "m_indepDistorded : " << m_indepDistorded << endl;
   cout << "m_indepTemplates : " << m_indepTemplates << endl;
   cout << "m_bootstrap : " << m_bootstrap << endl;
-  cout << "m_doWeight : " << m_doWeight << endl;
   cout << "m_etaBins : ";
   PrintVector( m_etaBins );
   cout << "m_sigmaSimEta : ";

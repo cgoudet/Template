@@ -8,7 +8,7 @@ from SideFunction import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=0
+switch=2
 
 
 if switch==0 :
@@ -73,7 +73,10 @@ elif switch == 1 :
 		['Closure_nUsel10.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'nUseEl=10', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ]
 		]	
 
-spsPath="/sps/atlas/a/aguerguichon/Calibration/PreRec/"
+elif switch == 2 :
+	LaunchNPScale( configFiles )
+
+spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
 
 for confFile in range( 0, len( configFiles ) ) :
