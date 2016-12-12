@@ -86,7 +86,6 @@ def FillDatasetContainer( container, datasets ) :
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
-    print "Mode: "+str(mode)
 #mode 
     # 0 MeasureScale
     # 1 2Steps
@@ -305,6 +304,8 @@ def FillVars( NPName, isInclusive=0 ) :
     options.append( ( 'data' if isUp else 'MC' ) + 'BranchWeightName='+ NPName + '_weight' )
 
     options.append( 'etaBins=' + ( '0.5 20' if isInclusive else ' '.join( [ str(x+0.5) for x in range(0, 14) ] ) ) )
+    # print(options)
+    # print('\n')
     return options
 #==================================
 def LaunchNPScale( inputs, isInclusive=1 ) :
@@ -320,8 +321,8 @@ def LaunchNPScale( inputs, isInclusive=1 ) :
         isUp = '1up' in NP
         options = commonOptions
         options += FillVars( NP, isInclusive )
-        inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options, 0 ] )
-        return
+        inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options[:], 0 ] )
+
 
 #==================================
 def IsolateInfo( inFile, configLine, measScaleLine, datasetsLine ) :

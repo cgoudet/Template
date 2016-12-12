@@ -74,8 +74,9 @@ elif switch == 1 :
 		]	
 
 elif switch == 2 :
-	LaunchNPScale( configFiles )
-
+	LaunchNPScale( configFiles, 0 )
+	print(configFiles)
+#	LaunchNPScale( configFiles )
 spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
 
@@ -86,7 +87,7 @@ for confFile in range( 0, len( configFiles ) ) :
 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
 	else : mode = 3
 	launcherFile=CreateLauncher( configFiles[confFile], mode, " --makePlot " )
-	if switch==2 : launchers.append( launcherFile ); print( launcherFile)
+	if switch==2 : launchers.append( launcherFile ); 
 	else :	
 		logFile = StripString( configFiles[confFile][0] )
 		
