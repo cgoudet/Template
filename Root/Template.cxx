@@ -312,10 +312,9 @@ int TemplateMethod::Template::CreateTemplate() {
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
-
       m_chiMatrix[i_eta][j_eta]->CreateTemplates();
     }}  
-
+  
   if ( m_setting.GetDebug() ) cout << "Template::CreateTemplate Done" << endl;
   return 0;
 }
@@ -327,10 +326,7 @@ int TemplateMethod::Template::ExtractFactors() {
   if ( ! m_chiMatrix.size() ) { 
     //Create templates if they haven't been loaded
     if ( m_MCFileNames.size() ) CreateTemplate();
-    else {
-      cout << "Error : No MCNtuple and no loaded templates" << endl;
-      return 1;
-    }
+    else throw runtime_error( "TemplateMethod::Template::ExtractFactors : No MCNtuple and no loaded templates" );
   }
 
   if ( !m_setting.GetNEventData() ) FillDistrib( true );

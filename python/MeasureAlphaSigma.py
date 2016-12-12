@@ -75,7 +75,6 @@ elif switch == 1 :
 
 elif switch == 2 :
 	LaunchNPScale( configFiles, 0 )
-	print(configFiles)
 #	LaunchNPScale( configFiles )
 spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
@@ -107,4 +106,4 @@ if len( launchers ) :
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile
 	
-	os.system( launchLine )
+	#os.system( launchLine )
