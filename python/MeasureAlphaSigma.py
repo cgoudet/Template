@@ -79,16 +79,31 @@ elif switch == 2 :
 spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
 
+
+launchers=[]
+
 for confFile in range( 0, len( configFiles ) ) :
 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
 	else : mode = 3
-	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
-	
-	logFile = StripString( configFiles[confFile][0] )
+	launcherFile=CreateLauncher( configFiles[confFile], mode, " --makePlot " )
+	if switch==2 : launchers.append( launcherFile ); print( launcherFile)
+	else :	
+		logFile = StripString( configFiles[confFile][0] )
+		
+		launchLine='~/sub1.sh ' + logFile + ' ' \
+		    + spsPath + logPath + logFile + '.log ' \
+		    + spsPath + logPath + logFile + '.err ' \
+		    + launcherFile
+		
+		os.system( launchLine )
+
+if len( launchers ) : 
+	launcherFile = MergeLaunchers( launchers )
+	logFile = StripString( launcherFile  )
 	
 	launchLine='~/sub1.sh ' + logFile + ' ' \
 	    + spsPath + logPath + logFile + '.log ' \
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile
-
+	
 	os.system( launchLine )

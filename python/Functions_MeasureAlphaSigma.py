@@ -184,8 +184,9 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
-    batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
-    batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
+#    batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
+#    batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
+ #   batch.write( 'ls\n' )
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()
@@ -219,7 +220,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaMin']=0
     options['sigmaMax']=0.15
     options['sigmaNBins']=20
-    options['debug']=1
+    options['debug']=0
     options['constVarFit']="SIGMA"
     options['selection']=''
     options['doSimulation']=0
@@ -248,7 +249,7 @@ def CreateConfig( configName, inOptions = [] ) :
     # options['branchVarNames']['PT_1']='pt_1'
     # options['branchVarNames']['PT_2']='pt_2'
     options['dataBranchVarNames']['MASS']='m12'
-    options['dataBranchVarNames']['WEIGHT']='weight'
+
     options['dataBranchWeightName']='weight'
     options['MCBranchWeightName']='weight'
 
@@ -258,7 +259,6 @@ def CreateConfig( configName, inOptions = [] ) :
     # options['branchVarNames']['PT_1']='pt_1'
     # options['branchVarNames']['PT_2']='pt_2'
     options['MCBranchVarNames']['MASS']='m12'
-    options['MCBranchVarNames']['WEIGHT']='weight'
 
 
     for inOpt in inOptions :
@@ -282,21 +282,70 @@ def CreateConfig( configName, inOptions = [] ) :
         
     return
 
-#==================================
-def LaunchNPScale( inputs ) :
-    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/NPNames.txt' )
-    commonOptions = [ 'thresholdMass=0', 'ZMassMin=105', 'ZMassMax=160', 'ZMassNBins=55', 
-                      'doSemaring=1', 'doScale=1', 'fitMethod=2', 'etaBins=105 160' ]
-
-    mandatoryVariables = [ 'ETA_CALO_1', 'ETA_CALO_2', 'MASS' ]
+#======================================================================
+def VarPerKeyword( keyword ) :
+    if 'ETA_CALO' in keyword : return 'catCoup'
+    elif 'PT' in keyword : return 'weight'
+    else : return 'm_yy'
+#======================================================================
+def FillVars( NPName, isInclusive=0 ) :
+    options = []
+    prefix = 'BranchVarNames='
+    isUp = '1up' in NPName
+    mandatoryVariables = [ 'ETA_CALO_1', 'ETA_CALO_2', 'MASS', 'PT_1', 'PT_2' ]
     
+    fluctOptions = [ prefix + var + ' ' + NPName + '_' + VarPerKeyword( var ) for var in mandatoryVariables ]
+    nomOptions = [ prefix + var + ' ' + VarPerKeyword( var ) for var in mandatoryVariables ]
+
+    fluctOptions = [ ( 'data' if isUp else 'MC' ) + x for x in fluctOptions ]
+    nomOptions = [ ( 'data' if not isUp else 'MC' ) + x for x in nomOptions ]
+
+    options += fluctOptions + nomOptions
+
+    options.append( ( 'data' if isUp else 'MC' ) + 'BranchWeightName='+ NPName + '_weight' )
+
+    options.append( 'etaBins=' + ( '0.5 20' if isInclusive else ' '.join( [ str(x+0.5) for x in range(0, 14) ] ) ) )
+    return options
+#==================================
+def LaunchNPScale( inputs, isInclusive=1 ) :
+    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/NPNames.txt' )
+    commonOptions = [ 'thresholdMass=0', 'ZMassMin=120', 'ZMassMax=130', 'ZMassNBins=20',
+                      'alphaMin=-0.01', 'alphaMax=0.01', 'mode=2VAR', 'ptBins=-98 100',
+                      'doSemaring=1', 'doScale=1', 'fitMethod=2' ]
+
+    suffix = ( '_inc' if isInclusive else '' ) + '.root'
     for NP in NPFile :
         NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
         if NP=='' : continue
         isUp = '1up' in NP
         options = commonOptions
-        nomOptions = [ ( 'data' if isUp else 'MC') + 'BranchVarNames=' + var + ' ' + NP + '_m_yy' for var in mandatoryVariables ]
-        fluctOptions = [ ('data'if not isUp else 'MC') + 'BranchVarNames=' +var + ' m_yy' for var in mandatoryVariables ]
-        options+=nomOptions+fluctOptions
-        inputs.append( [ NP+'.root', 'photonsAllSyst_h013', 'photonsAllSyst_h013', options, 0 ] )
+        options += FillVars( NP, isInclusive )
+        inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options, 0 ] )
         return
+
+#==================================
+def IsolateInfo( inFile, configLine, measScaleLine, datasetsLine ) :
+    text = open( inFile )
+    for line in text : 
+        if '/Config/' in line : configLine.append( line )
+        elif 'MeasureScale --' in line : measScaleLine.append( line )
+        elif '/Inputs/' in line : datasetsLine.append( line )
+    
+#==================================
+def MergeLaunchers( launchers ) :
+    outLauncherContent=BatchHeader( '/afs/in2p3.fr/home/'+user+'/Calibration', 'Template', 'MeasureScale' )
+    datasetsLine=[]
+    measScaleLine=[]
+    configLine=[]
+    for iFile in launchers : IsolateInfo( iFile, configLine, measScaleLine, datasetsLine )
+
+    outLauncherContent += ''.join( set(configLine) ) + ''.join( set(datasetsLine) ) + ''.join( set(measScaleLine))
+
+    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + 'Plots/. \n'
+    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + 'Results/. \n'
+
+    launcherName = '/sps/atlas/c/cgoudet/Calibration/PreRec/Batch/allNP.sh'
+    outLauncher = open( launcherName , 'w' )
+    outLauncher.write( outLauncherContent )
+    outLauncher.close()
+    return launcherName

@@ -68,7 +68,6 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
     vector<string> &treeNames = iType ? MCTreeNames : dataTreeNames;
 
     for ( unsigned int iFile = 0; iFile < fileNames.size(); iFile++ ) {
-      cout << "iFile : " << fileNames[iFile] << endl;
       TFile *dumFile = new TFile( fileNames[iFile].c_str() );
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
@@ -79,7 +78,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
 	cout << treeNames[iFile] << " in " << fileNames[iFile] << " does not exist. Exiting" << endl;
 	exit( 0 );
       }
-      cout << "tree checked : " << iType << endl;
+
       delete dumTree; dumTree=0;
       dumFile->Close("R");
       delete dumFile; dumFile=0;
@@ -474,12 +473,12 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
   FillBranchesToLink( isData );
 
-  cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
-  cout << "nFiles : " << nFiles << endl;
+  // cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
+  // cout << "nFiles : " << nFiles << endl;
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     TFile *inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
-    cout << "openFile : " << inputFile->GetName() << endl;
+    //    cout << "openFile : " << inputFile->GetName() << endl;
 
     TTree *inputTree = static_cast<TTree*>(inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() ));
     
@@ -492,11 +491,11 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
  
-    cout << "inputTree : " << inputTree->GetName() << endl;
+    //    cout << "inputTree : " << inputTree->GetName() << endl;
     inputTree->SetDirectory( 0 );
-    if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
+    //    if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
-    cout << "branches linked" << endl;
+    //    cout << "branches linked" << endl;
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
@@ -505,6 +504,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
+
       //##############################
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
@@ -822,9 +822,15 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
     while ( j_eta <  etaBins.size()-1 && eta2 >  etaBins[j_eta+1] )  j_eta++;  
   }
   else {
+    if ( eta2 < -10 ) {
+      cout << "eta2 : " << eta2 << endl;
+      cout << "ptBins : " << ptBins[0] << endl;
+      cout << "passSell : " << ( eta2<=ptBins[0] ) << endl;
+    }
     if ( eta2 <= ptBins[0] || eta2 > ptBins.back() ) return 3;
     while ( j_eta <  ptBins.size() && eta2 >  ptBins[j_eta+1] )  j_eta++;  
   }
+
 
   return 0;
 }

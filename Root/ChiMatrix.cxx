@@ -17,10 +17,12 @@
 #include <stdexcept>
 #include <functional>
 
+using std::string;
+using std::to_string;
 using std::logic_error;
 using std::runtime_error;
+using std::invalid_argument;
 using std::stringstream;
-using std::string;
 using std::cout;
 using std::endl;
 using std::fstream;
@@ -340,11 +342,12 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 	  const double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 
 	  const double newMass =  mass*factor1Alpha*factor1Sigma;
-	  // if ( iEvent<100 ) {
-	  // cout << "mass : " << mass << endl;
-	  // cout << "factoralpha : " << factor1Alpha << endl;
-	  // cout << "factor1Sigma : " << factor1Sigma << endl;
-	  // cout << "newMass :  " << newMass << endl;
+	  // if ( weight <0 ) {
+	  //   cout << "mass : " << mass << endl;
+	  //   cout << "factoralpha : " << factor1Alpha << endl;
+	  //   cout << "factor1Sigma : " << factor1Sigma << endl;
+	  //   cout << "newMass :  " << newMass << endl;
+	  //   cout << "weight : " << weight << endl;
 	  // }
 	  if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;
 
@@ -676,7 +679,18 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 	return ;
       }
 
+      // for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
+      // 	for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
+      // 	  vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
+      // 	  string outName = "/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter);
+      // 	  vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
+      // 	  options.push_back( "latex=alpha : " + to_string( m_scaleValues[i_alpha] ));	  
+      // 	  options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
+      // 	  DrawPlot( drawVect, outName, options );
+      // 	}}
+
       FillChiMatrix();
+
       TH1D* histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )
 	: m_chiMatrix->ProjectionX( m_name.c_str() + TString("histAlpha"), 1, 1, "o" );
 
@@ -710,6 +724,7 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
       cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
       if ( histScale ) delete histScale; histScale=0;
     }
+    cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
     if ( m_setting->GetDebug() ) cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
   }
 
@@ -753,14 +768,11 @@ unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
 
 //==========================
 double TemplateMethod::ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedStat ) {
-
+  //  cout << "ComputeChi2" << endl;
   if ( MCHist->GetNbinsX() != m_dataZMass->GetNbinsX() 
        || MCHist->GetXaxis()->GetXmin() != m_dataZMass->GetXaxis()->GetXmin() 
        || MCHist->GetXaxis()->GetXmax() != m_dataZMass->GetXaxis()->GetXmax() ) 
-    {
-      cout << "Histograms for chi do not match" << endl;
-      exit(1);
-    }
+    throw invalid_argument("Histograms for chi do not match");
   
   double chi2 = 0;
   for ( int i = 0; i < MCHist->GetNbinsX(); i++ ) {
@@ -768,9 +780,11 @@ double TemplateMethod::ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedSta
     double valdif =  MCHist->GetBinContent( i+1 ) - m_dataZMass->GetBinContent( i+1 );
     double sigmaMC = MCHist->GetBinError( i+1 ) * ((isIncreasedStat) ? sqrt( m_setting->GetNUseEl() ) : 1 );
     double sigma2 =  sigmaMC*sigmaMC + m_dataZMass->GetBinError( i+1 ) * m_dataZMass->GetBinError( i+1 );
+    // cout << "hists : " << MCHist->GetBinContent( i+1 ) << " " <<  m_dataZMass->GetBinContent( i+1 ) << " " << sigmaMC << " " << m_dataZMass->GetBinError( i+1 ) << endl;
+    // cout << "chi2 : " << valdif << " " << sqrt(sigma2) << endl;
     chi2 += valdif * valdif / sigma2; 
   }
-    
+  //  cout << "totChi2 : " << chi2 << endl;
   return chi2;
 }
 
@@ -780,6 +794,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*(x-[2])*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   //TF1 *cubicFit = new TF1( "cubicFit", "[0] + (x-[2])*(x-[2])/[1]/[1]+[3]*TMath::Abs((x-[2]))*(x-[2])*(x-[2])/[1]/[1]/[1]",-1, 1);
   cubicFit->SetParLimits( 3, 0, 1e5 );
+
   TF1 *fittingFunction = 0;
   TFitResultPtr fitResult = 0;
 
@@ -799,20 +814,14 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
-  case 2 :
+  case 2 : case 4 :
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
   case 3 :
     fittingFunction = quadraticFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
-    cout << "minBin : " << minBin;
     minBin = hist->GetMinimumBin();
-    cout << " " << minBin << endl;
-    break;
-  case 4 :
-    fittingFunction = cubicFit;
-    minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
   default : //Fit alpha optimization
     fittingFunction = quadraticFit;
@@ -850,6 +859,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
 	cout << "fit failed 3 times : try with another range" << endl;
 	fittingFunction->SetParameter( 0, hist->GetMinimum() );
 	fittingFunction->SetParameter( 2, hist->GetBinCenter( hist->GetMinimumBin()));
+	fittingFunction->SetParLimits( 2, hist->GetXaxis()->GetBinLowEdge( minBin ), hist->GetXaxis()->GetBinUpEdge( maxBin ) );
 	sigma = ( hist->GetBinCenter( maxBin ) - hist->GetMinimum() ) / sqrt(hist->GetBinContent( maxBin ) - hist->GetBinContent( hist->GetMinimumBin() ) );
 	fittingFunction->SetParameter( 1, sigma );
 	//	if ( fitResult.Get() ) delete fitResult.Get();
@@ -942,10 +952,10 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
     else limit = x.back() + width;
     return false;
   }
-  else if ( distance( y.begin()+minBin, binUp ) == 1 ) {
-    limit=x[indexBinUp];
-    return false;
-  }
+  // else if ( distance( y.begin()+minBin, binUp ) == 1 && limit != x[indexBinUp] ) {
+  //   limit=x[indexBinUp];
+  //   return false;
+  // }
   else if ( *(binUp-1) >dChi2Min ) {
     limit = x[indexBinUp-1];
     return true;
