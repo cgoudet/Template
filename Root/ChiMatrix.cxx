@@ -699,19 +699,19 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
       vector<double>::iterator minY = min_element( histValues.begin(), histValues.end() );
       if ( chiMin > *minY || chiMin==-99 ) chiMin = *minY;
       for_each( histValues.begin(), histValues.end(), [chiMin]( double &val ) { val-=chiMin; } );
-      copy( histValues.begin(), histValues.end(), ostream_iterator<double>(cout,"\t" ));
-      cout << endl;
+      // copy( histValues.begin(), histValues.end(), ostream_iterator<double>(cout,"\t" ));
+      // cout << endl;
 
       vector<double> &scales = iScale ? m_sigmaValues : m_scaleValues;
-      copy( scales.begin(), scales.end(), ostream_iterator<double>(cout,"\t" ));
-      cout << endl;
+      // copy( scales.begin(), scales.end(), ostream_iterator<double>(cout,"\t" ));
+      // cout << endl;
 
       isUp = OptimizeVect( histValues, 
 				scales,
 				allowedRangeMax, 
 				widthUp,
 				rangeMax );
-      cout << "isUp : " << isUp << " " << allowedRangeMax << " " << widthUp << " " << rangeMax << " " << widthUp << endl;
+      //      cout << "isUp : " << isUp << " " << allowedRangeMax << " " << widthUp << " " << rangeMax << " " << widthUp << endl;
 
       reverse( histValues.begin(), histValues.end() );
       reverse( scales.begin(), scales.end() );
@@ -721,7 +721,7 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 				  widthDown,
 				  rangeMin );
 
-      cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
+      //      cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
       if ( histScale ) delete histScale; histScale=0;
     }
     cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
@@ -761,7 +761,7 @@ unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
     if ( mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
   }
 
-  cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;
+  //  cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;
   return m_quality.to_ulong();
 }
 

@@ -156,7 +156,7 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
 
   ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
   ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
-
+  cout << "Setting::Configure : Testing" << endl;
   //=====
   if ( !m_nUseEl ) m_nUseEl=1;
   if ( m_mode != "1VAR" && m_mode != "2VAR" ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad mode input. Choose 1VAR or 2VAR." );

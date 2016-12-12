@@ -30,7 +30,7 @@ using namespace std::chrono;
 using namespace ChrisLib;
 using namespace TemplateMethod;
 using std::runtime_error;
-
+using std::cerr;
 //########## CONSTRUCTOR
 TemplateMethod::Template::Template() : m_setting(), m_rand(), m_mapBranches(), m_name()
 {
@@ -72,9 +72,9 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
-      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "_selectionTree" );
-      TTree *dumTree = (TTree*) dumFile->Get( treeNames[iFile].c_str() );
-      if ( !dumTree ) throw runtime_error( treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
+      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree" );
+      TTree *dumTree = static_cast<TTree*>(dumFile->Get(treeNames[iFile].c_str()));
+      if ( !dumTree ) throw runtime_error( "TempalteMethod::Template::Configure : "+treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
 
       delete dumTree; dumTree=0;
       dumFile->Close("R");
@@ -118,18 +118,11 @@ int  TemplateMethod::Template::Load( const string &inFileName, bool justTemplate
   if ( m_setting.GetDebug() ) cout << "Template::LoadTemplate"<< endl;
 
   TFile *inFile = TFile::Open( inFileName.c_str() );
-  if ( !inFile ) {
-    cout << "Input file not found : " << inFileName << endl; 
-    return 1;
-  }
-  //  inFile->ls();
+  if ( !inFile ) throw runtime_error( "TemplateMethod::Template::Load : Input file not found : " + inFileName );
   
   //Get the proper information from saved configuration file
   int err = m_setting.Load( inFileName, justTemplate );
-  if ( err ) {
-    cout << "Setting Loading failed : " << err  << endl;
-    return 2;
-  }
+  if ( err ) throw runtime_error( "TemplateMethod::Template::Load : Setting Loading failed : " + err );
 
   //Decide which variables to extract and how to cut the detector
   vector<double> etaBins = m_setting.GetEtaBins();
@@ -325,7 +318,7 @@ int TemplateMethod::Template::ExtractFactors() {
     if ( m_MCFileNames.size() ) CreateTemplate();
     else throw runtime_error( "TemplateMethod::Template::ExtractFactors : No MCNtuple and no loaded templates" );
   }
-
+  
   if ( !m_setting.GetNEventData() ) FillDistrib( true );
   //Checks that all factors matrices are empty
   
@@ -348,8 +341,8 @@ int TemplateMethod::Template::ExtractFactors() {
     if ( !isMeasuredVar ) continue;
     
     //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
-    int eta1Max = (int) etaBins.size() -1;
-    int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : (int) ptBins.size()-1; 
+    int eta1Max = static_cast<int>(etaBins.size() -1);
+    int eta2Max = ( m_setting.GetMode() == "1VAR" ) ? eta1Max : static_cast<int>(ptBins.size())-1; 
     
     unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames );
     unsigned int matCombinBin = SearchVectorBin( string("combin"), m_matrixNames );
@@ -364,7 +357,7 @@ int TemplateMethod::Template::ExtractFactors() {
   	m_vectHist[iVar][histBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] );
   	m_vectHist[iVar][histBin]->GetXaxis()->SetTitle( xVar.c_str() );
   	m_vectHist[iVar][histBin]->GetYaxis()->SetTitle( iVar ? "C" : "#alpha" );
-  	for ( int i = 0; i < (int) alphaSimEta.size(); i++ ) {
+  	for ( int i = 0; i < static_cast<int>(alphaSimEta.size()); i++ ) {
   	  m_vectHist[iVar][histBin]->SetBinContent( i+1, iVar ? sigmaSimEta[i] : alphaSimEta[i] );
   	  m_vectHist[iVar][histBin]->SetBinError( i+1, 0);
   	}
@@ -376,7 +369,6 @@ int TemplateMethod::Template::ExtractFactors() {
     
 
     //Create combined factor matrices
-    cout << "eta1Max : " << eta1Max << " " << eta2Max << endl;
     for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
     
@@ -386,8 +378,6 @@ int TemplateMethod::Template::ExtractFactors() {
 
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
   	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
-	cout << "alpah : " << i_eta << " " << j_eta << " " << m_chiMatrix[i_eta][j_eta]->GetQuality() << " " << m_chiMatrix[i_eta][j_eta]->GetScale(iVar) << endl;
-	cout << "sizes : " << m_vectMatrix[iVar][matCombinBin]->GetNrows() << " " << m_vectMatrix[iVar][matCombinBin]->GetNcols() << endl;
   	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
   	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
   	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
@@ -414,9 +404,12 @@ int TemplateMethod::Template::ExtractFactors() {
       TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
       TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
       unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
-      if ( is2Var ) inversionMethod = iVar ? 14 : 13;
-      InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
-
+      if ( is2Var ) {
+	inversionMethod = iVar ? 14 : 13;
+	resultMatrix = *m_vectMatrix[iVar][matCombinBin];
+	resultErrMatrix = *m_vectMatrix[iVar][matErrBin];
+      }
+      else InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
       string histName = CreateHistMatName( m_histNames[histMeasBin], iVar );
       if ( is2Var ) m_vectHist[iVar][histMeasBin] = new TH2D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0], ptBins.size()-1, (double*) &ptBins[0] ); 
       else m_vectHist[iVar][histMeasBin] = new TH1D( histName.c_str(), histName.c_str(), etaBins.size()-1, (double*) &etaBins[0] ); 

@@ -76,8 +76,7 @@ FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
 
 
-FILESETS['photonsAllSyst_h013']=['/sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD_h013_Full/ntuple/*.root']
-
+FILESETS['photonsAllSyst_h013']= sub.check_output( ['ls /sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD_h013_Full/ntuple/*.root' ],  shell=1, stderr=sub.STDOUT ).split()
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )

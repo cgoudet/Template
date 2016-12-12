@@ -17,7 +17,7 @@ if switch==0 :
 		#['DataOff_13TeV_25nsTest.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['debug=1'] ], #nominal
 
 		##Tests
-		 ['DataOff_13TeV_1615.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
+		['DataOff_13TeV_1615.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
 		# ['DataOff_13TeV_2016.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['etaBins=ETA68'] ], #nominal
 
 # 		Mesure des scales
@@ -75,7 +75,7 @@ elif switch == 1 :
 
 elif switch == 2 :
 	LaunchNPScale( configFiles, 0 )
-#	LaunchNPScale( configFiles )
+	LaunchNPScale( configFiles )
 spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
 
