@@ -74,10 +74,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
       if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "_selectionTree" );
       TTree *dumTree = (TTree*) dumFile->Get( treeNames[iFile].c_str() );
-      if ( !dumTree ) {
-	cout << treeNames[iFile] << " in " << fileNames[iFile] << " does not exist. Exiting" << endl;
-	exit( 0 );
-      }
+      if ( !dumTree ) throw runtime_error( treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
 
       delete dumTree; dumTree=0;
       dumFile->Close("R");
@@ -348,10 +345,7 @@ int TemplateMethod::Template::ExtractFactors() {
   for ( unsigned int iVar = 0; iVar < m_vectHist.size(); iVar++ ) {
     
     bool isMeasuredVar =  (m_setting.GetDoScale() && !iVar) || (iVar && m_setting.GetDoSmearing() );
-
-
     if ( !isMeasuredVar ) continue;
-
     
     //In case of pt bins, there will be one more bin than ptBins, hence i_eta must reach ptBins.size()
     int eta1Max = (int) etaBins.size() -1;
@@ -382,6 +376,7 @@ int TemplateMethod::Template::ExtractFactors() {
     
 
     //Create combined factor matrices
+    cout << "eta1Max : " << eta1Max << " " << eta2Max << endl;
     for ( unsigned int iMat = 0; iMat < m_matrixNames.size(); iMat++ ) 
       m_vectMatrix[iVar][iMat] = new TMatrixD( eta1Max, eta2Max  );
     
@@ -392,6 +387,7 @@ int TemplateMethod::Template::ExtractFactors() {
       for ( int j_eta = 0; j_eta < eta2Max; j_eta++ ) {
   	if ( !isChi2Done )  m_chiMatrix[i_eta][j_eta]->FitChi2();
 	cout << "alpah : " << i_eta << " " << j_eta << " " << m_chiMatrix[i_eta][j_eta]->GetQuality() << " " << m_chiMatrix[i_eta][j_eta]->GetScale(iVar) << endl;
+	cout << "sizes : " << m_vectMatrix[iVar][matCombinBin]->GetNrows() << " " << m_vectMatrix[iVar][matCombinBin]->GetNcols() << endl;
   	// Make symmetric matrices of combined alpha and their values in order to apply the formulae
   	(*m_vectMatrix[iVar][matCombinBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetScale(iVar) : 0;
   	(*m_vectMatrix[iVar][matErrBin])(i_eta, j_eta) =  ( !m_chiMatrix[i_eta][j_eta]->GetQuality() ) ? m_chiMatrix[i_eta][j_eta]->GetErrScale(iVar) : 100;
@@ -418,7 +414,6 @@ int TemplateMethod::Template::ExtractFactors() {
       TMatrixD resultMatrix( eta1Max, is2Var ? eta2Max : 1 );
       TMatrixD resultErrMatrix( eta1Max, is2Var ? eta2Max : 1  );
       unsigned int inversionMethod = is2Var ? 13 : (iVar ? m_setting.GetInversionMethod() : 0);
-      cout << "inversion method : " << inversionMethod << endl;
       if ( is2Var ) inversionMethod = iVar ? 14 : 13;
       InvertMatrix( *m_vectMatrix[iVar][matCombinBin], *m_vectMatrix[iVar][matErrBin], resultMatrix, resultErrMatrix, inversionMethod );
 
@@ -431,8 +426,6 @@ int TemplateMethod::Template::ExtractFactors() {
       if ( is2Var ) yTitle = ReplaceString("_2")( m_setting.GetMCBranchVarNames().at( "ETA_CALO_2" ) );
       m_vectHist[iVar][histMeasBin]->GetYaxis()->SetTitle( yTitle.c_str() );
 
-      resultMatrix.Print();
-      resultErrMatrix.Print();
       for ( int iBin = 0; iBin < resultMatrix.GetNrows(); iBin++ ) {
   	for ( int jBin = 0; jBin < resultMatrix.GetNcols(); jBin++ ) {
   	  if ( is2Var ) {

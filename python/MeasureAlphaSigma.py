@@ -106,4 +106,4 @@ if len( launchers ) :
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile
 	
-	#os.system( launchLine )
+	os.system( launchLine )
