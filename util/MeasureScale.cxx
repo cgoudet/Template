@@ -51,11 +51,6 @@ int main( int argc, char* argv[] ) {
   
   if (vm.count("help")) {cout << desc; return 0;}
   //########################################
-
-  int err = 0;
-  //Simplifies execution line for Christophe
-
-
   TFile *correctAlphaFile=0, *correctSigmaFile=0;
   TH1D *correctAlphaHist=0, *correctSigmaHist=0;
   if ( vm.count( "correctAlphaFileName" ) && vm.count( "correctAlphaHistName" ) )  {
@@ -68,52 +63,19 @@ int main( int argc, char* argv[] ) {
   }
 
   Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, MCFileNames, MCTreeNames  );
-
-  if (outFileName == 0) { cout<<"Error: cannot open file\n"<<endl;}
-  else cout<<"file: "<<outFileName<<" ok\n";
-
   Temp.ApplyCorrection( correctAlphaHist, correctSigmaHist );
-
-
-
-  cout<< "After ApplyCorrection"<<endl;
   
   if ( vm.count("createDistorded") ) { 
     Temp.CreateDistordedTree( distordedTreeName );
     return 0;
   }
 
-  cout<<"After createDistorded"<<endl;
-
-
-  if ( vm.count("loadFull") ) {
-    err = Temp.Load( loadFullFileName, false);
-    if ( err ) {
-      cout << "Template::LoadFull failed : " << err << endl;
-      return 3;
-    }}
-
-  if ( vm.count( "loadTemplate" ) ) {
-    err = Temp.Load( loadTemplateFileName, true );
-    if ( err ) {
-      cout << "Template::LoadTemplate failed : " << err << endl;
-      return 4;
-    }} 
+  if ( vm.count("loadFull") ) Temp.Load( loadFullFileName, false);
+  if ( vm.count( "loadTemplate" ) ) Temp.Load( loadTemplateFileName, true );
+  if ( !vm.count( "noExtraction" ) ) Temp.ExtractFactors();
   
+  Temp.Save(1);
   
-  if ( !vm.count( "noExtraction" ) )  {
-    err = Temp.ExtractFactors();
-    if ( err ) {
-      cout << "Template::Extraction failed : " << err << endl;
-      return 1;  
-   }
-    err = Temp.Save(1);
-    if ( err ) {
-       cout << "Template::Save failed : " << err << endl;
-       return 2;
-     }
-  }
-
   if ( vm.count("makePlot") )  {
     //string title = outFileName.substr( 0, outFileName.find_last_of( "." ) ) + ".tex";
     string path= "";///sps/atlas/a/aguerguichon/Calibration/ScaleResults/";

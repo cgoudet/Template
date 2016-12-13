@@ -26,7 +26,7 @@ TemplateMethod::Setting::Setting() : m_mode("1VAR"), m_ZMassMin(80), m_ZMassMax(
 				     m_doScale(false), m_alphaMin(-0.01), m_alphaMax(0.01), m_alphaNBins(20),
 				     m_doSmearing(false), m_sigmaMin(0), m_sigmaMax(0.1), m_sigmaNBins(20),
 				     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
-				     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
+				     m_debug( false ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
 				     m_optimizeRanges( 5 ), m_symBin(0), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(10), m_thresholdMass( 70 ),
 				     m_indepDistorded( 0 ), m_indepTemplates( 0 ), m_inversionMethod(0), m_bootstrap( 0 )
 {
@@ -180,15 +180,8 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
 int TemplateMethod::Setting::Save( TFile *outFile ) {
   if ( m_debug ) cout << "Setting::Save" << endl;
 
-  if ( !outFile ) {
-    cout << "TFile is a 0 pointer" << endl;
-    return 1;}
-
-  if ( !outFile->IsOpen() ) {
-    cout << "TFile is not opened" << endl;
-    return 2;
-  }
-
+  if ( !outFile ) throw runtime_error( "Setting::Save : TFile is a 0 pointer.");
+  if ( !outFile->IsOpen() ) throw runtime_error( "Setting::Save : TFile is not opened." );
   outFile->cd();
 
   TTree *infoTree = new TTree( "InfoTree", "InfoTree" );

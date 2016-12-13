@@ -234,7 +234,7 @@ int TemplateMethod::Template::Save( bool saveChiMatrix ) {
     for ( unsigned int iMat = 0; iMat < m_vectMatrix[0].size(); iMat++ ) 
       if ( m_vectMatrix[iVar][iMat] ) m_vectMatrix[iVar][iMat]->Write( CreateHistMatName( m_matrixNames[iMat], iVar ).c_str(), TObject::kOverwrite );
   }
-  cout << "saving setting" << endl;
+
   //Save Setting variables
   //  err = m_setting.Save( outFile );
   // if ( err ) {
@@ -442,7 +442,7 @@ int TemplateMethod::Template::ExtractFactors() {
 //###########################################==
 void TemplateMethod::Template::FillDistrib( bool isData ) {
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib " << isData << endl;
-  clock_t tStart = clock(); 
+  //  clock_t tStart = clock(); 
 
   if ( isData ) m_setting.SetNEventData(0);
   else m_setting.SetNEventMC(0);
@@ -482,7 +482,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
-      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
+      //      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
@@ -509,8 +509,8 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
     inputFile->Close("R");
     delete inputFile; inputFile = 0;
   }//end loop iFile
-  cout << "entries filled (" << isData << ") : " << counterEntry << endl;
-  cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
+  // cout << "entries filled (" << isData << ") : " << counterEntry << endl;
+  // cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
 
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib Done" << endl;
   
@@ -627,7 +627,7 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
     else latexFileName = "latex.tex";
   }
 
-  cout << "latexFile : " << path << "/" << latexFileName << endl;
+  if ( m_setting.GetDebug() ) cout << "latexFile : " << path << "/" << latexFileName << endl;
 
   unsigned int histMeasBin = SearchVectorBin( string("measScale"), m_histNames );
   unsigned int histInputBin = SearchVectorBin( string("inputScale"), m_histNames );   
@@ -731,7 +731,6 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
     }
   }//end iBin
 
-  cout << "tabular done" << endl;
   latex << "\\hline";
   latex << "\\end{tabular}" << endl;    
   latex << "\\end{center}" << endl;
@@ -767,11 +766,9 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   latex.close();
 
   string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
-  cout << "latexFileName : " << commandLine << endl;
   system( commandLine.c_str() );
   system( commandLine.c_str() );
   system( commandLine.c_str() );
-  //  system( "rm ChiMatrix_*" );
 
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;
 }
@@ -846,18 +843,16 @@ void TemplateMethod::Template::RescaleMapVar( double factor1, double factor2, co
 }
 //######################################################
 int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *correctionSigma ) {
+  if ( m_setting.GetDebug() )cout<< "Template::ApplyCorrection"<<endl;
 
-  cout<< "Template :: ApplyCorrection"<<endl;
-
-  if ( !correctionAlpha && !correctionSigma ){ cout<<"return: no correction possible"<<endl;return 0;}
-
+  if ( !correctionAlpha && !correctionSigma ) return 0;
 
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {
 
     if (  iCorrection && !correctionSigma ) continue;
     if ( !iCorrection && !correctionAlpha ) continue;
     const map<string, string> &mapBranchNames = iCorrection ? m_setting.GetMCBranchVarNames() : m_setting.GetDataBranchVarNames();
-    cout << "correcting : " << iCorrection << endl;
+    if ( m_setting.GetDebug() )cout << "correcting : " << iCorrection << endl;
     //correctionAlpha is applied on the data
 
     TTree *dumTree = 0;

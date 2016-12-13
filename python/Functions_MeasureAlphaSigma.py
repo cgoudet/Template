@@ -147,7 +147,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     batch.write( '\n'.join( [ 'cp ' + confName + ' .' for confName in configName  ] ) + '\n' )
 #copy the data files to the server and prepare the command line
 
-    batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
+    batch.write( '\n'.join( [ 'cp ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
     dataLine = ' '.join( [ ' --dataFileName ' + StripString( name, 1, 0 ) for name in dataFiles ] ) 
     MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) for name in MCFiles ] )
@@ -316,6 +316,7 @@ def LaunchNPScale( inputs, isInclusive=1 ) :
     suffix = ( '_inc' if isInclusive else '' ) + '.root'
     for NP in NPFile :
         NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
+        if NP != 'EG_SCALE_MATCRYO__ETABIN10__1up' : continue
         if NP=='' : continue
         isUp = '1up' in NP
         options = commonOptions
