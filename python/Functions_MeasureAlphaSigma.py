@@ -76,7 +76,10 @@ FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
 
 
+
 FILESETS['photonsAllSyst_h013']= sub.check_output( ['ls /sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD_h013_Full/ntuple/*.root' ],  shell=1, stderr=sub.STDOUT ).split()
+FILESETS['photonsAllSyst_h013_simpl']= sub.check_output( ['ls /sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD1NP/ntuple/*.root' ],  shell=1, stderr=sub.STDOUT ).split()
+
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
@@ -307,21 +310,24 @@ def FillVars( NPName, isInclusive=0 ) :
     # print('\n')
     return options
 #==================================
-def LaunchNPScale( inputs, isInclusive=1 ) :
-    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/NPNames.txt' )
+def LaunchNPScale( inputs, isInclusive=1, model="Full" ) :
+    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/' + ('NPNames.txt' if model=='Full' else 'ReadMxAOD_h013_all.boost') )
     commonOptions = [ 'thresholdMass=0', 'ZMassMin=120', 'ZMassMax=130', 'ZMassNBins=20',
                       'alphaMin=-0.01', 'alphaMax=0.01', 'mode=2VAR', 'ptBins=-98 100',
-                      'doSemaring=1', 'doScale=1', 'fitMethod=2' ]
+                      'doSemaring=1', 'doScale=1', 'fitMethod=2', 'optimizeRanges=7' ]
 
     suffix = ( '_inc' if isInclusive else '' ) + '.root'
     for NP in NPFile :
+
+        if '#' in NP : continue
         NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
-        if NP != 'EG_SCALE_MATCRYO__ETABIN10__1up' : continue
-        if NP=='' : continue
+        if NP in ['', 'HGamEventInfo' ] : continue
         isUp = '1up' in NP
-        options = commonOptions
-        options += FillVars( NP, isInclusive )
+        options = commonOptions[:]
+        varOptions = FillVars( NP, isInclusive )
+        options +=varOptions
         inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options[:], 0 ] )
+
 
 
 #==================================
@@ -342,7 +348,7 @@ def MergeLaunchers( launchers ) :
 
     outLauncherContent += ''.join( set(configLine) ) + ''.join( set(datasetsLine) ) + ''.join( set(measScaleLine))
 
-    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + 'Plots/. \n'
+    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + 'Plots/. \n'
     outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + 'Results/. \n'
 
     launcherName = '/sps/atlas/c/cgoudet/Calibration/PreRec/Batch/allNP.sh'

@@ -47,12 +47,12 @@ void TemplateMethod::Setting:: TestBranches( const vector<string> &inVect, const
   map< string, bool > mapDefinedVar;
   for ( auto &vBranch : constraint ) mapDefinedVar[vBranch]=false;
 
+  map<string,string> &mapFill = isData ? m_dataBranchVarNames : m_MCBranchVarNames;
   for ( auto &branchVarName : inVect ) {
     vector< string > dumVect;
     ParseVector( branchVarName, dumVect );
     if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
-    if ( isData ) m_dataBranchVarNames[dumVect[0]] = dumVect[1];
-    else m_MCBranchVarNames[dumVect[0]] = dumVect[1];
+    mapFill[dumVect[0]] = dumVect[1];
     vector<string>::const_iterator pos = find(constraint.begin(), constraint.end(), dumVect[0] );
     if ( pos != constraint.end() ) mapDefinedVar[*pos]=true;
   }
@@ -156,7 +156,6 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
 
   ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
   ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
-  cout << "Setting::Configure : Testing" << endl;
   //=====
   if ( !m_nUseEl ) m_nUseEl=1;
   if ( m_mode != "1VAR" && m_mode != "2VAR" ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad mode input. Choose 1VAR or 2VAR." );

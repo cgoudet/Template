@@ -74,8 +74,8 @@ elif switch == 1 :
 		]	
 
 elif switch == 2 :
-	LaunchNPScale( configFiles, 0 )
-	LaunchNPScale( configFiles )
+	LaunchNPScale( configFiles, 0, 'all' )
+	LaunchNPScale( configFiles, 1, 'all' )
 spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
 

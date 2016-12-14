@@ -61,7 +61,6 @@ TemplateMethod::ChiMatrix::ChiMatrix( string name ) : ChiMatrix()
   m_eta1Bin = atoi( name.substr( 0, name.find_first_of("_") ).c_str() );
   m_eta2Bin = atoi( name.substr(name.find_last_of("_") +1).c_str() );
   m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );
-  if ( m_name == "ChiMatrix_0_0" ) cout << "rand seed : " << m_rand.GetSeed() << endl;
 }
 
 TemplateMethod::ChiMatrix::ChiMatrix( string name, Setting &configSetting ) : ChiMatrix( name )

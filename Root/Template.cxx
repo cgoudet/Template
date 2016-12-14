@@ -3,6 +3,7 @@
 #include "PlotFunctions/SideFunctions.h"
 #include "PlotFunctions/SideFunctionsTpp.h"
 
+#include <iterator>
 #include <iostream>
 #include "TLorentzVector.h"
 #include <fstream>
@@ -31,6 +32,7 @@ using namespace ChrisLib;
 using namespace TemplateMethod;
 using std::runtime_error;
 using std::cerr;
+
 //########## CONSTRUCTOR
 TemplateMethod::Template::Template() : m_setting(), m_rand(), m_mapBranches(), m_name()
 {
@@ -453,15 +455,16 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   unsigned long int counterEntry = 0;
 
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+  cout << "BranchNames : " << endl;
+  for ( auto vBranch : mapBranchNames ) cout << vBranch.first << " " << vBranch.second << endl;
   FillBranchesToLink( isData );
+  cout << "isData : " << isData << endl;
+  std::copy( m_branchesToLink.begin(), m_branchesToLink.end(), std::ostream_iterator<string>(cout, "\n"));
+  cout << "endBranchesToLink" << endl;
 
-  // cout << "indepTemplate : " << m_setting.GetIndepTemplates() << endl;
-  // cout << "nFiles : " << nFiles << endl;
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     TFile *inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
-    //    cout << "openFile : " << inputFile->GetName() << endl;
-
     TTree *inputTree = static_cast<TTree*>(inputFile->Get( ( isData ) ? m_dataTreeNames[iFile].c_str() : m_MCTreeNames[iFile].c_str() ));
     
     if ( m_setting.GetSelection() != "" && 
@@ -473,18 +476,23 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
  
-    //    cout << "inputTree : " << inputTree->GetName() << endl;
     inputTree->SetDirectory( 0 );
-    //    if ( m_setting.GetDebug() ) cout << "inputTree " << inputTree->GetName() << " : " << inputTree << " " << inputTree->GetEntries()<< endl;
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
-    //    cout << "branches linked" << endl;
+    std::list<string> keys;
+    m_mapBranches.GetKeys( keys );
+    cout << "keys : " << endl;
+    std::copy( keys.begin(), keys.end(), std::ostream_iterator<string>(cout, "\n" ));
+    cout << "end keys" << endl;
+
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
       //      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       
+      cout << "testing mass : " << mapBranchNames.at( "MASS" ) << endl;
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
+      cout << "end mass" << endl;
       weight = GetWeight(isData);
 
       //##############################
@@ -979,5 +987,8 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   const vector<string> weightNames = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
+
+  m_branchesToLink.sort();
+  m_branchesToLink.erase( unique( m_branchesToLink.begin(), m_branchesToLink.end()), m_branchesToLink.end() );
 
 }
