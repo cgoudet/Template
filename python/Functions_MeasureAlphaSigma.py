@@ -13,12 +13,31 @@ PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
 
+
+
+FILESETS['MC_13TeV_Zee_2015c_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_2015c_Lkh1/'] 
+FILESETS['MC15c_13TeV_Zee_Lkh2']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh2/'] 
 FILESETS['MC15c_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1/'] 
-FILESETS['Data16_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/'] 
+FILESETS['MC15c_13TeV_Zee_Lkh1_IDSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1_IDSyst/'] 
+FILESETS['MC15c_13TeV_Zee_Lkh1_recoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1_recoSyst/'] 
+FILESETS['MC15c_13TeV_Zee_Lkh1_isoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1_isoSyst/']
+FILESETS['MC15c_13TeV_Zee_Lkh1_noIso']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1_doIso0/']  
+FILESETS['MC15c_13TeV_Zee_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_Lkh1_fBrem70/']  
 
-FILESETS['Data1615_13TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/', PREFIXDATASETS + 'Data15_13TeV_Zee_Lkh1/'] 
 
-FILESETS['Data16_13TeV_Zee_Lkh1']       =[ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/'] 
+FILESETS['Data1615_13TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/', PREFIXDATASETS + 'Data15_13TeV_Zee_Lkh1/']
+
+FILESETS['Data15_13TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data15_13TeV_Zee_Lkh1/']
+FILESETS['Data16_13TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1/']
+
+FILESETS['Data1615_13TeV_Zee_Lkh1_scaled'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_Lkh1_scaled/', PREFIXDATASETS + 'Data15_13TeV_Zee_Lkh1_scaled/'] 
+
+FILESETS['Data1615_13TeV_Zee_Lkh1_noIso'] = [ PREFIXDATASETS + 'Data1615_13TeV_Zee_Lkh1_doIso0/'] 
+
+FILESETS['Data1615_13TeV_Zee_Lkh1_fBrem70'] = [ PREFIXDATASETS + 'Data1615_13TeV_Zee_Lkh1_fBrem70/'] 
+
+
+FILESETS['Data1615_13TeV_Zee_Lkh2'] = [ PREFIXDATASETS + 'Data1615_13TeV_Zee_Lkh2/'] 
 
 
 #=======================Test
@@ -83,7 +102,7 @@ FILESETS['photonsAllSyst_h013_simpl']= sub.check_output( ['ls /sps/atlas/c/cgoud
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
-        else : container += listFiles( addSlash(dataset) + ( 'MC' if 'MC' in dataset else 'Data' ) + '*.root' )
+        else : container += listFiles( AddSlash(dataset) + ( 'MC' if 'MC' in dataset else 'Data' ) + '*.root' )
     
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
@@ -181,13 +200,11 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
 
 
-        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' \n')
+        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
-#    batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
-#    batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
- #   batch.write( 'ls\n' )
+
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()

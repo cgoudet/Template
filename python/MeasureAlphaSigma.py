@@ -13,6 +13,7 @@ switch=2
 
 if switch==0 :
         configFiles=[ 
+<<<<<<< HEAD
 	
 		#['DataOff_13TeV_25nsTest.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['debug=1'] ], #nominal
 
@@ -20,27 +21,33 @@ if switch==0 :
 		['DataOff_13TeV_1615.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
 		# ['DataOff_13TeV_2016.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['etaBins=ETA68'] ], #nominal
 
+=======
+			
+>>>>>>> master
 # 		Mesure des scales
- 	
- 		# ['DataOff_13TeV_syst.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['debug=1'] ],
-		# ['DataOff_13TeV_2Steps.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
- 		# ['DataOff_13TeV_dataScaled.root', 'Data16_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],
-		# #mesure avec electron tight
-		# ['DataOff_13TeV_ID.root', 'Data16_13TeV_Zee_Lkh2', 'MC15c_13TeV_Zee_Lkh2', [] ],
-		# #bkg
-		# #['DataOff_13TeV_25ns_EW.root', 'Data16_13TeV_Zee_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', [] ],
-		# #mesure avec masse sueil Off0
-		# ['DataOff_13TeV_Threshold.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['thresholdMass=75']],
-		# #mesure avec fenetre masse plus faible
-		# ['DataOff_13TeV_Window.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5'] ],
-		# #mesure avec fBrem
- 		# ['DataOff_13TeV_fBrem.root', 'Data16_13TeV_Zee_Lkh1_fBrem70', 'MC15c_13TeV_Zee_Lkh1_fBrem70', [ ]],
-		# #Mesure avec ID
-		# ['DataOff_13TeV_IDEff.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_IDSyst', []],
-		# ['DataOff_13TeV_recoEff.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_recoSyst', []],
-		# ['DataOff_13TeV_isoEff.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_isoSyst', []],
+		['DataOff_13TeV_16.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
+		['DataOff_13TeV_15.root', 'Data15_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
+		['DataOff_13TeV_1615.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
 
-		# ['DataOff_13TeV_noIso.root', 'Data16_13TeV_Zee_Lkh1_noIso', 'MC15c_13TeV_Zee_Lkh1_noIso', []],
+ 		# ['DataOff_13TeV_syst.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['debug=1'] ],
+		# #['DataOff_13TeV_2Steps.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
+ 		# ['DataOff_13TeV_dataScaled.root', 'Data1615_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],
+		# #mesure avec electron tight
+		# ['DataOff_13TeV_ID.root', 'Data1615_13TeV_Zee_Lkh2', 'MC15c_13TeV_Zee_Lkh2', [] ],
+		# #bkg
+		# #['DataOff_13TeV_25ns_EW.root', 'Data1615_13TeV_Zee_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', [] ],
+		# #mesure avec masse sueil Off0
+		# ['DataOff_13TeV_Threshold.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['thresholdMass=75']],
+		# #mesure avec fenetre masse plus faible
+		# ['DataOff_13TeV_Window.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5'] ],
+		# #mesure avec fBrem
+		# ['DataOff_13TeV_fBrem.root', 'Data1615_13TeV_Zee_Lkh1_fBrem70', 'MC15c_13TeV_Zee_Lkh1_fBrem70', [ ]],
+		# #Mesure avec ID
+		# ['DataOff_13TeV_IDEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_IDSyst', []],
+		# ['DataOff_13TeV_recoEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_recoSyst', []],
+		# ['DataOff_13TeV_isoEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_isoSyst', []],
+
+		# ['DataOff_13TeV_noIso.root', 'Data1615_13TeV_Zee_Lkh1_noIso', 'MC15c_13TeV_Zee_Lkh1_noIso', []],
 
 
 		##Syst matiere
