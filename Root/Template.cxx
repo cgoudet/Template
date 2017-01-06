@@ -455,12 +455,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   unsigned long int counterEntry = 0;
 
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
-  cout << "BranchNames : " << endl;
-  for ( auto vBranch : mapBranchNames ) cout << vBranch.first << " " << vBranch.second << endl;
   FillBranchesToLink( isData );
-  cout << "isData : " << isData << endl;
-  std::copy( m_branchesToLink.begin(), m_branchesToLink.end(), std::ostream_iterator<string>(cout, "\n"));
-  cout << "endBranchesToLink" << endl;
 
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
@@ -478,11 +473,6 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
  
     inputTree->SetDirectory( 0 );
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
-    std::list<string> keys;
-    m_mapBranches.GetKeys( keys );
-    cout << "keys : " << endl;
-    std::copy( keys.begin(), keys.end(), std::ostream_iterator<string>(cout, "\n" ));
-    cout << "end keys" << endl;
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
@@ -490,9 +480,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       inputTree->GetEntry( iEvent );
       //      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
       
-      cout << "testing mass : " << mapBranchNames.at( "MASS" ) << endl;
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
-      cout << "end mass" << endl;
       weight = GetWeight(isData);
 
       //##############################

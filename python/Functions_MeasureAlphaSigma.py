@@ -200,13 +200,13 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
 
 
-        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
+        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' \n')
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
 
     batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
+    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()
     return fileName
 
@@ -329,7 +329,7 @@ def FillVars( NPName, isInclusive=0 ) :
 #==================================
 def LaunchNPScale( inputs, isInclusive=1, model="Full" ) :
     NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/' + ('NPNames.txt' if model=='Full' else 'ReadMxAOD_h013_all.boost') )
-    commonOptions = [ 'thresholdMass=0', 'ZMassMin=120', 'ZMassMax=130', 'ZMassNBins=20',
+    commonOptions = [ 'thresholdMass=0', 'ZMassMin=122', 'ZMassMax=128', 'ZMassNBins=20',
                       'alphaMin=-0.01', 'alphaMax=0.01', 'mode=2VAR', 'ptBins=-98 100',
                       'doSemaring=1', 'doScale=1', 'fitMethod=2', 'optimizeRanges=7' ]
 
@@ -339,11 +339,13 @@ def LaunchNPScale( inputs, isInclusive=1, model="Full" ) :
         if '#' in NP : continue
         NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
         if NP in ['', 'HGamEventInfo' ] : continue
+        if 'ZSMEARING' not in NP : continue
         isUp = '1up' in NP
         options = commonOptions[:]
         varOptions = FillVars( NP, isInclusive )
         options +=varOptions
-        inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options[:], 0 ] )
+        if model =='Full' : inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options[:], 0 ] )
+        else :inputs.append( [ NP+suffix, 'photonsAllSyst_h013_simpl', 'photonsAllSyst_h013_simpl', options[:], 0 ] )
 
 
 
@@ -365,8 +367,12 @@ def MergeLaunchers( launchers ) :
 
     outLauncherContent += ''.join( set(configLine) ) + ''.join( set(datasetsLine) ) + ''.join( set(measScaleLine))
 
-    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + 'Plots/. \n'
-    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + 'Results/. \n'
+    outLauncherContent += 'for f in `ls *.tex | awk -F "." \'{print $1 }\'`; \ndo\n'
+    outLauncherContent += 'cp -v ${f}.pdf ' + PREFIXPATH + 'Plots/. \n'
+    outLauncherContent += 'cp -v ${f}.root ' + PREFIXPATH + 'Results/. \n'
+    outLauncherContent += 'done\n'
+
+#    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.root ' + PREFIXPATH + 'Results/. \n'
 
     launcherName = '/sps/atlas/c/cgoudet/Calibration/PreRec/Batch/allNP.sh'
     outLauncher = open( launcherName , 'w' )

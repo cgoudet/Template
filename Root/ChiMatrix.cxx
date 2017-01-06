@@ -646,6 +646,8 @@ void TemplateMethod::ChiMatrix::FillScaleValues( int nTemplates ) {
 void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::OptimizeRanges() " << m_name << endl;
 
+  bool debugOptimize=1;
+
   for ( unsigned int iScale = 0; iScale < 2; iScale++ ) {
     if ( (!m_setting->GetDoScale() && !iScale) || (!m_setting->GetDoSmearing() && iScale) ) continue;
     double &rangeMin = iScale ? m_sigmaMin : m_alphaMin;
@@ -678,17 +680,21 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 	return ;
       }
 
-      // for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
-      // 	for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
-      // 	  vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
-      // 	  string outName = "/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter);
-      // 	  vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
-      // 	  options.push_back( "latex=alpha : " + to_string( m_scaleValues[i_alpha] ));	  
-      // 	  options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
-      // 	  DrawPlot( drawVect, outName, options );
-      // 	}}
 
       FillChiMatrix();
+
+      if ( debugOptimize ) {
+	for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
+	  for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
+	    vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
+	    string outName = "/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter);
+	    vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
+	    options.push_back( string(TString::Format( "latex=alpha : %2.2f", m_scaleValues[i_alpha]*1e6 )));	  
+	    options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
+	    DrawPlot( drawVect, outName, options );
+	  }}
+      }
+
 
       TH1D* histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )
 	: m_chiMatrix->ProjectionX( m_name.c_str() + TString("histAlpha"), 1, 1, "o" );
@@ -698,19 +704,23 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
       vector<double>::iterator minY = min_element( histValues.begin(), histValues.end() );
       if ( chiMin > *minY || chiMin==-99 ) chiMin = *minY;
       for_each( histValues.begin(), histValues.end(), [chiMin]( double &val ) { val-=chiMin; } );
-      // copy( histValues.begin(), histValues.end(), ostream_iterator<double>(cout,"\t" ));
-      // cout << endl;
-
       vector<double> &scales = iScale ? m_sigmaValues : m_scaleValues;
-      // copy( scales.begin(), scales.end(), ostream_iterator<double>(cout,"\t" ));
-      // cout << endl;
+
 
       isUp = OptimizeVect( histValues, 
 				scales,
 				allowedRangeMax, 
 				widthUp,
 				rangeMax );
-      //      cout << "isUp : " << isUp << " " << allowedRangeMax << " " << widthUp << " " << rangeMax << " " << widthUp << endl;
+
+      if ( debugOptimize ) {
+	cout << "Optimize : step " << counter << endl;
+	copy( histValues.begin(), histValues.end(), ostream_iterator<double>(cout,"\t" ));
+	cout << endl;
+	copy( scales.begin(), scales.end(), ostream_iterator<double>(cout,"\t" ));
+	cout << endl;
+	cout << "isUp : " << isUp << " " << allowedRangeMax << " " << widthUp << " " << rangeMax << " " << widthUp << endl;
+      }
 
       reverse( histValues.begin(), histValues.end() );
       reverse( scales.begin(), scales.end() );
@@ -720,7 +730,7 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 				  widthDown,
 				  rangeMin );
 
-      //      cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
+      if ( debugOptimize ) cout << "isDown : " << isDown << " " << allowedRangeMin << " " << widthDown << " " << rangeMin << " " << widthDown << endl;      
       if ( histScale ) delete histScale; histScale=0;
     }
     //    cout << "range " << (iScale ? "Sigma" : "Alpha" ) << " : " << rangeMin << " " << rangeMax << endl;	 
@@ -951,10 +961,6 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
     else limit = x.back() + width;
     return false;
   }
-  // else if ( distance( y.begin()+minBin, binUp ) == 1 && limit != x[indexBinUp] ) {
-  //   limit=x[indexBinUp];
-  //   return false;
-  // }
   else if ( *(binUp-1) >dChi2Min ) {
     limit = x[indexBinUp-1];
     return true;
