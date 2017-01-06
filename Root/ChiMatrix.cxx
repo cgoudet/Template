@@ -654,7 +654,7 @@ void TemplateMethod::ChiMatrix::FillScaleValues( int nTemplates ) {
 void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
   if ( m_setting->GetDebug() ) cout << m_name << "::OptimizeRanges() " << m_name << endl;
 
-  bool debugOptimize=1;
+  bool debugOptimize=0;
 
   for ( unsigned int iScale = 0; iScale < 2; iScale++ ) {
     if ( (!m_setting->GetDoScale() && !iScale) || (!m_setting->GetDoSmearing() && iScale) ) continue;
