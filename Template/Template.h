@@ -82,7 +82,7 @@ namespace TemplateMethod {
 
        Examples of configuration files given in configFiles directory
     */
-    int Configure( const string &configFile );
+    void Configure( const string &configFile );
 
     /**\brief Compute alpha_ij and sigma_ij
        \return 0 OK
@@ -178,9 +178,11 @@ namespace TemplateMethod {
 
 
   private :
+    void FillBranchesToLink( bool isData );
+
     /**\brief Change the electrons pt and Z mass with scales
      */
-    void RescaleMapVar( double factor1, double factor2 );
+    void RescaleMapVar( double factor1, double factor2, const std::string &key );
 
     /**\brief Properly delete 2D vectors of pointers to ChiMatrix
      */
@@ -196,10 +198,6 @@ namespace TemplateMethod {
     */
     void CleanMatrixVect( int jVar = -1 );
 
-    /**\brief Look for TTree within a TFile
-       \param inFile root file to look into
-    */
-    string FindDefaultTree( TFile* inFile ); 
 
     /**\brief Get color to use for printing in latex file
        \param inputVal theoretical value
@@ -219,14 +217,14 @@ namespace TemplateMethod {
        \param objName name of the object we want to create
        \param iVar Tells if the object is created for alpha (iVar=0) or for C (iVar=1)
     */
-    string CreateHistMatName( string objName, unsigned int iVar );
+    static string CreateHistMatName( string objName, unsigned int iVar ) { return objName + ( iVar ? "_c" : "_alpha" ); }
 
     /**\brief Find the configuration to put an event into
        \return 0 OK
 
        Bin numbers of the configuration are put into i_eta and j_eta.
     */
-    int FindBin( unsigned int &i_eta, unsigned int &j_eta, bool swapEl=0 );
+    int FindBin( unsigned int &i_eta, unsigned int &j_eta, const bool swapEl, const std::map<std::string,std::string> &mapBranchNames );
 
     /**\brief Fill a ZMass distributions
        \param isData Tell wich role has the input tree
@@ -289,6 +287,7 @@ namespace TemplateMethod {
     stringstream m_sStream;
 
     double GetWeight( bool isData );
+    std::list<std::string> m_branchesToLink;
   };
 }
 //#########################################

@@ -8,12 +8,11 @@ from SideFunction import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=0
+switch=2
 
 
 if switch==0 :
         configFiles=[ 
-			
 # 		Mesure des scales
 		['DataOff_13TeV_16.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
 		['DataOff_13TeV_15.root', 'Data15_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
@@ -70,19 +69,37 @@ elif switch == 1 :
 		['Closure_nUsel10.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'nUseEl=10', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ]
 		]	
 
-spsPath="/sps/atlas/a/aguerguichon/Calibration/PreRec/"
+elif switch == 2 :
+	LaunchNPScale( configFiles, 0, 'Full' )
+	LaunchNPScale( configFiles, 1, 'Full' )
+spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
 logPath="Log/"
+
+
+launchers=[]
 
 for confFile in range( 0, len( configFiles ) ) :
 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
 	else : mode = 3
-	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
-	
-	logFile = StripString( configFiles[confFile][0] )
+	launcherFile=CreateLauncher( configFiles[confFile], mode, " --makePlot " )
+	if switch==2 : launchers.append( launcherFile ); 
+	else :	
+		logFile = StripString( configFiles[confFile][0] )
+		
+		launchLine='~/sub1.sh ' + logFile + ' ' \
+		    + spsPath + logPath + logFile + '.log ' \
+		    + spsPath + logPath + logFile + '.err ' \
+		    + launcherFile
+		
+		os.system( launchLine )
+
+if len( launchers ) : 
+	launcherFile = MergeLaunchers( launchers )
+	logFile = StripString( launcherFile  )
 	
 	launchLine='~/sub1.sh ' + logFile + ' ' \
 	    + spsPath + logPath + logFile + '.log ' \
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile
-
+	
 	os.system( launchLine )

@@ -11,22 +11,24 @@
 namespace po = boost::program_options;
 using std::ifstream;
 
+using std::swap;
 using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
 using std::stringstream;
 using std::runtime_error;
+using std::invalid_argument;
 using namespace ChrisLib;
 
 //######## CONSTRUCTORS
-TemplateMethod::Setting::Setting() : m_mode("1VAR"), m_var1( "eta" ), m_var2( "pt" ), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),
-		     m_doScale(false), m_alphaMin(-1e-2), m_alphaMax(1e-2), m_alphaNBins(10),
-		     m_doSmearing(false), m_sigmaMin(0), m_sigmaMax(0.1), m_sigmaNBins(10),
-		     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
-		     m_debug( true ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
-		     m_optimizeRanges( 10 ), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(500), m_thresholdMass( 70 ),
-		     m_indepDistorded( 0 ), m_indepTemplates( 0 ), m_inversionMethod(0), m_bootstrap( 0 ), m_doPileup( true ), m_doWeight( true )
+TemplateMethod::Setting::Setting() : m_mode("1VAR"), m_ZMassMin(80), m_ZMassMax(100), m_ZMassNBins(40),
+				     m_doScale(false), m_alphaMin(-0.01), m_alphaMax(0.01), m_alphaNBins(20),
+				     m_doSmearing(false), m_sigmaMin(0), m_sigmaMax(0.1), m_sigmaNBins(20),
+				     m_selection(""), m_applySelection(0), m_nEventMC(0), m_nEventData(0), m_nUseEvent(0),
+				     m_debug( false ), m_doSimulation( false ), m_MCName(""), m_dataName(""),
+				     m_optimizeRanges( 5 ), m_symBin(0), m_fitMethod( 3 ), m_nUseEl(1), m_nEventCut(10), m_thresholdMass( 70 ),
+				     m_indepDistorded( 0 ), m_indepTemplates( 0 ), m_inversionMethod(0), m_bootstrap( 0 )
 {
   m_etaBins.clear();
   m_ptBins.clear();
@@ -41,11 +43,33 @@ void TemplateMethod::Setting::SetConstVarFit( string constVarFit ) {
 
 
 //############METHODS
-int TemplateMethod::Setting::Configure( const string &configFile ) {
+void TemplateMethod::Setting:: TestBranches( const vector<string> &inVect, const vector<string> constraint, const bool isData ) {
+  map< string, bool > mapDefinedVar;
+  for ( auto &vBranch : constraint ) mapDefinedVar[vBranch]=false;
+
+  map<string,string> &mapFill = isData ? m_dataBranchVarNames : m_MCBranchVarNames;
+  for ( auto &branchVarName : inVect ) {
+    vector< string > dumVect;
+    ParseVector( branchVarName, dumVect );
+    if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
+    mapFill[dumVect[0]] = dumVect[1];
+    vector<string>::const_iterator pos = find(constraint.begin(), constraint.end(), dumVect[0] );
+    if ( pos != constraint.end() ) mapDefinedVar[*pos]=true;
+  }
+
+  for ( auto &vDefined : mapDefinedVar ) {
+    if ( vDefined.second ) continue;
+    throw runtime_error( "TemplateMethod::Setting::Configure : " + vDefined.first + " needed and not linked to any branch" );
+  }
+  
+}
+
+//===================================================================
+void TemplateMethod::Setting::Configure( const string &configFile ) {
   if ( m_debug )  cout << "Setting : Configure( " << configFile << " )" << endl;
   string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, dataBranchWeightName, MCBranchWeightName;
   int debug, doSmearing, doScale,  symBin;
-  vector< string > branchVarNames;
+  vector< string > dataBranchVarNames, MCBranchVarNames;
 
   po::options_description configOptions("configOptions");
   configOptions.add_options()
@@ -53,8 +77,6 @@ int TemplateMethod::Setting::Configure( const string &configFile ) {
     ( "ZMassMax", po::value<double>(&m_ZMassMax), "")
     ( "ZMassNBins", po::value<unsigned int>(&m_ZMassNBins), "" )
     ( "mode", po::value<string>(&m_mode), "" )
-    ( "var1", po::value<string>(&m_var1), "" )
-    ( "var2", po::value<string>(&m_var2), "" )
     ( "doScale", po::value<int>(&doScale), "" )
     ( "alphaMin", po::value<double>(&m_alphaMin), "")
     ( "alphaMax", po::value<double>(&m_alphaMax), "")
@@ -84,10 +106,9 @@ int TemplateMethod::Setting::Configure( const string &configFile ) {
     ( "indepTemplates", po::value<unsigned long>(&m_indepTemplates), "" )
     ( "inversionMethod", po::value<unsigned int>(&m_inversionMethod), "" )
     ( "bootstrap", po::value<unsigned long>( &m_bootstrap ), "" )
-    ( "doPileup", po::value<bool>( &m_doPileup ), "" )
-    ( "doWeight", po::value<bool>( &m_doWeight ), "" )
     ( "applySelection", po::value<unsigned int>( &m_applySelection ), "" )
-    ( "branchVarNames", po::value< vector< string > >( &branchVarNames )->multitoken(), "" )
+    ( "dataBranchVarNames", po::value< vector< string > >( &dataBranchVarNames )->multitoken(), "" )
+    ( "MCBranchVarNames", po::value< vector< string > >( &MCBranchVarNames )->multitoken(), "" )
     ( "dataBranchWeightName", po::value< string >( &dataBranchWeightName ), "" )
     ( "MCBranchWeightName", po::value< string >( &MCBranchWeightName ), "" )
     ;
@@ -124,65 +145,42 @@ int TemplateMethod::Setting::Configure( const string &configFile ) {
   m_ptBins.erase( unique( m_ptBins.begin(), m_ptBins.end() ), m_ptBins.end() );  
 
   //create a vector with all the mandatory variables.
-  vector<string> minVarNames = { "ETA_TRK_1", "ETA_TRK_2", "PHI_1", "PHI_2", "MASS", "PT_1", "PT_2", m_var1 + "_1", m_var1 + "_2" };
-  if ( m_var2 != "" ) {
-    minVarNames.push_back( m_var2 + "_1" );
-    minVarNames.push_back( m_var2 + "_2" );
+  vector<string> minVarNames = { "MASS", "ETA_CALO_1", "ETA_CALO_2" };
+  if ( m_mode == "2VAR" ) {
+    minVarNames.push_back( "PT_1" );
+    minVarNames.push_back( "PT_2" );
   }
 
-  map< string, bool > mapDefinedVar;
-  for ( auto vBranch : minVarNames ) mapDefinedVar[vBranch]=false;
-
-   for ( auto branchVarName : branchVarNames ) {
-    vector< string > dumVect;
-    ParseVector( branchVarName, dumVect );
-    if ( dumVect.size() !=2 ) throw runtime_error( "Setting::Configure : Wrong string in branchVarNames : " + branchVarName );
-    m_branchVarNames[dumVect[0]] = dumVect[1];
-    unsigned int bin=SearchVectorBin( dumVect[0], minVarNames );
-    if ( bin != minVarNames.size() ) mapDefinedVar[minVarNames[bin]]=true;
-  }
-
-  for ( auto vDefined : mapDefinedVar ) {
-    if ( vDefined.second ) continue;
-    cout << vDefined.first << " needed and not linked to any branch" << endl;
-    exit(0);
-  }
+  TestBranches( dataBranchVarNames, minVarNames, 1 );
+  TestBranches( MCBranchVarNames, minVarNames, 0 );
 
   ParseVector( dataBranchWeightName, m_dataBranchWeightNames );
   ParseVector( MCBranchWeightName, m_MCBranchWeightNames );
-
   //=====
   if ( !m_nUseEl ) m_nUseEl=1;
-  if ( m_mode != "1VAR" && m_mode != "2VAR" ) return 1;
+  if ( m_mode != "1VAR" && m_mode != "2VAR" ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad mode input. Choose 1VAR or 2VAR." );
+  if ( m_alphaMin > m_alphaMax ) swap( m_alphaMin, m_alphaMax );
+  if ( m_sigmaMin > m_sigmaMax ) swap( m_sigmaMin, m_sigmaMax );
+
   if ( m_doSimulation ) { //Make checks for vector sizes in simulation
-    if ( m_etaBins.size() && m_alphaSimEta.size() != m_etaBins.size() - 1 ) return 2;
-    if ( m_ptBins.size() && m_alphaSimPt.size() != m_ptBins.size() - 1 ) return 2;
-    if ( m_etaBins.size() && m_sigmaSimEta.size() != m_etaBins.size() - 1 ) return 2;
-    if ( m_ptBins.size() && m_sigmaSimPt.size() != m_ptBins.size() - 1 ) return 2;
-    if ( m_constVarFit != "ALPHA" && m_constVarFit != "SIGMA" ) return 3;
-    if ( m_alphaMin > m_alphaMax ) return 4;
-    if ( m_sigmaMin > m_sigmaMax ) return 4;
+    if ( m_etaBins.size() && m_alphaSimEta.size() != m_etaBins.size() - 1 ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad input" );
+    if ( m_ptBins.size() && m_alphaSimPt.size() != m_ptBins.size() - 1 ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad input" );
+    if ( m_etaBins.size() && m_sigmaSimEta.size() != m_etaBins.size() - 1 ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad input" );
+    if ( m_ptBins.size() && m_sigmaSimPt.size() != m_ptBins.size() - 1 ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad input" );
+    if ( m_constVarFit != "ALPHA" && m_constVarFit != "SIGMA" ) throw runtime_error( "TemplateMethod::Setting::Configure : Bad input" );
   }
 
-  if ( !m_doScale && !m_doSmearing ) return 5;
+  if ( !m_doScale && !m_doSmearing ) throw invalid_argument( "TemplateMethod::Setting::Configure : No measurement required." );
 
   if ( m_debug )  cout << "Setting : Configure " << configFile << " ) Done" << endl; 
-   return 0;
 }
 
 //====================================================
 int TemplateMethod::Setting::Save( TFile *outFile ) {
   if ( m_debug ) cout << "Setting::Save" << endl;
 
-  if ( !outFile ) {
-    cout << "TFile is a 0 pointer" << endl;
-    return 1;}
-
-  if ( !outFile->IsOpen() ) {
-    cout << "TFile is not opened" << endl;
-    return 2;
-  }
-
+  if ( !outFile ) throw runtime_error( "Setting::Save : TFile is a 0 pointer.");
+  if ( !outFile->IsOpen() ) throw runtime_error( "Setting::Save : TFile is not opened." );
   outFile->cd();
 
   TTree *infoTree = new TTree( "InfoTree", "InfoTree" );
@@ -380,8 +378,6 @@ int TemplateMethod::Setting::SymmetrizedSim( vector<double> &outVector ) {
 void TemplateMethod::Setting::Print() {
 
   cout << "m_mode : "<< m_mode << endl << endl;
-  cout << "m_var1 : " << m_var1 << endl;
-  cout << "m_var2 : " << m_var2 << endl;
   cout << "m_ZMassMin : " << m_ZMassMin << endl;
   cout << "m_ZMassMax : " << m_ZMassMax << endl;
   cout << "m_ZMassNBins : " << m_ZMassNBins << endl;
@@ -411,8 +407,6 @@ void TemplateMethod::Setting::Print() {
   cout << "m_indepDistorded : " << m_indepDistorded << endl;
   cout << "m_indepTemplates : " << m_indepTemplates << endl;
   cout << "m_bootstrap : " << m_bootstrap << endl;
-  cout << "m_doPileup : " << m_doPileup << endl;
-  cout << "m_doWeight : " << m_doWeight << endl;
   cout << "m_etaBins : ";
   PrintVector( m_etaBins );
   cout << "m_sigmaSimEta : ";

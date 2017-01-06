@@ -1,7 +1,7 @@
 import os
 import sys
 
-isAntinea=1
+isAntinea=0
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
@@ -93,6 +93,12 @@ FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_
 FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
 
 FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
+
+
+
+FILESETS['photonsAllSyst_h013']= sub.check_output( ['ls /sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD_h013_Full/ntuple/*.root' ],  shell=1, stderr=sub.STDOUT ).split()
+FILESETS['photonsAllSyst_h013_simpl']= sub.check_output( ['ls /sps/atlas/c/cgoudet/Hgam/Inputs/MxAOD1NP/ntuple/*.root' ],  shell=1, stderr=sub.STDOUT ).split()
+
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
@@ -101,7 +107,6 @@ def FillDatasetContainer( container, datasets ) :
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
-    print "Mode: "+str(mode)
 #mode 
     # 0 MeasureScale
     # 1 2Steps
@@ -164,7 +169,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     batch.write( '\n'.join( [ 'cp ' + confName + ' .' for confName in configName  ] ) + '\n' )
 #copy the data files to the server and prepare the command line
 
-    batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
+    batch.write( '\n'.join( [ 'cp ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
     dataLine = ' '.join( [ ' --dataFileName ' + StripString( name, 1, 0 ) for name in dataFiles ] ) 
     MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) for name in MCFiles ] )
@@ -195,14 +200,13 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
 
 
-        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
+        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' \n')
 
     if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n' )
     batch.write( 'rm *distorded* \n' )
-    batch.write( '`ls *.tex | awk -F "." \'{print $1 }\'` \n' )
-    batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
-    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
+
+    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
+    batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.root ' + PREFIXPATH + resultPath + '. \n' ) 
     batch.close()
     return fileName
 
@@ -224,8 +228,8 @@ def CreateConfig( configName, inOptions = [] ) :
     options['ZMassMax'] = 100
     options['ZMassNBins'] = 20
     options['mode'] = "1VAR"
-    options['var1'] = "ETA_CALO"
-    options['var2'] = ""
+#    options['var1'] = "ETA_CALO"
+#    options['var2'] = ""
     options['doScale'] = 1
     options['alphaMin']=-0.10
     options['alphaMax']=0.10
@@ -234,7 +238,7 @@ def CreateConfig( configName, inOptions = [] ) :
     options['sigmaMin']=0
     options['sigmaMax']=0.15
     options['sigmaNBins']=20
-    options['debug']=1
+    options['debug']=0
     options['constVarFit']="SIGMA"
     options['selection']=''
     options['doSimulation']=0
@@ -248,29 +252,31 @@ def CreateConfig( configName, inOptions = [] ) :
     options['nUseEl']=1
     options['nUseEvent']=0
     options['nEventCut']=10
-    options['thresholdMass']=70
+    options['thresholdMass']=0
     options['indepDistorded']=0
     options['indepTemplates']=0
     options['inversionMethod']=11
     options['bootstrap']=0
-    options['doPileup']=1
-    options['doWeight']=1
+#    options['doWeight']=1
     options['etaBins']=defaultBinning['ETA68']
     options['ptBins']=''
     options['applySelection']=0
-    options['branchVarNames']={}
-    options['branchVarNames']['ETA_CALO_1']='eta_calo_1'
-    options['branchVarNames']['ETA_CALO_2']='eta_calo_2' 
-    options['branchVarNames']['PHI_1']='phi_1' 
-    options['branchVarNames']['PHI_2']='phi_2' 
-    options['branchVarNames']['ETA_TRK_1']='eta_1'
-    options['branchVarNames']['ETA_TRK_2']='eta_2'
-    options['branchVarNames']['PT_1']='pt_1'
-    options['branchVarNames']['PT_2']='pt_2'
-    options['branchVarNames']['MASS']='m12'
-    options['branchVarNames']['WEIGHT']='m12'
+    options['dataBranchVarNames']={}
+    options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'
+    options['dataBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
+    # options['branchVarNames']['PT_1']='pt_1'
+    # options['branchVarNames']['PT_2']='pt_2'
+    options['dataBranchVarNames']['MASS']='m12'
+
     options['dataBranchWeightName']='weight'
     options['MCBranchWeightName']='weight'
+
+    options['MCBranchVarNames']={}
+    options['MCBranchVarNames']['ETA_CALO_1']='eta_calo_1'
+    options['MCBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
+    # options['branchVarNames']['PT_1']='pt_1'
+    # options['branchVarNames']['PT_2']='pt_2'
+    options['MCBranchVarNames']['MASS']='m12'
 
 
     for inOpt in inOptions :
@@ -278,7 +284,7 @@ def CreateConfig( configName, inOptions = [] ) :
         optValue= inOpt[inOpt.find('=')+1:]
 
         if optKey in options :
-            if optKey == 'branchVarNames' :
+            if optKey in ['dataBranchVarNames', 'MCBranchVarNames' ]  :
                 optValue = optValue.split( ' ' )
                 options[optKey][optValue[0]] = optValue[1]
                 pass
@@ -289,7 +295,87 @@ def CreateConfig( configName, inOptions = [] ) :
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
-            if iLabel == 'branchVarNames' : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
+            if 'BranchVarNames' in iLabel : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
             else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         
     return
+
+#======================================================================
+def VarPerKeyword( keyword ) :
+    if 'ETA_CALO' in keyword : return 'catCoup'
+    elif 'PT' in keyword : return 'weight'
+    else : return 'm_yy'
+#======================================================================
+def FillVars( NPName, isInclusive=0 ) :
+    options = []
+    prefix = 'BranchVarNames='
+    isUp = '1up' in NPName
+    mandatoryVariables = [ 'ETA_CALO_1', 'ETA_CALO_2', 'MASS', 'PT_1', 'PT_2' ]
+    
+    fluctOptions = [ prefix + var + ' ' + NPName + '_' + VarPerKeyword( var ) for var in mandatoryVariables ]
+    nomOptions = [ prefix + var + ' ' + VarPerKeyword( var ) for var in mandatoryVariables ]
+
+    fluctOptions = [ ( 'data' if isUp else 'MC' ) + x for x in fluctOptions ]
+    nomOptions = [ ( 'data' if not isUp else 'MC' ) + x for x in nomOptions ]
+
+    options += fluctOptions + nomOptions
+
+    options.append( ( 'data' if isUp else 'MC' ) + 'BranchWeightName='+ NPName + '_weight' )
+
+    options.append( 'etaBins=' + ( '0.5 20' if isInclusive else ' '.join( [ str(x+0.5) for x in range(0, 14) ] ) ) )
+    # print(options)
+    # print('\n')
+    return options
+#==================================
+def LaunchNPScale( inputs, isInclusive=1, model="Full" ) :
+    NPFile = open( '/sps/atlas/c/cgoudet/Hgam/FrameWork/PhotonSystematic/data/' + ('NPNames.txt' if model=='Full' else 'ReadMxAOD_h013_all.boost') )
+    commonOptions = [ 'thresholdMass=0', 'ZMassMin=122', 'ZMassMax=128', 'ZMassNBins=20',
+                      'alphaMin=-0.01', 'alphaMax=0.01', 'mode=2VAR', 'ptBins=-98 100',
+                      'doSemaring=1', 'doScale=1', 'fitMethod=2', 'optimizeRanges=7' ]
+
+    suffix = ( '_inc' if isInclusive else '' ) + '.root'
+    for NP in NPFile :
+
+        if '#' in NP : continue
+        NP = NP.replace( '\n', '').replace('containerName=','').replace( 'HGamEventInfo_', '' )
+        if NP in ['', 'HGamEventInfo' ] : continue
+        if 'ZSMEARING' not in NP : continue
+        isUp = '1up' in NP
+        options = commonOptions[:]
+        varOptions = FillVars( NP, isInclusive )
+        options +=varOptions
+        if model =='Full' : inputs.append( [ NP+suffix, 'photonsAllSyst_h013', 'photonsAllSyst_h013', options[:], 0 ] )
+        else :inputs.append( [ NP+suffix, 'photonsAllSyst_h013_simpl', 'photonsAllSyst_h013_simpl', options[:], 0 ] )
+
+
+
+#==================================
+def IsolateInfo( inFile, configLine, measScaleLine, datasetsLine ) :
+    text = open( inFile )
+    for line in text : 
+        if '/Config/' in line : configLine.append( line )
+        elif 'MeasureScale --' in line : measScaleLine.append( line )
+        elif '/Inputs/' in line : datasetsLine.append( line )
+    
+#==================================
+def MergeLaunchers( launchers ) :
+    outLauncherContent=BatchHeader( '/afs/in2p3.fr/home/'+user+'/Calibration', 'Template', 'MeasureScale' )
+    datasetsLine=[]
+    measScaleLine=[]
+    configLine=[]
+    for iFile in launchers : IsolateInfo( iFile, configLine, measScaleLine, datasetsLine )
+
+    outLauncherContent += ''.join( set(configLine) ) + ''.join( set(datasetsLine) ) + ''.join( set(measScaleLine))
+
+    outLauncherContent += 'for f in `ls *.tex | awk -F "." \'{print $1 }\'`; \ndo\n'
+    outLauncherContent += 'cp -v ${f}.pdf ' + PREFIXPATH + 'Plots/. \n'
+    outLauncherContent += 'cp -v ${f}.root ' + PREFIXPATH + 'Results/. \n'
+    outLauncherContent += 'done\n'
+
+#    outLauncherContent += 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`.root ' + PREFIXPATH + 'Results/. \n'
+
+    launcherName = '/sps/atlas/c/cgoudet/Calibration/PreRec/Batch/allNP.sh'
+    outLauncher = open( launcherName , 'w' )
+    outLauncher.write( outLauncherContent )
+    outLauncher.close()
+    return launcherName
