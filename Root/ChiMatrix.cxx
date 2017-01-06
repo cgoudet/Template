@@ -8,7 +8,7 @@
 #include "TF1.h"
 #include "TFitResult.h"
 #include "TLegend.h"
-#include "PlotFunctions/DrawPlot.h"
+#include "PlotFunctions/DrawOptions.h"
 #include "TAxis.h"
 
 #include <fstream>

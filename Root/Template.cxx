@@ -2,21 +2,23 @@
 #include "PlotFunctions/Foncteurs.h"
 #include "PlotFunctions/SideFunctions.h"
 #include "PlotFunctions/SideFunctionsTpp.h"
+#include "PlotFunctions/DrawOptions.h"
+#include "PlotFunctions/InvertMatrix.h"
+
+#include "TCanvas.h"
+#include "TLorentzVector.h"
+#include "TError.h"
 
 #include <iterator>
 #include <iostream>
-#include "TLorentzVector.h"
 #include <fstream>
-#include "TCanvas.h"
 #include "time.h"
 #include "TKey.h"
 #include "time.h"
-#include "TError.h"
-#include "PlotFunctions/InvertMatrix.h"
 #include <chrono>
-#include "PlotFunctions/DrawPlot.h"
 #include <algorithm>
 #include <stdexcept>
+
 using std::invalid_argument;
 using std::swap;
 using boost::extents;
