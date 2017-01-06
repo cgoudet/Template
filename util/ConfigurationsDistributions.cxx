@@ -439,9 +439,10 @@ int main( int argc, char* argv[] ) {
   //-interaction=batchmode
   string commandLine = "pdflatex -interaction=batchmode " + latexFileName;
   cout << "latexFileName : " << commandLine << endl;
-  system( commandLine.c_str() );
-  system( commandLine.c_str() );
-  system( commandLine.c_str() );
+  int err = system( commandLine.c_str() );
+  err = system( commandLine.c_str() );
+  err = system( commandLine.c_str() );
+  cout << "isPdfCompiled : " << !err << endl;
   //system( "rm ConfigurationsDistributions_*.pdf" );
 
   cout << "The End" << endl;

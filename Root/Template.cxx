@@ -263,14 +263,14 @@ int TemplateMethod::Template::Save( bool saveChiMatrix ) {
     return 2;
   }
 
-  // if ( saveChiMatrix ) {  
+  if ( saveChiMatrix ) {  
   //   for ( auto vChiMatrixLine : m_chiMatrix ) {
   //     for ( auto vChiMatrix : vChiMatrixLine ) {
   // 	vChiMatrix->Save(outFile, 1);   
   // 	vChiMatrix->Save(outFile, 0);   
   //     }
   //   }
-  // }
+  }
 
   outFile->Close();
   delete outFile;
@@ -799,7 +799,8 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
 
   vector< string > plotNames;
   unsigned int histDevBin = SearchVectorBin( string("deviation"), m_histNames ); 
-
+  DrawOptions drawOpt;
+  
   for ( unsigned int iVar = 0; iVar< m_vectHist.size(); iVar++ ) {
     for ( unsigned int iHist = 0; iHist< m_vectHist[0].size(); iHist++ ) {
       if ( iHist != histMeasBin && iHist != histDevBin ) continue;
@@ -807,7 +808,8 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
 	string plotName = path + m_vectHist[iVar][iHist]->GetName();
 	vector<TH1*> histPlot = { m_vectHist[iVar][iHist] };
 	if ( m_vectHist[iVar][histInputBin] && iHist==histMeasBin ) histPlot.insert( histPlot.begin(), m_vectHist[iVar][histInputBin] );
-	DrawPlot( histPlot, plotName );
+	drawOpt.AddOption( "outName", plotName );
+	drawOpt.Draw( histPlot );
 	plotNames.push_back( plotName );
       }
     }
@@ -829,9 +831,10 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
 
   string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
   cout << "latexFileName : " << commandLine << endl;
-  system( commandLine.c_str() );
-  system( commandLine.c_str() );
-  system( commandLine.c_str() );
+  int err = system( commandLine.c_str() );
+  err = system( commandLine.c_str() );
+  err = system( commandLine.c_str() );
+  cout << "isPdfCompiled : " << !err << endl;
   //  system( "rm ChiMatrix_*" );
 
   if ( m_setting.GetDebug() )  cout << "Template::MakePlot Done" << endl;

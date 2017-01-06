@@ -502,7 +502,7 @@ void TemplateMethod::ChiMatrix::FitChi2() {
 void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot " << m_name << endl;
   if ( m_quality.to_ulong() ) return;
-
+  DrawOptions drawOpt;
   vector<string> plotNames, legends;
   string plotName;
 
@@ -540,7 +540,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   ss << "\\end{minipage}\\hfill" << endl;
   plotName = path + m_name + "_chiMatrix";
   vector<TH1*> dumVect = {m_chiMatrix};
-  DrawPlot( dumVect, plotName );
+  drawOpt.AddOption( "outName", plotName );
+  drawOpt.Draw( dumVect );
   WriteLatexMinipage( ss, {plotName}, 2 );
 
   // //Comparison data and extrmal alpha templates
@@ -551,9 +552,11 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( string(TString::Format("legend=Template : alpha=%i; m=__MEAN",(int) ( m_scaleValues.front()*1e6)) ) );
       legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
       legends.push_back("doRatio=1");
-      plotName = TString( path + m_name + "_CompareAlpha" );
+      legends.push_back( "outName=" + path + m_name + "_CompareAlpha" );
       dumVect = { m_dataZMass, m_MCZMass[0][bestSigma], m_MCZMass.back()[bestSigma]};
-      DrawPlot( dumVect, plotName, legends );
+      drawOpt.FillOptions( legends );
+      drawOpt.Draw( dumVect );
+      drawOpt.ResetLegends();
       plotNames.push_back( plotName   );
     }
   
@@ -562,9 +565,11 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( "legend=Data" );
       legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
       legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
-      plotName = path + m_name + "_CompareSigma";
+      legends.push_back( "outName=" + path + m_name + "_CompareSigma" );
       dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front(), m_MCZMass[bestAlpha].back()};
-      DrawPlot( dumVect, plotName, legends );
+      drawOpt.FillOptions( legends );
+      drawOpt.Draw( dumVect );
+      drawOpt.ResetLegends();
       plotNames.push_back( plotName );
 
     }
@@ -572,13 +577,16 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   
   plotName = path + m_name + "_chi2FitConstVar";
   dumVect = { m_chi2FitConstVar };
-  DrawPlot( dumVect, plotName );
+
+  drawOpt.AddOption( "outName", plotName );
+  drawOpt.Draw( dumVect );
   plotNames.push_back( plotName );
 
   if ( m_corAngle ) {
     plotName = path + m_name + "_corAngle";
     dumVect = { m_corAngle};
-    DrawPlot( dumVect, plotName );
+    drawOpt.AddOption( "outName", plotName );
+    drawOpt.Draw( dumVect );
     plotNames.push_back( plotName );
   }
   WriteLatexMinipage( ss, plotNames, 2 );
