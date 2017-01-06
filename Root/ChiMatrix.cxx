@@ -692,14 +692,17 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
       FillChiMatrix();
 
       if ( debugOptimize ) {
+
 	for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
 	  for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
+	    DrawOptions drawOpt;
 	    vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
-	    string outName = "/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter);
 	    vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
 	    options.push_back( string(TString::Format( "latex=alpha : %2.2f", m_scaleValues[i_alpha]*1e6 )));	  
 	    options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
-	    DrawPlot( drawVect, outName, options );
+	    options.push_back( "outName=/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
+	    drawOpt.FillOptions( options );
+	    drawOpt.Draw( drawVect );
 	  }}
       }
 
