@@ -16,6 +16,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <functional>
+#include <limits>
 
 using std::string;
 using std::to_string;
@@ -957,7 +958,7 @@ bool TemplateMethod::ChiMatrix::OptimizeVect( vector<double> &y,
   const double chiOptim = m_setting->GetOptimizeRanges();
   const double dChi2Min = (chiOptim-chiOptimDiff)*(chiOptim-chiOptimDiff);
   const double dChi2Max = (chiOptim+chiOptimDiff)*(chiOptim+chiOptimDiff);
-  if ( x.back() == allowedMaxRange && y.back()<dChi2Min ) return true;
+  if ( fabs(x.back()-allowedMaxRange)<std::numeric_limits<double>::epsilon() && y.back()<dChi2Min ) return true;
   
   vector<double>::iterator minY = min_element( y.begin(), y.end() );
   unsigned minBin = distance( y.begin(), minY );
