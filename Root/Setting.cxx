@@ -68,7 +68,7 @@ void TemplateMethod::Setting:: TestBranches( const vector<string> &inVect, const
 void TemplateMethod::Setting::Configure( const string &configFile ) {
   if ( m_debug )  cout << "Setting : Configure( " << configFile << " )" << endl;
   string etaBins, ptBins, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, dataBranchWeightName, MCBranchWeightName;
-  int debug, doSmearing, doScale,  symBin;
+  int debug{0}, doSmearing{0}, doScale{0},  symBin{0};
   vector< string > dataBranchVarNames, MCBranchVarNames;
 
   po::options_description configOptions("configOptions");
