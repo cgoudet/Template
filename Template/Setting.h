@@ -1,20 +1,54 @@
 #ifndef SETTING_H
 #define SETTING_H
 
-//#include "yaml-cpp/yaml.h"
 #include <string>
 #include <vector>
 #include "TFile.h"
 #include <map>
 
-using std::map;
-using std::vector;
-using std::string;
 
 namespace TemplateMethod {
-  /**\brief Class to store the settings of the progra
+  /**\brief Class to store the settings of the Template method
 
-     The class is meant to read a Yaml configuration file to setup the properties of the run.
+     The Setting class is filled through a configuration file in the boost format.
+     The list of options and their meaning is described below.
+
+     Variable definition :
+     - selection=<string> : Define a selection to apply on the inputs.
+     - applySelection=<int> (default 0 ) : Define which input must undergo the selection : data (0 or 1) and/or MC (0 or 2 ).
+
+     Options related to categorization :
+     - mode={ 1VAR (default), 2VAR } : Chooses the categorization. 
+     1VAR adds an event in a configuration (ETA_CALO_1, ETA_CALO_2).
+     2VAR adds an event in both configurations ( ETA_CALO_1, PT_1 ) and (ETA_CALO_2, PT_2 ) with half its weight.
+     - etaBins= <double> <double> ... : Defines the binning for the variable in ETA_CALO_1 and ETA_CALO_2. 
+     Extremal values defines the domain of definition.
+
+     Options related to the template method : 
+     - doScale=<int(bool)> ( default 0) : Allows the measurement of scale factor
+     - doSmearing=<int(bool)> ( default 0) : Allows the measurement of smearing factor
+     - ZMassMin=<double> (default 80) : Low limit for variable of interest value
+     - ZMassMax=<double> (default 100) : High limit for variable of interest value
+     - ZMassNBins=<int> (default 20) : Number of bins to compute chi2
+     - alphaNBins=<int> (default 20) : Number of tested scale values
+     - sigmaNBins=<int> (default 20) : Number of tested smearing values
+
+     The framework allows for an easy procedure to perform closures. 
+     The options to perform a closure are detailed here :
+     - doSimulation=<int(bool)> : Switches the closure mode.
+     
+     When testing exreme values of scale factors, it is possible to change dramatically the shape of the distribution.
+     Optionnal variables are defined to set a range for the tested of scale factors.
+     - alphaMin=<double> (default -0.10)
+     - alphaMax=<double> (default 0.10)
+     - sigmaMin=<double> (default 0)
+     - sigmaMin=<double> (default 0.10)
+
+     Other options : 
+     - debug=<int(bool)> (default 0)
+     - constVarFit={ ALPHA, SIGMA (default) } : Selects the factor which remains constant while the other is scanned.
+     - optimizeRange=<int> ( default 5 ) : Defines how the final interval of tested scales values is computed. 
+     An optimization code looks for having an interval such as the maximum difference in chi2 is optimizeRanges**2.
   */
   class Setting 
   {
@@ -34,7 +68,7 @@ namespace TemplateMethod {
        - The mapping is made with the label of the attribute : adding a property in the config file, or changing orders of properties, will not perturb the reading.
        - Perform checks on read values : binFitRange, mode, vector sizes for simulation, 
     */
-    void Configure( const string &configFile  );
+    void Configure( const std::string &configFile  );
   
   
     double GetAlphaMin()        const { return m_alphaMin;       };
@@ -49,15 +83,15 @@ namespace TemplateMethod {
     double GetZMassMin()        const { return m_ZMassMin;       };
     double GetZMassMax()        const { return m_ZMassMax;       };
     int    GetZMassNBins()      const { return m_ZMassNBins;     };
-    string GetMode()            const { return m_mode;           };
+    std::string GetMode()            const { return m_mode;           };
     bool   GetDebug()           const { return m_debug;          };
     bool   GetDoSmearing()      const { return m_doSmearing;     };
     bool   GetDoScale()         const { return m_doScale;        };
     bool   GetDoSimulation()    const { return m_doSimulation;   };
-    string GetConstVarFit()     const { return m_constVarFit;    };
-    string    GetSelection()       const { return m_selection;      };
-    string GetMCName()          const { return m_MCName;         };
-    string GetDataName()        const { return m_dataName;       };
+    std::string GetConstVarFit()     const { return m_constVarFit;    };
+    std::string    GetSelection()       const { return m_selection;      };
+    std::string GetMCName()          const { return m_MCName;         };
+    std::string GetDataName()        const { return m_dataName;       };
     bool   GetDoSymBin()        const { return m_symBin;         };
     unsigned int GetFitMethod() const { return m_fitMethod;      };
     unsigned int GetNUseEl()    const { return m_nUseEl;         };
@@ -70,29 +104,29 @@ namespace TemplateMethod {
     unsigned int GetApplySelection() const { return m_applySelection; }
  
     double GetOptimizeRanges()  const { return m_optimizeRanges; };
-    vector< double > const &GetEtaBins()     const { return m_etaBins;     };
-    vector< double > const &GetPtBins()      const { return m_ptBins;      };
-    vector< double > const &GetAlphaSimEta() const { return m_alphaSimEta; };
-    vector< double > const &GetSigmaSimEta() const { return m_sigmaSimEta; }; 
-    vector< double > const &GetAlphaSimPt()  const { return m_alphaSimPt;  }; 
-    vector< double > const &GetSigmaSimPt()  const { return m_sigmaSimPt;  };
-    vector< string > const &GetDataBranchWeightNames() const { return m_dataBranchWeightNames; }
-    vector< string > const &GetMCBranchWeightNames() const { return m_MCBranchWeightNames; }
-    map< string, string> const &GetDataBranchVarNames() const { return m_dataBranchVarNames;}
-    map< string, string> const &GetMCBranchVarNames() const { return m_MCBranchVarNames;}
+    std::vector< double > const &GetEtaBins()     const { return m_etaBins;     };
+    std::vector< double > const &GetPtBins()      const { return m_ptBins;      };
+    std::vector< double > const &GetAlphaSimEta() const { return m_alphaSimEta; };
+    std::vector< double > const &GetSigmaSimEta() const { return m_sigmaSimEta; }; 
+    std::vector< double > const &GetAlphaSimPt()  const { return m_alphaSimPt;  }; 
+    std::vector< double > const &GetSigmaSimPt()  const { return m_sigmaSimPt;  };
+    std::vector< std::string > const &GetDataBranchWeightNames() const { return m_dataBranchWeightNames; }
+    std::vector< std::string > const &GetMCBranchWeightNames() const { return m_MCBranchWeightNames; }
+    std::map< std::string, std::string> const &GetDataBranchVarNames() const { return m_dataBranchVarNames;}
+    std::map< std::string, std::string> const &GetMCBranchVarNames() const { return m_MCBranchVarNames;}
 
     void SetInversionMethod( unsigned int inversionMethod ) { m_inversionMethod = inversionMethod; }
     void SetDebug( bool debug )               { m_debug = debug; };
     void SetDoSmearing( bool smearing )       { m_doSmearing = smearing; };
     void SetDoScale( bool scale )             { m_doScale = scale; };
-    void SetSelection( string selection )        { m_selection = selection; };
+    void SetSelection( std::string selection )        { m_selection = selection; };
     void SetNEventMC(  long int nEventMC = -1 )     { ( nEventMC != -1 ) ?  m_nEventMC = (unsigned long int ) nEventMC : m_nEventMC++; };
     void SetNEventData( long int nEventData = -1 ) { ( nEventData != -1 ) ? m_nEventData = (unsigned long int ) nEventData : m_nEventData++;};
-    void SetMCName( string MCName )           { m_MCName = MCName; };
-    void SetDataName( string DataName )       { m_dataName = DataName; };
-    void SetConstVarFit( string constVarFit = "SIGMA" );
-    void SetSigmaSimEta( const vector<double> &sigmaSimEta );
-    void SetAlphaSimEta( const vector<double> &alphaSimEta );
+    void SetMCName( std::string MCName )           { m_MCName = MCName; };
+    void SetDataName( std::string DataName )       { m_dataName = DataName; };
+    void SetConstVarFit( std::string constVarFit = "SIGMA" );
+    void SetSigmaSimEta( const std::vector<double> &sigmaSimEta );
+    void SetAlphaSimEta( const std::vector<double> &alphaSimEta );
     void SetNUseEvent( unsigned int nUseEvent ) { m_nUseEvent = nUseEvent; }
     void SetNUseEl( unsigned int nUseEl ) { m_nUseEl = nUseEl; }
     void SetIndepDistorded( unsigned long indepDistorded ) { m_indepDistorded = indepDistorded; }
@@ -122,16 +156,16 @@ namespace TemplateMethod {
        - Variables not loaded for template only : doScale, doSmearing, doSimulation, binFitRange, alphaSimEta, alphaSimPt, sigmaSimEta, sigmaSimPt, constVarFit
        - Perform a check on detector binning and simulation binning if justTemplate
     */
-    int Load( const string &inFileName, bool justTemplate = false ); 
+    int Load( const std::string &inFileName, bool justTemplate = false ); 
 
     void Print();
 
   private : 
 
-    void PrintVector( vector<double> vect );
-    int Symmetrize( vector<double> &outVector );
-    int SymmetrizedSim( vector<double> &outVector );
-    void TestBranches( const vector<string> &inVect, const vector<string> constraint, const bool isData );
+    void PrintVector( std::vector<double> vect );
+    int Symmetrize( std::vector<double> &outVector );
+    int SymmetrizedSim( std::vector<double> &outVector );
+    void TestBranches( const std::vector<std::string> &inVect, const std::vector<std::string> constraint, const bool isData );
 
     /**\brief Define the mode of the run
 
@@ -139,7 +173,7 @@ namespace TemplateMethod {
        - 1VAR : Electrons are separated in eta bins
        - 2VAR : Electrons are separated in eta and pt bins
     */
-    string  m_mode;
+    std::string  m_mode;
     /**\brief Z mass lower bound
      */
     double m_ZMassMin;
@@ -156,13 +190,13 @@ namespace TemplateMethod {
      
        Do not contain extremal etas
     */
-    vector< double > m_etaBins;
+    std::vector< double > m_etaBins;
 
     /**\brief Vector with pt frontiers
      
        Do not contain extremal pts
     */
-    vector< double > m_ptBins;
+    std::vector< double > m_ptBins;
 
     /**\brief Setup the computation of scale factors
      */
@@ -205,27 +239,27 @@ namespace TemplateMethod {
   
     /**\brief Matrix of simulated alpha in Eta bins
      */
-    vector< double > m_alphaSimEta;
+    std::vector< double > m_alphaSimEta;
 
     /**\brief Matrix of simulated sigma in Eta bins
      */
-    vector< double > m_sigmaSimEta;
+    std::vector< double > m_sigmaSimEta;
 
     /**\brief Matrix of simulated alpha in Pt bins
      */
-    vector< double > m_alphaSimPt;
+    std::vector< double > m_alphaSimPt;
 
     /**\brief Matrix of simulated bpt in Pt bins
      */
-    vector< double > m_sigmaSimPt;
+    std::vector< double > m_sigmaSimPt;
 
     /**\brief Decide which variable remains constant for the first round of fit
      */
-    string m_constVarFit;
+    std::string m_constVarFit;
 
 
 
-    string m_selection;
+    std::string m_selection;
     unsigned int m_applySelection;//0 both, 1 data only, 2 MC only
     unsigned long int m_nEventMC;
     unsigned long int m_nEventData;
@@ -238,8 +272,8 @@ namespace TemplateMethod {
      */
     bool  m_doSimulation;
 
-    string m_MCName;
-    string m_dataName;
+    std::string m_MCName;
+    std::string m_dataName;
 
     double m_optimizeRanges;
     bool m_symBin;
@@ -261,10 +295,10 @@ namespace TemplateMethod {
     unsigned int m_inversionMethod;
     unsigned long m_bootstrap;
 
-    map<string,string> m_dataBranchVarNames;
-    map<string,string> m_MCBranchVarNames;
-    vector< string > m_dataBranchWeightNames;
-    vector< string > m_MCBranchWeightNames;
+    std::map<std::string,std::string> m_dataBranchVarNames;
+    std::map<std::string,std::string> m_MCBranchVarNames;
+    std::vector< std::string > m_dataBranchWeightNames;
+    std::vector< std::string > m_MCBranchWeightNames;
   };
 }
 
