@@ -19,7 +19,7 @@ class Systematic :
         self.m_inFile = inFile
         self.m_name = name
 
-        self.m_nomFile = 'DataOff_13TeV_1615'
+        self.m_nomFile = 'ScalesOff_1516_nUseEl3'
         self.m_nomSuffixes = {'alpha' : '', 'c' : '_c'}
         self.m_systModel = { 'alpha' : 20, 'c' : 20 }
         self.m_plotOptions = []
@@ -43,14 +43,14 @@ class Systematic :
 
 #Define all systematics
 systematics = []
-systematics.append( Systematic( 'Window', 'DataOff_13TeV_Window' ) )
-systematics.append( Systematic( 'fBrem', 'DataOff_13TeV_fBrem' ) )
-systematics.append( Systematic( 'Threshold', 'DataOff_13TeV_Threshold') )
-systematics.append( Systematic( 'ID', 'DataOff_13TeV_ID') )
-systematics.append( Systematic( 'recoEff', 'DataOff_13TeV_recoEff') )
-systematics.append( Systematic( 'isoEff', 'DataOff_13TeV_isoEff') )
-systematics.append( Systematic( 'IDEff', 'DataOff_13TeV_IDEff') )
-systematics.append( Systematic( 'noIso', 'DataOff_13TeV_noIso') )
+systematics.append( Systematic( 'Window', 'ScalesOff_1516_Window' ) )
+systematics.append( Systematic( 'fBrem', 'ScalesOff_1516_fBrem' ) )
+systematics.append( Systematic( 'Threshold', 'ScalesOff_1516_Threshold') )
+systematics.append( Systematic( 'ID', 'ScalesOff_1516_ID') )
+systematics.append( Systematic( 'recoEff', 'ScalesOff_1516_recoEff') )
+systematics.append( Systematic( 'isoEff', 'ScalesOff_1516_isoEff') )
+systematics.append( Systematic( 'IDEff', 'ScalesOff_1516_IDEff') )
+systematics.append( Systematic( 'noIso', 'ScalesOff_1516_noIso') )
 
 systematics.append( Systematic( 'Inv', 'InversionStudy') )
 systematics[-1].SetSuffixes( {'c' : '_c' } )
@@ -76,11 +76,12 @@ systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } )
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_EW', 'c' : 'Run1/ctErrZee_run1_EW' } ) 
 systematics[-1].SetNomFile( '' )
 
-specialID = [ 'fBrem', 'reweighting', 'cutFlow', 'nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
+#specialID = [ 'fBrem', 'reweighting', 'cutFlow', 'nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
+specialID = [ 'totSyst', 'fBrem', 'run1Syst' ]
 
 def InversionStudy( directory ) :
     print('create inversion systematic' )
-    commandLines = [ 'InversionStudy --inFileName ' + directory + 'DataOff_13TeV_1615_c.root'
+    commandLines = [ 'InversionStudy --inFileName ' + directory + 'ScalesOff_1516_c.root'
                      + ' --outFileName ' + directory + 'InversionStudy_c.root'
                      + ' --inputType ' + str(var) + ' --mode 12 '
                      for var in range(1,2) ]
@@ -90,18 +91,36 @@ def InversionStudy( directory ) :
 #===============================================================
 def applyCorrection( directory ) :
 
-#    commandLine = 'MeasureScale --configFile /afs/in2p3.fr/home/a/aguergui/public/Calibration/Template/python/DataOff_13TeV_25ns.boost --noExtraction '
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/DataOff_13TeV_1615.boost --noExtraction '
-    commandLine += ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data16_13TeV_Zee_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_Lkh1/Data*.root' ) )
-    commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_Lkh1/MC*.root' ) )
-    commandLine += ' --correctAlphaHistName measScale_alpha --correctSigmaHistName measScale_c '
-    commandLine += ' --correctAlphaFileName ' + directory + 'DataOff_13TeV_1615.root'
-    commandLine += ' --correctSigmaFileName ' + directory + 'DataOff_13TeV_1615_c.root'
-
     os.chdir( directory )
 
+    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/AlphaOff_15.boost --noExtraction'
+    commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh1/Data*root' ) ) 
+    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'AlphaOff_15.root \n'
+
+    #os.system( commandLine )
+    #os.system( commandLine.replace('15', '16') )
+
+
+    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom_c.boost --noExtraction '
+    commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC*.root' ) )
+    commandLine += ' --correctSigmaHistName measScale_c '
+    commandLine += ' --correctSigmaFileName ' + directory + 'ScalesGeom_c.root'
+
+    #os.system( commandLine )
+
+
+    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom.boost --noExtraction'
+    commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_NewGeom_Lkh1/MC*root' ) ) 
+    #commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'ScalesGeom.root \n'
+    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesGeom.root \n'
     os.system( commandLine )
-    content = listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_Lkh1/Data*.root' ) + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data16_13TeV_Zee_Lkh1/Data*.root' )  + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_Lkh1/MC*.root' )
+    
+    content = ( listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh*/Data*.root' ) 
+                + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data16_13TeV_Zee_noGain_Lkh*/Data*.root' )  
+                + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_2016_noGain_Lkh*/MC*.root' ) 
+                + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_2015_noGain_Lkh*/MC*.root' )
+                #+ listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh*/MC*.root' )
+                )
     content = [ (f if 'corrected' in f else '' ) for f in content ]
     
     commandLine= 'mv ' + ' '.join( content ) + ' ' + directory  
@@ -137,7 +156,7 @@ def createSingleFile( directory, var, systList, suffix='' ) :
     systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + var + ' dum 0\n' )
 
     if systList[0].GetNomFile() != '' : 
-        systFile.write( ( directory if '/' not in systList[0].GetNomFile() else '' ) + systList[0].GetNomFile() + systList[0].GetNomSuffixes()[var] + '.root measScale_' + var + ( ' centVal_'+var if systList[0].GetNomFile()== 'DataOff_13TeV_1615' else ' dum' ) + ' 0\n' )
+        systFile.write( ( directory if '/' not in systList[0].GetNomFile() else '' ) + systList[0].GetNomFile() + systList[0].GetNomSuffixes()[var] + '.root measScale_' + var + ( ' centVal_'+var if systList[0].GetNomFile()== 'ScalesOff_1516' else ' dum' ) + ' 0\n' )
     
     systFile.write( '\n'.join( [ 
                 ( directory if '/' not in syst.GetInFile() else '' ) 
@@ -278,6 +297,7 @@ def createSystBoost( directory, syst, var, mode ) :
         boostFile.write( 'rootFileName=' +  directory + 'EnergyScaleFactors.root\n'
                          + 'objName=syst_'+syst.GetName()+'_'+var+'\n'
                          + 'legend='+syst.GetName()+'\n'
+                         + 'shiftColor=1 \n'
                          + 'line=0\n'
                          )
 
@@ -299,8 +319,8 @@ def createRestBoost( directory, ID, var ) :
     options = {}
 
     if ID=='residual':
-        if var=='c':options['rootFileName'] = [ directory+"DataOff_13TeV_dataScaled_c.root" ]
-        else: options['rootFileName'] = [ directory+"DataOff_13TeV_dataScaled.root" ]
+        if var=='c':options['rootFileName'] = [ directory+"ScalesOff_1516_dataScaled_c.root" ]
+        else: options['rootFileName'] = [ directory+"ScalesOff_1516_dataScaled.root" ]
 
     else:
         options['rootFileName'] = [ directory+systematics[0].GetNomFile()+fileSuffix+'.root' ]
@@ -362,9 +382,9 @@ def createRestBoost( directory, ID, var ) :
         optionsUnique['inputType']=1   
         boostFile= directory +'correction.boost'
         options['varName'] = [ 'm12']
-        options['varMin'] = [ '70' ]
-        options['varMax'] = [ '110' ]
-        optionsUnique['nComparedEvents'] = 40
+        options['varMin'] = [ '80' ]
+        options['varMax'] = [ '100' ]
+        optionsUnique['nBins'] = 40
         optionsUnique['normalize']=1
         optionsUnique['doRatio']=1
         optionsUnique['rangeUserY'] = '0 0.99'
@@ -377,14 +397,21 @@ def createRestBoost( directory, ID, var ) :
 
     elif ID == 'cutFlow' : 
         boostFile= directory + ID + '.boost'
+        #options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/a/aguerguichon/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
+                                    #for datasetType in [ 'MC15c_13TeV_Zee_Lkh1' ] 
+    #                                 ] 
+        #options['objName'] = [ ' '.join( [ StripString(objName)+'_cutFlow' for objName in rootFile.split(' ') ] )
+                                #for rootFile in options['rootFileName'] ]
+        
+        #options['loadFiles']=['Data1615_cutFlow.boost']
         options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/a/aguerguichon/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
-                                    for datasetType in [ 'MC15c_13TeV_Zee_Lkh1' ] 
+                                    for datasetType in [ 'Data1*_13TeV_Zee_Lkh1','MC15c_13TeV_Zee_Lkh1' ] 
                                      ] 
         options['objName'] = [ ' '.join( [ StripString(objName)+'_cutFlow' for objName in rootFile.split(' ') ] )
                                 for rootFile in options['rootFileName'] ]
         
-        options['loadFiles']=['Data1615_cutFlow.boost']
-        options['legend']= [ 'MC', 'Data' ]
+        
+        options['legend']= [ 'Data', 'MC' ]
         optionsUnique['rangeUserY'] = '0 0.99'
 
     elif ID == 'reweighting' :
@@ -392,27 +419,24 @@ def createRestBoost( directory, ID, var ) :
         options['rootFileName']=[]
         boostFile= directory + ID + '.boost'
         options['varWeight'] = ['X', 'SFID', 'SFIso', 'SFReco', 'puWeight', 'weight' ]
-        options['loadFiles'] = [ '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_Lkh1/MC15c_13TeV_Zee_Lkh1.boost' ]*len(options['varWeight'])
+        options['loadFiles'] = [ '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC15c_13TeV_Zee_noGain_Lkh1.boost' ]*len(options['varWeight'])
         options['legend']= options['varWeight']
         options['varName']=['m12']
         options['varMin'] = ['80']
         options['varMax'] = ['100']
-        options['nComparedEvents'] = ['20']
+        options['nBins'] = ['20']
         optionsUnique['rangeUserY'] = '0 0.99'
         optionsUnique['doRatio']=1
         optionsUnique['normalize']=1
 
     elif ID == 'fBrem' :
-        optionsUnique['inputType']=1        
-        options['rootFileName']=[]
+        optionsUnique['inputType']=0        
+        options['rootFileName']=['/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data16_13TeV_Zee_noGain_Lkh1/Data16_13TeV_Zee_noGain_Lkh1.root /sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh1/Data15_13TeV_Zee_noGain_Lkh1.root', '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC15c_13TeV_Zee_noGain_Lkh1.root']
+        options['objName']=['Analysis_fBrem Analysis_fBrem', 'Analysis_fBrem']
         boostFile= directory + ID + '.boost'
         options['varWeight'] = ['weight' ]
-        options['loadFiles'] = [ '/sps/atlas/a/aguerguichon/Calibration/ScalesResults/Data1615.boost', '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_Lkh1/MC15c_13TeV_Zee_Lkh1.boost' ]
         options['legend']= ['Data', 'MC' ]
-        options['varName']=['fBrem_1 fBrem_2']
-        options['varMin'] = ['-0.5 -0.5']
-        options['varMax'] = ['1 1']
-        options['nComparedEvents'] = ['30']
+        options['nBins'] = ['50']
         optionsUnique['rangeUserY'] = '0 0.99'
         optionsUnique['doRatio']=1
         optionsUnique['normalize']=1

@@ -8,37 +8,60 @@ from SideFunction import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=2
+switch=0
 
 
 if switch==0 :
         configFiles=[ 
+			
 # 		Mesure des scales
-		['DataOff_13TeV_16.root', 'Data16_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
-		['DataOff_13TeV_15.root', 'Data15_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
-		['DataOff_13TeV_1615.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1',[] ], #nominal
+		# ['ScalesOff_13TeV_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[] ], #nominal
+		# ['ScalesOff_13TeV_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[] ], #nominal
+		#['AlphaOff_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[], 0 ], #nominal
+		#['AlphaOff_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[], 0 ], #nominal
+		['ScalesOff_1516_nUseEl3.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal
+		['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',[]], #nominal
+		#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',['MCBranchWeightName=SFReco SFIso SFID', 'inversionMethod=11', "nUseEl=3"] ], #nominal
 
- 		# ['DataOff_13TeV_syst.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['debug=1'] ],
-		# #['DataOff_13TeV_2Steps.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
+		# ['Scales_eos_16.root', 'Data16_eos', 'MC15c_eos',['MCBranchWeightName=weight_16', 'etaBins='] ], #eosNtuples
+		# ['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',['MCBranchWeightName=weight_15'] ], #eosNtuples
+		
+			       
+#============Systematics
+		#For residuals
  		# ['DataOff_13TeV_dataScaled.root', 'Data1615_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],
-		# #mesure avec electron tight
-		# ['DataOff_13TeV_ID.root', 'Data1615_13TeV_Zee_Lkh2', 'MC15c_13TeV_Zee_Lkh2', [] ],
+		# Changing mass threshold from 70 to 75GeV
+		#['AlphaOff_16_Threshold.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1', ['thresholdMass=75'],0],
+		#['AlphaOff_15_Threshold.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1', ['thresholdMass=75'],0],
+		['ScalesOff_1516_Threshold.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'thresholdMass=75']],
+		# Changing mass window of interest
+		#['AlphaOff_16_Window.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0],
+		#['AlphaOff_15_Window.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0], 
+		['ScalesOff_1516_Window.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'ZMassMin=82.5', 'ZMassMax=97.5']],
+		#  # Electron tight
+		# ['AlphaOff_16_ID.root', 'Data16_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2016_noGain_Lkh2', [], 0 ],
+		# ['AlphaOff_15_ID.root', 'Data15_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2015_noGain_Lkh2', [], 0 ],
+		['ScalesOff_1516_ID.root', 'CorrectedDataID', 'MC15c_13TeV_Zee_noGain_Lkh2',['nUseEl=3']],
+		#  #mesure avec fBrem
+		# ['AlphaOff_16_fBrem.root', 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70', [ ], 0],
+		# ['AlphaOff_15_fBrem.root', 'Data15_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70', [ ], 0],
+		['ScalesOff_1516_fBrem.root', 'CorrectedDatafBrem', 'MC15c_13TeV_Zee_noGain_Lkh1_fBrem70',['nUseEl=3'] ],
+
+		# #Removing isolation 
+		# ['AlphaOff_16_noIso.root', 'Data16_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_noIso', [ ], 0],
+		# ['AlphaOff_15_noIso.root', 'Data15_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_noIso', [], 0],
+		['ScalesOff_1516_noIso.root', 'CorrectedDataIso', 'MC15c_13TeV_Zee_noGain_Lkh1_noIso',['nUseEl=3'] ],
+
+
+		# #Efficiencies
+		['ScalesOff_1516_IDEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_IDSyst',['nUseEl=3'] ], 
+		['ScalesOff_1516_recoEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_recoSyst',['nUseEl=3'] ], 
+		['ScalesOff_1516_isoEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_isoSyst',['nUseEl=3']], 
+
 		# #bkg
 		# #['DataOff_13TeV_25ns_EW.root', 'Data1615_13TeV_Zee_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', [] ],
-		# #mesure avec masse sueil Off0
-		# ['DataOff_13TeV_Threshold.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['thresholdMass=75']],
-		# #mesure avec fenetre masse plus faible
-		# ['DataOff_13TeV_Window.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', ['ZMassMin=82.5', 'ZMassMax=97.5'] ],
-		# #mesure avec fBrem
-		# ['DataOff_13TeV_fBrem.root', 'Data1615_13TeV_Zee_Lkh1_fBrem70', 'MC15c_13TeV_Zee_Lkh1_fBrem70', [ ]],
-		# #Mesure avec ID
-		# ['DataOff_13TeV_IDEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_IDSyst', []],
-		# ['DataOff_13TeV_recoEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_recoSyst', []],
-		# ['DataOff_13TeV_isoEff.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1_isoSyst', []],
-
-		# ['DataOff_13TeV_noIso.root', 'Data1615_13TeV_Zee_Lkh1_noIso', 'MC15c_13TeV_Zee_Lkh1_noIso', []],
-
-
+		
+		#['DataOff_13TeV_2Steps.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
 		##Syst matiere
 		#['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco']],
 
@@ -69,37 +92,20 @@ elif switch == 1 :
 		['Closure_nUsel10.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'nUseEl=10', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ]
 		]	
 
-elif switch == 2 :
-	LaunchNPScale( configFiles, 0, 'Full' )
-	LaunchNPScale( configFiles, 1, 'Full' )
-spsPath="/sps/atlas/" + ('a/aguerguichon' if isAntinea else 'c/cgoudet' ) + '/Calibration/PreRec/'
+spsPath="/sps/atlas/a/aguerguichon/Calibration/PreRec/"
 logPath="Log/"
-
-
-launchers=[]
 
 for confFile in range( 0, len( configFiles ) ) :
 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
 	else : mode = 3
-	launcherFile=CreateLauncher( configFiles[confFile], mode, " --makePlot " )
-	if switch==2 : launchers.append( launcherFile ); 
-	else :	
-		logFile = StripString( configFiles[confFile][0] )
-		
-		launchLine='~/sub1.sh ' + logFile + ' ' \
-		    + spsPath + logPath + logFile + '.log ' \
-		    + spsPath + logPath + logFile + '.err ' \
-		    + launcherFile
-		
-		os.system( launchLine )
-
-if len( launchers ) : 
-	launcherFile = MergeLaunchers( launchers )
-	logFile = StripString( launcherFile  )
+	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
+	
+	logFile = StripString( configFiles[confFile][0] )
 	
 	launchLine='~/sub1.sh ' + logFile + ' ' \
 	    + spsPath + logPath + logFile + '.log ' \
 	    + spsPath + logPath + logFile + '.err ' \
 	    + launcherFile
-	
+	#print(launchLine)
+
 	os.system( launchLine )

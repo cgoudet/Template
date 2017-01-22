@@ -76,7 +76,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
-      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree" );
+      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "selectionTree" );
       TTree *dumTree = static_cast<TTree*>(dumFile->Get(treeNames[iFile].c_str()));
       if ( !dumTree ) throw runtime_error( "TempalteMethod::Template::Configure : "+treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
 
