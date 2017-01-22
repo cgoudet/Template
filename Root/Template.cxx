@@ -76,6 +76,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
       if ( !dumFile ) throw invalid_argument( "Template::Template : Unknown input file.");
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
+      //      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "selectionTree" );
       if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree" );
       TTree *dumTree = static_cast<TTree*>(dumFile->Get(treeNames[iFile].c_str()));
       if ( !dumTree ) throw runtime_error( "TempalteMethod::Template::Configure : "+treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
@@ -473,7 +474,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
  
-    inputTree->SetDirectory( 0 );
+    //    inputTree->SetDirectory( 0 );
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {

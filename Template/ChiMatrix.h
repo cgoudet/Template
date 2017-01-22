@@ -13,9 +13,7 @@
 #include <map>
 #include <bitset>
 #include <sstream>
-using std::stringstream;
-using std::bitset;
-using std::map;
+
 
 namespace TemplateMethod {
   class ChiMatrix
@@ -28,13 +26,13 @@ namespace TemplateMethod {
  
     /**\brief Constructor which initialize m_name
      */
-    ChiMatrix( string name );
+    ChiMatrix( std::string name );
 
     /** Overloaded Constructor
 	\param name Name of the object
 	\param configSetting Setting to be used
     */
-    ChiMatrix( string name, Setting &configSetting );
+    ChiMatrix( std::string name, Setting &configSetting );
     ~ChiMatrix();
 
     double GetScale( unsigned int iVar ) const { return iVar ? m_sigma : m_alpha; };
@@ -105,7 +103,7 @@ namespace TemplateMethod {
        \param path directory path where to save the plots
        \param latexFileName latex file to write in 
     */
-    void MakePlot( stringstream &ss, string path = "" );
+    void MakePlot( std::stringstream &ss, std::string path = "" );
 
     /*\brief Create the templates
       \return 0 OK
@@ -233,7 +231,7 @@ namespace TemplateMethod {
 
 	Each ChiMatrix object must have a different name in order for the histograms not to overwrite each other.
     */
-    string m_name;
+    std::string m_name;
 
     /**\brief 2D matrix containing chi^2
      */
@@ -241,7 +239,7 @@ namespace TemplateMethod {
 
     /**\brief MC ZMass distributions
      */
-    vector< vector< TH1D* > > m_MCZMass;
+    std::vector< std::vector< TH1D* > > m_MCZMass;
 
     /**\brief Data ZMass Distribution
      */
@@ -263,7 +261,7 @@ namespace TemplateMethod {
 
     /**\brief Store the chi2 fits for the first non-const variable
      */
-    vector< TH1D* > m_chi2FitNonConstVar;
+    std::vector< TH1D* > m_chi2FitNonConstVar;
 
     /**\brief Store chi2fit for the constant variable
      */
@@ -278,11 +276,11 @@ namespace TemplateMethod {
 
     /**\brief Values of scale factors for templates
      */
-    vector< double > m_scaleValues;
+    std::vector< double > m_scaleValues;
 
     /**\brief Values of smearing factors for templates
      */
-    vector< double > m_sigmaValues;
+    std::vector< double > m_sigmaValues;
 
     /*\brief Local lower boundary for alpha
      */
@@ -300,7 +298,7 @@ namespace TemplateMethod {
      */
     double m_sigmaMax;
 
-    bitset<8> m_quality;
+    std::bitset<8> m_quality;
 
     unsigned int  m_eta1Bin;
     unsigned int  m_eta2Bin;

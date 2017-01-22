@@ -8,14 +8,21 @@
 
 
 namespace TemplateMethod {
+  
   /**\brief Class to store the settings of the Template method
 
      The Setting class is filled through a configuration file in the boost format.
-     The list of options and their meaning is described below.
+
+     ### Options
 
      Variable definition :
+     - data(MC)BranchVarName= keyword <string> : Links the branch <string> with the vairiable under keyword.
+     ETA_CALO_1 and ETA_CALO_2 ( and PT_1 and PT_2) are variable which define the categorization.
+     MASS is the variable which distribution must be matched.
+     - data(MC)WeightName= <string1> <string2> ... : List of the branches names to multiply to get each event total weight.
      - selection=<string> : Define a selection to apply on the inputs.
      - applySelection=<int> (default 0 ) : Define which input must undergo the selection : data (0 or 1) and/or MC (0 or 2 ).
+     - nUseEvent<int> (default 0 ) : Define how many data events are kept. 0 means the whole input.
 
      Options related to categorization :
      - mode={ 1VAR (default), 2VAR } : Chooses the categorization. 
@@ -23,6 +30,11 @@ namespace TemplateMethod {
      2VAR adds an event in both configurations ( ETA_CALO_1, PT_1 ) and (ETA_CALO_2, PT_2 ) with half its weight.
      - etaBins= <double> <double> ... : Defines the binning for the variable in ETA_CALO_1 and ETA_CALO_2. 
      Extremal values defines the domain of definition.
+     - ptBins=<double> <double> ... : Defines the binning for the variable in PT_1 and PTO_2. 
+     Extremal values defines the domain of definition.
+     - symBin=<int(bool)> : Only keeps tha absolute values of binnings
+     - nEventCut=<int> (default 10) : Define the minimal number of data or MC event in a configuration to measure scale.
+
 
      Options related to the template method : 
      - doScale=<int(bool)> ( default 0) : Allows the measurement of scale factor
@@ -32,10 +44,16 @@ namespace TemplateMethod {
      - ZMassNBins=<int> (default 20) : Number of bins to compute chi2
      - alphaNBins=<int> (default 20) : Number of tested scale values
      - sigmaNBins=<int> (default 20) : Number of tested smearing values
+     - fitMethod=<int> : Defines which polynomial is used to fit chi2 distribution of c. 
+     Details documented below
 
      The framework allows for an easy procedure to perform closures. 
      The options to perform a closure are detailed here :
      - doSimulation=<int(bool)> : Switches the closure mode.
+     - alphaSimEta= <double> <double> ... : Values of alpha to inject in MC as a function of ETA_CALO
+     - alphaSimPT= <double> <double> ... : Values of alpha to inject in MC as a function of PT
+     - sigmaSimEta= <double> <double> ... : Values of c to inject in MC as a function of ETA_CALO
+     - sigmaSimPT= <double> <double> ... : Values of c to inject in MC as a function of PT
      
      When testing exreme values of scale factors, it is possible to change dramatically the shape of the distribution.
      Optionnal variables are defined to set a range for the tested of scale factors.
@@ -49,6 +67,32 @@ namespace TemplateMethod {
      - constVarFit={ ALPHA, SIGMA (default) } : Selects the factor which remains constant while the other is scanned.
      - optimizeRange=<int> ( default 5 ) : Defines how the final interval of tested scales values is computed. 
      An optimization code looks for having an interval such as the maximum difference in chi2 is optimizeRanges**2.
+     - nUseEl=<int> : If statistics of MC and data are close, smearing of MC for c testing create statistical fuctuation.
+     nUseEl allows for multiple smearing of same event to reduce fluctuations.
+     Multiply measurement running time by nUseEl.
+     - thresholMass=<int> ( default 0 ) : In the case of mass measurement. 
+     Selection cut on electrons lead to minimal possible mass for an event in a configuration.
+     This selection removes the configuration with a higher threshold.
+
+     ### Fit method
+     Fit methods define the way fits of chi2 distributions are performed. 
+     The mode 0 is fixed for the scale.
+     The fitMethod options onlys sets the fit method for the constant term, because of its less quadratic behaviour.
+
+     Two fits are accepted : \n
+
+     \f$ f(x) = a_0 + \frac{(x-a_2)^2}{a_1^2} \f$
+
+     \f$ f(x)= a_0 + \frac{(x-a_1)^2}{a_2^2} + a_3 \frac{(x-a_1)^3}{a_2^3} \f$
+
+     - 0 : Quadratic fit, uncertainty defined as a_1
+     - 1 : Cubic fit, uncertainty defined by a_1
+     - 2 : Cubic fit, uncertainty numerically computed to get : \f$f(c+\Delta x) - f(x) = 1\f$
+
+
+     ### Independent random generators
+     bootstrap
+
   */
   class Setting 
   {

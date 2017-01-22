@@ -431,22 +431,11 @@ void TemplateMethod::ChiMatrix::FitChi2() {
     if ( isSigmaConstVar ) {
       m_sigma = max( fittingFunction->GetParameter(2), 0.); 
       m_errSigma = fittingFunction->GetParameter(1);
-
-      if ( m_setting->GetFitMethod() == 4 ) {
-	//Find the minimum of the distribution within 2 sigma of the fit minimum
-	double minChi = m_chi2FitConstVar->GetBinContent( m_chi2FitConstVar->FindBin( m_sigma) );
-	for ( int bin = max( m_chi2FitConstVar->FindBin( m_sigma - 2*m_errSigma ), 1); bin <= min( m_chi2FitConstVar->FindBin( m_sigma +2*m_errSigma ), m_chi2FitConstVar->GetNbinsX() ); bin++ ) {
-	  if ( m_chi2FitConstVar->GetBinContent( bin ) > minChi ) continue;
-	  minChi = m_chi2FitConstVar->GetBinContent( bin );
-	  m_sigma = max( 0., m_chi2FitConstVar->GetXaxis()->GetBinCenter( bin ) );
-	}
-      }
     }
     else {
       m_alpha = fittingFunction->GetParameter(2);
       m_errAlpha = fittingFunction->GetParameter(1);
     }
-
     delete fittingFunction; fittingFunction=0;
   }
   else m_quality.set( 0, 1 );
@@ -831,21 +820,16 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   }
 
   switch ( mode ) {
-  case 1 :
+  case 1 : case 2 
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
-  case 2 : case 4 :
-    fittingFunction = cubicFit;
-    minCentral=max( 0., hist->GetXaxis()->GetXmin() );
-    break;
-  case 3 :
+  default :
     fittingFunction = quadraticFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     minBin = hist->GetMinimumBin();
     break;
-  default : //Fit alpha optimization
-    fittingFunction = quadraticFit;
+
   }
 
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
@@ -897,7 +881,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   }
 
 
-  if ( !fitResult->Status() && ( mode == 2 || mode == 4 ) ) { //solve the equation chi(C))=1 with dichotomy
+  if ( !fitResult->Status() && mode == 2 ) ) { //solve the equation chi(C))=1 with dichotomy
     double minVal = fittingFunction->GetParameter(2);
     double currentValue = hist->GetXaxis()->GetXmax();
     double width = currentValue-minVal;
