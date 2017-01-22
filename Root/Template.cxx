@@ -473,7 +473,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
  
-    inputTree->SetDirectory( 0 );
+    //    inputTree->SetDirectory( 0 );
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
@@ -850,29 +850,35 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 
   if ( !correctionAlpha && !correctionSigma ) return 0;
 
+  string dumString="";
+  TString outFileName = "";
+
   for ( unsigned int iCorrection = 0; iCorrection < 2; iCorrection++ ) {
 
     if (  iCorrection && !correctionSigma ) continue;
     if ( !iCorrection && !correctionAlpha ) continue;
     const map<string, string> &mapBranchNames = iCorrection ? m_setting.GetMCBranchVarNames() : m_setting.GetDataBranchVarNames();
     if ( m_setting.GetDebug() )cout << "correcting : " << iCorrection << endl;
-    //correctionAlpha is applied on the data
-
-    TTree *dumTree = 0;
-    string dumString="";
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
+
     for ( unsigned int iFile = 0; iFile < nFile; iFile++ ) {
-      dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
-      dumTree = new TTree( dumString.c_str(), dumString.c_str() );
-      dumTree->SetDirectory(0);
 
       dumString = ( iCorrection ) ? m_MCFileNames[iFile] : m_dataFileNames[iFile];
       cout << "correcting : " << dumString << endl;
       TFile *dataFile = new TFile( dumString.c_str() );
-      
+
       dumString = ( iCorrection ) ? m_MCTreeNames[iFile] : m_dataTreeNames[iFile];
       TTree *dataTree = (TTree*) dataFile->Get( dumString.c_str() );
+
+      outFileName = ( iCorrection ) ? m_MCFileNames[iFile] : m_dataFileNames[iFile];
+      outFileName.ReplaceAll( ".root", "_corrected.root" );
+      TFile *distorded = new TFile( outFileName, "RECREATE" );
+
+      dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
+      TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
+
+
       m_mapBranches.LinkTreeBranches( dataTree, dumTree, m_branchesToLink );
       
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
@@ -896,27 +902,23 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
       dataFile->Close("R");
       delete dataFile;
 
-      TString outFileName = iCorrection ? m_MCFileNames[iFile] : m_dataFileNames[iFile];
-      outFileName.ReplaceAll( ".root", "_corrected.root" );
+
       cout << "saving : " << outFileName << endl;
-      TFile distorded( outFileName, "RECREATE" );
       dumTree->Write( "", TObject::kOverwrite );
-      distorded.Close("R");
 
-    if ( iCorrection ) {
-      m_MCFileNames[iFile] = outFileName;
-      m_MCTreeNames[iFile] = dumTree->GetName();
-    }
-    else {
-      m_dataFileNames[iFile] = distorded.GetName();
-      m_dataTreeNames[iFile] = dumTree->GetName();
-    }
-    delete dumTree; dumTree = 0;
-    }//end iFile  
+      if ( iCorrection ) {
+        m_MCFileNames[iFile] = outFileName;
+        m_MCTreeNames[iFile] = dumTree->GetName();
+      }
+      else {
+        m_dataFileNames[iFile] = distorded->GetName();
+        m_dataTreeNames[iFile] = dumTree->GetName();
+      }
+      distorded->Close();
+      delete distorded;
+    }//end iFile                                                                              
 
-  }//end if correctionAlpha
-
-    
+  }//end if correctionAlpha     
   if ( m_setting.GetDebug() )  cout << "Template : ApplyCorrection Done" << endl;
   return 0;
 }

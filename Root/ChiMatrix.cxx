@@ -590,7 +590,6 @@ int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
   if ( m_setting->GetDebug() )  cout << m_name << "::CreateTemplate" << endl;
 
   if ( m_setting->GetOptimizeRanges() ) OptimizeRanges();
-  if ( m_setting->GetDebug() )  cout <<"after OptimizeRanges"<<endl;
 
   ClearTemplates();
   if ( m_quality.to_ulong() ) return 0;
@@ -599,8 +598,6 @@ int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
   int sigmaMaxBin = ( m_setting->GetDoSmearing() ) ? ( nTemplates ) ? nTemplates : m_setting->GetSigmaNBins() : 0;
 
   FillScaleValues( nTemplates );  
-
-  if ( m_setting->GetDebug() )  cout <<"after FillScaleValues"<<endl;
 
   for ( int i_alpha = 0; i_alpha <= alphaMaxBin; i_alpha++ ) {
     m_MCZMass.push_back( vector< TH1D* > () );
@@ -612,12 +609,8 @@ int TemplateMethod::ChiMatrix::CreateTemplates( int nTemplates ) {
       m_MCZMass.back().back()->GetXaxis()->SetTitle( "M_{ee}" );
     }}
 
-    if ( m_setting->GetDebug() )  cout <<"after end loop alpha c"<<endl;
-
   FillTemplates();
 
-  if ( m_setting->GetDebug() )  cout <<"after FillTemplates"<<endl;
-  
   FillChiMatrix();
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::CreateTemplate Done" << endl;
