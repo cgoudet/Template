@@ -820,7 +820,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   }
 
   switch ( mode ) {
-  case 1 : case 2 
+  case 1 : case 2  :
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
@@ -881,7 +881,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   }
 
 
-  if ( !fitResult->Status() && mode == 2 ) ) { //solve the equation chi(C))=1 with dichotomy
+  if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
     double minVal = fittingFunction->GetParameter(2);
     double currentValue = hist->GetXaxis()->GetXmax();
     double width = currentValue-minVal;
