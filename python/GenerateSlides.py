@@ -55,8 +55,8 @@ systematics.append( Systematic( 'noIso', 'ScalesOff_1516_noIso') )
 systematics.append( Systematic( 'Inv', 'InversionStudy') )
 systematics[-1].SetSuffixes( {'c' : '_c' } )
 
-systematics.append( Systematic( 'Mat', 'DataOff_13TeV_25ns_rel201_IBL') )
-systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201' )
+#systematics.append( Systematic( 'Mat', 'DataOff_13TeV_25ns_rel201_IBL') )
+#systematics[-1].SetNomFile( 'DataOff_13TeV_25ns_rel201' )
 
 systematics.append( Systematic( 'Clos', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
@@ -210,9 +210,13 @@ def createLatex( directory, introFiles=[], concluFiles=[], mode=1 ) :
     slideText['totSyst'] = ( 'Sources of uncertainty and their contribution in the total systematic uncertainty.\n For statistical reasons, uncertainties are symetrized along $\eta_{calo}$\n' )
     slideText['WindowSyst'] = 'Systematic defined as the difference between nominal measurement and reducing $Z$ mass range from $[80-100]$~GeV to $[82.5-97.5]$~GeV.\n'
     slideText['noIsoSyst'] = 'Systematic defined as the difference between nominal measurement and removing the isolation cut.\n'
-    slideText['run1Syst'] = 'Comparison between current systematic model and run1 total systematic uncertainty\n.'
-    slideText['IDSyst'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection\n'
+    slideText['run1Syst'] = 'Comparison between current systematic model and run1 total systematic uncertainty.\n.'
+    slideText['IDSyst'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection.\n'
     slideText['fBremSyst' ] = 'Systematic defined as the difference between nominal measurement and an additional cut removing electrons with fBrem$>0.7$.\n'
+    slideText['Meth' ] = 'Systematic taken from Run I: difference between nominal measurement and lineshape method.\n'
+    slideText['EW' ] = 'Systematic taken from Run I: difference between nominal measurement and measurement using MC produced including EW processes. \n'
+    slideText['Inv' ] = 'Systematic taken from Run I: difference between measurement with $C_i>0$ and $C_{ij}>0$ for the inversion procedure.\n'
+    slideText['Clos' ] = 'Systematic taken from Run I: difference between values measured with the template method and values chosen as input when using a MC as pseudo-data.\n'
 
     effSyst = [ syst for syst in systs if 'Eff' in syst ]
     for syst in effSyst :

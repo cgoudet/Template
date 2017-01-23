@@ -23,6 +23,8 @@ FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/Zee_data16.root']
 
 #==============
 FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
+FILESETS['CorrectedDataThreshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Threshold_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
+FILESETS['CorrectedDataWindow']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Window_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
 FILESETS['CorrectedDataID']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh2_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh2/']
 FILESETS['CorrectedDataIso']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_doIso0_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_doIso0/']
 FILESETS['CorrectedDatafBrem']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_fBrem70_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70/']
@@ -174,7 +176,8 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
-    dataLine = ' '.join( [ ' --dataFileName ' + StripString( name, 1, 0 ) for name in dataFiles ] ) 
+    dataLine = ' '.join( [ (' --dataFileName ' + StripString( name, 1, 0 ) + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) ) for name in dataFiles ] ) 
+    
     MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) for name in MCFiles ] )
 
 #Fill the command line
@@ -203,7 +206,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
 
 
-        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine + ' --makePlot \n')
+        else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine +' --makePlot \n')
 
    # if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n rm *distorded* \n' )
     batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
@@ -294,7 +297,7 @@ def CreateConfig( configName, inOptions = [] ) :
          #options['branchVarNames']['PT_1']='pt_1'
          #options['branchVarNames']['PT_2']='pt_2'
          options['MCBranchVarNames']['MASS']='m12'
-         options['MCBranchWeightName']=''
+         options['MCBranchWeightName']='weight'
    
 
 
@@ -303,7 +306,7 @@ def CreateConfig( configName, inOptions = [] ) :
         optValue= inOpt[inOpt.find('=')+1:]
 
         if optKey in options :
-            if optKey == 'branchVarNames' :
+            if 'BranchVarNames' in optKey :
                 optValue = optValue.split( ' ' )
                 options[optKey][optValue[0]] = optValue[1]
                 pass
@@ -314,7 +317,7 @@ def CreateConfig( configName, inOptions = [] ) :
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
-            if iLabel == 'branchVarNames' : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
+            if 'BranchVarNames' in iLabel : batch.write( '\n'.join( [ iLabel + '=' + var + ' ' + options[iLabel][var]  for var in options[iLabel] ] ) + '\n' )
             else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         
     return

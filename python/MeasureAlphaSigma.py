@@ -15,13 +15,10 @@ if switch==0 :
         configFiles=[ 
 			
 # 		Mesure des scales
-		# ['ScalesOff_13TeV_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[] ], #nominal
-		# ['ScalesOff_13TeV_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[] ], #nominal
 		#['AlphaOff_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[], 0 ], #nominal
 		#['AlphaOff_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[], 0 ], #nominal
-		['ScalesOff_1516_nUseEl3.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal
-		['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',[]], #nominal
-		#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',['MCBranchWeightName=SFReco SFIso SFID', 'inversionMethod=11', "nUseEl=3"] ], #nominal
+		['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal to compute systematics
+		['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',['MCBranchWeightName=weight', "nUseEl=3"] ], #nominal
 
 		# ['Scales_eos_16.root', 'Data16_eos', 'MC15c_eos',['MCBranchWeightName=weight_16', 'etaBins='] ], #eosNtuples
 		# ['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',['MCBranchWeightName=weight_15'] ], #eosNtuples
@@ -33,23 +30,23 @@ if switch==0 :
 		# Changing mass threshold from 70 to 75GeV
 		#['AlphaOff_16_Threshold.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1', ['thresholdMass=75'],0],
 		#['AlphaOff_15_Threshold.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1', ['thresholdMass=75'],0],
-		['ScalesOff_1516_Threshold.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'thresholdMass=75']],
+		['ScalesOff_1516_Threshold.root', 'CorrectedDataThreshold', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'thresholdMass=75']],
 		# Changing mass window of interest
 		#['AlphaOff_16_Window.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0],
 		#['AlphaOff_15_Window.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0], 
-		['ScalesOff_1516_Window.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'ZMassMin=82.5', 'ZMassMax=97.5']],
+		['ScalesOff_1516_Window.root', 'CorrectedDataWindow', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'ZMassMin=82.5', 'ZMassMax=97.5']],
 		#  # Electron tight
-		# ['AlphaOff_16_ID.root', 'Data16_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2016_noGain_Lkh2', [], 0 ],
-		# ['AlphaOff_15_ID.root', 'Data15_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2015_noGain_Lkh2', [], 0 ],
+		#['AlphaOff_16_ID.root', 'Data16_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2016_noGain_Lkh2', [], 0 ],
+		#['AlphaOff_15_ID.root', 'Data15_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2015_noGain_Lkh2', [], 0 ],
 		['ScalesOff_1516_ID.root', 'CorrectedDataID', 'MC15c_13TeV_Zee_noGain_Lkh2',['nUseEl=3']],
 		#  #mesure avec fBrem
-		# ['AlphaOff_16_fBrem.root', 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70', [ ], 0],
-		# ['AlphaOff_15_fBrem.root', 'Data15_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70', [ ], 0],
+		#['AlphaOff_16_fBrem.root', 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70', [ ], 0],
+		#['AlphaOff_15_fBrem.root', 'Data15_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70', [ ], 0],
 		['ScalesOff_1516_fBrem.root', 'CorrectedDatafBrem', 'MC15c_13TeV_Zee_noGain_Lkh1_fBrem70',['nUseEl=3'] ],
 
 		# #Removing isolation 
-		# ['AlphaOff_16_noIso.root', 'Data16_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_noIso', [ ], 0],
-		# ['AlphaOff_15_noIso.root', 'Data15_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_noIso', [], 0],
+		#['AlphaOff_16_noIso.root', 'Data16_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_noIso', [ ], 0],
+		#['AlphaOff_15_noIso.root', 'Data15_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_noIso', [], 0],
 		['ScalesOff_1516_noIso.root', 'CorrectedDataIso', 'MC15c_13TeV_Zee_noGain_Lkh1_noIso',['nUseEl=3'] ],
 
 

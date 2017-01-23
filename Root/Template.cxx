@@ -274,7 +274,7 @@ int TemplateMethod::Template::CreateTemplate() {
   int eta2Max = 0;
 
   //Setup ChiMatrix
-  for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) { 
+  for ( int i_eta = 0; i_eta < eta1Max; i_eta++ ) {
     m_chiMatrix.push_back( vector< ChiMatrix * >() );
 
     //If only eta binning : we do a tringular matrix 
@@ -306,6 +306,7 @@ int TemplateMethod::Template::CreateTemplate() {
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
+      //if (i_eta!=16 || j_eta!=6) continue;
       m_chiMatrix[i_eta][j_eta]->CreateTemplates();
     }}  
   
@@ -878,7 +879,6 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
       dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
       TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
 
-
       m_mapBranches.LinkTreeBranches( dataTree, dumTree, m_branchesToLink );
       
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
@@ -887,9 +887,10 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 	vector<double> factors(2);
 	for ( unsigned i=0; i<factors.size(); ++i ) {
 	  TH1 *hist = iCorrection ? correctionSigma : correctionAlpha;
-	  string varName = string( hist->GetXaxis()->GetTitle() ) + "_" + to_string(i+1);
-
+	  //string varName = string( hist->GetXaxis()->GetTitle() );// + "_" + to_string(i+1);
+	  string varName = "ETA_CALO_" + to_string(i+1);
 	  double scale = hist->GetBinContent( hist->FindFixBin( m_mapBranches.GetDouble( mapBranchNames.at(varName) ) ) );
+	  //double scale = hist->GetBinContent( hist->FindFixBin( m_mapBranches.GetDouble( varName ) ) );
 	  if ( iCorrection ) scale*=m_rand.Gaus();
 	  factors[i] = 1 - scale;
 	}
@@ -987,7 +988,8 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
 
+  
   m_branchesToLink.sort();
   m_branchesToLink.erase( unique( m_branchesToLink.begin(), m_branchesToLink.end()), m_branchesToLink.end() );
-
+  
 }
