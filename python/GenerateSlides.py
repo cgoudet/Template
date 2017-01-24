@@ -19,9 +19,9 @@ class Systematic :
         self.m_inFile = inFile
         self.m_name = name
 
-        self.m_nomFile = 'ScalesOff_1516_nUseEl3'
+        self.m_nomFile = 'ScalesOff_1516'
         self.m_nomSuffixes = {'alpha' : '', 'c' : '_c'}
-        self.m_systModel = { 'alpha' : 20, 'c' : 20 }
+        self.m_systModel = { 'alpha' : 10, 'c' : 10 }
         self.m_plotOptions = []
         self.m_suffixes = {'alpha' : '', 'c' : '_c'}
         self.m_histNames = { 'alpha' : 'measScale_alpha', 'c' : 'measScale_c' }
@@ -60,24 +60,24 @@ systematics[-1].SetSuffixes( {'c' : '_c' } )
 
 systematics.append( Systematic( 'Clos', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
-systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
+systematics[-1].SetSystModel( { 'alpha' : 100, 'c' : 100 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_Clos', 'c' : 'Run1/ctErrZee_run1_Clos' } ) 
 systematics[-1].SetNomFile( '' )
 
 systematics.append( Systematic( 'Meth', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
-systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
+systematics[-1].SetSystModel( { 'alpha' : 100, 'c' : 100 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_Meth', 'c' : 'Run1/ctErrZee_run1_MethMod' } ) 
 systematics[-1].SetNomFile( '' )
 
 systematics.append( Systematic( 'EW', '/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors') )
 systematics[-1].SetSuffixes( { 'alpha' : '', 'c' : '' } ) 
-systematics[-1].SetSystModel( { 'alpha' : 10, 'c' : 10 } ) 
+systematics[-1].SetSystModel( { 'alpha' : 100, 'c' : 100 } ) 
 systematics[-1].SetHistNames( { 'alpha' : 'Run1/alphaErrZee_run1_EW', 'c' : 'Run1/ctErrZee_run1_EW' } ) 
 systematics[-1].SetNomFile( '' )
 
 #specialID = [ 'fBrem', 'reweighting', 'cutFlow', 'nominal', 'residual', 'totSyst', 'correction', 'run1Syst' ]
-specialID = [ 'totSyst', 'fBrem', 'run1Syst' ]
+specialID = [ 'totSyst', 'fBrem', 'run1Syst', 'cutFlow' ]
 
 def InversionStudy( directory ) :
     print('create inversion systematic' )
@@ -153,16 +153,24 @@ def createSingleFile( directory, var, systList, suffix='' ) :
 
     outFile = directory + 'systematics_' + var + suffix + '.txt'
     systFile = open( outFile, 'w' )
-    systFile.write( directory + 'EnergyScaleFactors.root totSyst_' + var + ' dum 0\n' )
+    systFile.write( 'outFileName='+directory + 'EnergyScaleFactors.root\ntotSystName=totSyst_' + var + '\n' )
 
     if systList[0].GetNomFile() != '' : 
-        systFile.write( ( directory if '/' not in systList[0].GetNomFile() else '' ) + systList[0].GetNomFile() + systList[0].GetNomSuffixes()[var] + '.root measScale_' + var + ( ' centVal_'+var if systList[0].GetNomFile()== 'ScalesOff_1516' else ' dum' ) + ' 0\n' )
+        systFile.write('\n'.join( [ 
+            ( 'rootFileName='+directory if '/' not in systList[0].GetNomFile() else '' ) + systList[0].GetNomFile() + systList[0].GetNomSuffixes()[var] + '.root', 
+            'histName=measScale_' + var,
+            ( 'systName=centVal_'+var if systList[0].GetNomFile()== 'ScalesOff_1516' else '' ), 
+            'mode=0'])
+                       +'\n'
+            )
     
     systFile.write( '\n'.join( [ 
-                ( directory if '/' not in syst.GetInFile() else '' ) 
-                + syst.GetInFile() + syst.GetSuffixes()[var] + '.root ' + ' '.join( [ syst.GetHistNames()[var], syst.GetName()+ '_' + var, str( syst.GetSystModel()[var] ) ] ) 
+                '\n'.join(['rootFileName='+( directory if '/' not in syst.GetInFile() else '' ) +syst.GetInFile() + syst.GetSuffixes()[var] + '.root', 
+                'histName='+syst.GetHistNames()[var], 
+                'systName=syst_'+syst.GetName()+ '_' + var, 
+                'mode='+str( syst.GetSystModel()[var] )]) 
                 for syst in systList if var in syst.GetSuffixes() ] )
-                    + '\n' )
+                    +'\nupdate=1\n')
     systFile.close()
     return outFile
 #===============================================
@@ -208,15 +216,16 @@ def createLatex( directory, introFiles=[], concluFiles=[], mode=1 ) :
                              )
     slideText['correction'] = ( 'The lineshape of the $Z$ is compared after application of 2015 corrections between data and MC.\n' )
     slideText['totSyst'] = ( 'Sources of uncertainty and their contribution in the total systematic uncertainty.\n For statistical reasons, uncertainties are symetrized along $\eta_{calo}$\n' )
-    slideText['WindowSyst'] = 'Systematic defined as the difference between nominal measurement and reducing $Z$ mass range from $[80-100]$~GeV to $[82.5-97.5]$~GeV.\n'
-    slideText['noIsoSyst'] = 'Systematic defined as the difference between nominal measurement and removing the isolation cut.\n'
+    slideText['Window'] = 'Systematic defined as the difference between nominal measurement and reducing $Z$ mass range from $[80-100]$~GeV to $[82.5-97.5]$~GeV.\n'
+    slideText['noIso'] = 'Systematic defined as the difference between nominal measurement and removing the isolation cut.\n'
     slideText['run1Syst'] = 'Comparison between current systematic model and run1 total systematic uncertainty.\n.'
-    slideText['IDSyst'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection.\n'
-    slideText['fBremSyst' ] = 'Systematic defined as the difference between nominal measurement and an additional cut removing electrons with fBrem$>0.7$.\n'
+    slideText['ID'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection.\n'
+    slideText['fBrem' ] = 'Systematic defined as the difference between nominal measurement and an additional cut removing electrons with fBrem$>0.7$.\n'
     slideText['Meth' ] = 'Systematic taken from Run I: difference between nominal measurement and lineshape method.\n'
     slideText['EW' ] = 'Systematic taken from Run I: difference between nominal measurement and measurement using MC produced including EW processes. \n'
     slideText['Inv' ] = 'Systematic taken from Run I: difference between measurement with $C_i>0$ and $C_{ij}>0$ for the inversion procedure.\n'
     slideText['Clos' ] = 'Systematic taken from Run I: difference between values measured with the template method and values chosen as input when using a MC as pseudo-data.\n'
+    slideText['Threshold' ] = 'Systematic defined as the difference between nominal measurement and increasing the threshold mass from 70GeV to 75GeV. The threshold mass corresponds to the minimal $Z$ mass possible in a given ($\\eta_i$,$\\eta_j$) configuration.\n'
 
     effSyst = [ syst for syst in systs if 'Eff' in syst ]
     for syst in effSyst :
@@ -307,7 +316,7 @@ def createSystBoost( directory, syst, var, mode ) :
 
     boostFile.write( '\n'.join( syst.GetPlotOptions() ) +'\n' )
     boostFile.write( 'plotDirectory='+directory+'\n')
-    boostFile.write( 'loadFiles='+directory+'Label.txt\n')
+    if syst.GetName() not in ['EW', 'Clos', 'Meth'] : boostFile.write( 'loadFiles='+directory+'Label.txt\n')
 
     boostFile.close()
     
@@ -371,6 +380,7 @@ def createRestBoost( directory, ID, var ) :
         
     elif ID == 'totSyst' :
         systs = getSyst( 10 if var=='alpha' else 1 )
+        #systs = getSyst( 100 )
 
         options['rootFileName'] =  [directory + 'EnergyScaleFactors.root']*(len( systs )+ 1 ) 
         options['objName'].append( 'totSyst_' + var )
@@ -409,11 +419,9 @@ def createRestBoost( directory, ID, var ) :
         
         #options['loadFiles']=['Data1615_cutFlow.boost']
         options['rootFileName'] = [ ' '.join([ dataset for dataset in listFiles('/sps/atlas/a/aguerguichon/Calibration/DataxAOD/' + datasetType + '/', datasetType+'*.root' ) ] )
-                                    for datasetType in [ 'Data1*_13TeV_Zee_Lkh1','MC15c_13TeV_Zee_Lkh1' ] 
+                                    for datasetType in [ 'Data1*_13TeV_Zee_noGain_Lkh1','MC15c_13TeV_Zee_noGain_Lkh1' ] 
                                      ] 
-        options['objName'] = [ ' '.join( [ StripString(objName)+'_cutFlow' for objName in rootFile.split(' ') ] )
-                                for rootFile in options['rootFileName'] ]
-        
+        options['objName'] = [ 'Analysis_cutFlow Analysis_cutFlow', 'Analysis_cutFlow' ]
         
         options['legend']= [ 'Data', 'MC' ]
         optionsUnique['rangeUserY'] = '0 0.99'
@@ -558,8 +566,7 @@ def main():
         print('Creating Systematics')
         InversionStudy( args.directory )
         systematicsFiles = createSystematicFiles( args.directory, systematics ) 
-        #print(systematics)
-        os.system( 'AddSyst ' + ' '.join( systematicsFiles ) )
+        os.system( 'Catalog --mode 1 ' + ' '.join( systematicsFiles ) )
 
     if args.doPlot :
         print('Creating boost files')

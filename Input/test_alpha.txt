@@ -1,2 +1,19 @@
-/sps/atlas/a/aguerguichon/Calibration/Test/EnergyScaleFactors16.root				totSyst_alpha	dum 0
-/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/DataOff_13TeV_16.root			measScale_alpha centVal_alpha 0	
+outFileName=EnergyScaleFactors.root
+totSystName=tottSyst_alpha
+
+rootFileName=/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesOff_1516.root
+histName=measScale_alpha 
+systName=centVal_alpha 
+mode=0	
+
+rootFileName=/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesOff_1516_ID.root
+histName=measScale_alpha 
+systName=ID_alpha 
+mode=10
+
+rootFileName=/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root
+histName=Run1/alphaErrZee_run1_EW 
+systName=EW_alpha 
+mode=100
+
+	
