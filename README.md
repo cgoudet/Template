@@ -26,11 +26,11 @@ The different measurements are performed as jobs running on the Centre de Calcul
 Download and setup
 ------------------
 
-The Template package depends on the PlotFunctions one, meaning that you have to download both packages in the same directory from git@github.com:aguerguichon. A RootCore will have to be setup in this directory.
+The Template package depends on the PlotFunctions one, meaning that you have to download both packages in the same directory from git@github.com:cgoudet. A RootCore will have to be setup in this directory.
 
 ```
-git clone git@github.com:aguerguichon/Template.git
-git clone git@github.com:aguerguichon/PlotFunctions.git
+git clone git@github.com:cgoudet/Template.git
+git clone git@github.com:cgoudet/PlotFunctions.git
 rcSetup -r //to check the latest version of RootCore available  
 rcSetup Base,2.4.X  
 rc find_packages  
@@ -48,7 +48,7 @@ The MeasureScale.cxx macro allows to perform the measurement. The Functions_Meas
 
 To run the program, call:
 ```
-MeasureScale --configFile yourConfFile --dataFileName yourDataFile1 --dataFileName yourDataFile2 --MCFileName yourMCFile1 --outFileName yourOutputFile <other options>
+MeasureScale --configFile yourConfFile --dataFileName yourDataFile1 --dataTreeName yourDataTreeName1 --dataFileName yourDataFile2 --dataTreeName yourDataTreeName2 --MCFileName yourMCFile1 --MCTreeName yourMCTreeName1 --outFileName yourOutputFile <other options>
 ```  
 Different options are supported by MeasureScale and are displayed/described in MeasureScale.cxx.
 

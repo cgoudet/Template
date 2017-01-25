@@ -431,22 +431,11 @@ void TemplateMethod::ChiMatrix::FitChi2() {
     if ( isSigmaConstVar ) {
       m_sigma = max( fittingFunction->GetParameter(2), 0.); 
       m_errSigma = fittingFunction->GetParameter(1);
-
-      if ( m_setting->GetFitMethod() == 4 ) {
-	//Find the minimum of the distribution within 2 sigma of the fit minimum
-	double minChi = m_chi2FitConstVar->GetBinContent( m_chi2FitConstVar->FindBin( m_sigma) );
-	for ( int bin = max( m_chi2FitConstVar->FindBin( m_sigma - 2*m_errSigma ), 1); bin <= min( m_chi2FitConstVar->FindBin( m_sigma +2*m_errSigma ), m_chi2FitConstVar->GetNbinsX() ); bin++ ) {
-	  if ( m_chi2FitConstVar->GetBinContent( bin ) > minChi ) continue;
-	  minChi = m_chi2FitConstVar->GetBinContent( bin );
-	  m_sigma = max( 0., m_chi2FitConstVar->GetXaxis()->GetBinCenter( bin ) );
-	}
-      }
     }
     else {
       m_alpha = fittingFunction->GetParameter(2);
       m_errAlpha = fittingFunction->GetParameter(1);
     }
-
     delete fittingFunction; fittingFunction=0;
   }
   else m_quality.set( 0, 1 );
@@ -534,8 +523,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( string(TString::Format("legend=Template : alpha=%i; m=__MEAN",(int) ( m_scaleValues.front()*1e6)) ) );
       legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
       legends.push_back("doRatio=1");
-      plotName=TString(path + m_name + "_CompareAlpha");
-      legends.push_back( "outName=" + plotName );
+      plotName=path + m_name + "_CompareAlpha";
+      legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[0][bestSigma], m_MCZMass.back()[bestSigma]};
       drawOpt.FillOptions( legends );
       drawOpt.Draw( dumVect );
@@ -548,8 +537,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( "legend=Data" );
       legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
       legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
-      plotName=TString(path + m_name + "_CompareSigma");
-      legends.push_back( "outName=" + plotName );
+      plotName = path + m_name + "_CompareSigma";
+      legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front(), m_MCZMass[bestAlpha].back()};
       drawOpt.FillOptions( legends );
       drawOpt.Draw( dumVect );
@@ -558,7 +547,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
 
     }
   }
-  
+
+  drawOpt.AddOption( "doRatio=0");
   plotName = path + m_name + "_chi2FitConstVar";
   dumVect = { m_chi2FitConstVar };
 
@@ -576,12 +566,14 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   WriteLatexMinipage( ss, plotNames, 2 );
 
   plotNames.clear();
-  // for ( int i=0; i< (int) m_chi2FitNonConstVar.size(); i++ ) {
-  //   plotName = path + m_chi2FitNonConstVar[i]->GetName();
-  //   DrawPlot( { m_chi2FitNonConstVar[i] }, plotName );
-  //   plotNames.push_back( plotName );
-  // }
-  // WriteLatexMinipage( ss, plotNames, 4 );
+  for ( int i=0; i< static_cast<int>(m_chi2FitNonConstVar.size()); ++i ) {
+    plotName = path + m_chi2FitNonConstVar[i]->GetName();
+    drawOpt.AddOption( "outName", plotName );
+    dumVect = { m_chi2FitNonConstVar[i] };
+    drawOpt.Draw( dumVect );
+    plotNames.push_back( plotName );
+  }
+  WriteLatexMinipage( ss, plotNames, 4 );
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot Done" << endl;
 }
@@ -722,13 +714,8 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
     delete cubicFit; cubicFit=0;
     return 0;
   }
-
   switch ( mode ) {
-  case 1 :
-    fittingFunction = cubicFit;
-    minCentral=max( 0., hist->GetXaxis()->GetXmin() );
-    break;
-  case 2 : case 4 :
+  case 1 : case 2  :
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
@@ -737,7 +724,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     minBin = hist->GetMinimumBin();
     break;
-  default : //Fit alpha optimization
+  default :
     fittingFunction = quadraticFit;
   }
 
@@ -790,7 +777,7 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
   }
 
 
-  if ( !fitResult->Status() && ( mode == 2 || mode == 4 ) ) { //solve the equation chi(C))=1 with dichotomy
+  if ( !fitResult->Status() && mode == 2 ) { //solve the equation chi(C))=1 with dichotomy
     double minVal = fittingFunction->GetParameter(2);
     double currentValue = hist->GetXaxis()->GetXmax();
     double width = currentValue-minVal;
