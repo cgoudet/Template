@@ -333,7 +333,7 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
     const double mass = m_mapBranch.GetDouble("mass");
     const double weight = m_mapBranch.GetDouble("weight");
 
-    for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
+    for ( unsigned int useEl = 0; useEl<imax; ++useEl ) {
       const double randVal1 =  m_rand.Gaus();
       for ( unsigned i_alpha = 0; i_alpha < m_MCZMass.size(); ++i_alpha ) {	            
 	for ( unsigned i_sigma = 0; i_sigma < m_MCZMass[i_alpha].size(); ++i_sigma ) {
