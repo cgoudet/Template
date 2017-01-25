@@ -335,8 +335,8 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 
     for ( unsigned int useEl = 0; useEl<imax; useEl++ ) {
       const double randVal1 =  m_rand.Gaus();
-      for ( int i_alpha = 0; i_alpha < (int) m_MCZMass.size(); i_alpha++ ) {	            
-	for ( int i_sigma = 0; i_sigma < (int) m_MCZMass[i_alpha].size(); i_sigma++ ) {
+      for ( unsigned i_alpha = 0; i_alpha < m_MCZMass.size(); ++i_alpha ) {	            
+	for ( unsigned i_sigma = 0; i_sigma < m_MCZMass[i_alpha].size(); ++i_sigma ) {
 	  	  
 	  const double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
 	  const double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
