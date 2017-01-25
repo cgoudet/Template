@@ -340,6 +340,7 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 	  const double factor1Alpha = 1 + ( m_MCZMass.size()==1 ? ( m_setting->GetDoScale() ? (m_alphaMax + m_alphaMin)/2. : 0.) : m_scaleValues[i_alpha] );
 	  const double factor1Sigma = 1 + randVal1 *( m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0 );
 
+	  //	  const double newMass =  mass*sqrt(factor1Alpha*factor1Sigma);
 	  const double newMass =  mass*factor1Alpha*factor1Sigma;
 	  // if ( weight <0 ) {
 	  //   cout << "mass : " << mass << endl;

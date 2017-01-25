@@ -97,23 +97,25 @@ def applyCorrection( directory ) :
     commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh1/Data*root' ) ) 
     commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'AlphaOff_15.root \n'
 
-    #os.system( commandLine )
-    #os.system( commandLine.replace('15', '16') )
+    os.system( commandLine )
+    os.system( commandLine.replace('15', '16') )
 
 
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom_c.boost --noExtraction '
+    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOff_1516_c.boost --noExtraction '
     commandLine += ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC*.root' ) )
     commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName ' + directory + 'ScalesGeom_c.root'
+    commandLine += ' --correctSigmaFileName ' + directory + 'ScalesOff_1516_c.root'
 
-    #os.system( commandLine )
-
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom.boost --noExtraction'
-    commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_NewGeom_Lkh1/MC*root' ) ) 
-    #commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'ScalesGeom.root \n'
-    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesGeom.root \n'
     os.system( commandLine )
+
+
+    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom_c.boost --noExtraction'
+    #commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_NewGeom_Lkh1/MC*root' ) ) 
+    commandLine+= ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC*root' ) ) 
+#    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'NewGeom/ScalesGeom.root \n'
+    commandLine+= ' --correctSigmaHistName measScale_c --correctSigmaFileName '+directory+'NewGeom/ScalesGeom_c.root \n'
+#    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesGeom.root \n'
+    #os.system( commandLine )
     
     content = ( listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh*/Data*.root' ) 
                 + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data16_13TeV_Zee_noGain_Lkh*/Data*.root' )  
@@ -219,13 +221,13 @@ def createLatex( directory, introFiles=[], concluFiles=[], mode=1 ) :
     slideText['Window'] = 'Systematic defined as the difference between nominal measurement and reducing $Z$ mass range from $[80-100]$~GeV to $[82.5-97.5]$~GeV.\n'
     slideText['noIso'] = 'Systematic defined as the difference between nominal measurement and removing the isolation cut.\n'
     slideText['run1Syst'] = 'Comparison between current systematic model and run1 total systematic uncertainty.\n.'
-    slideText['ID'] = 'Systematic defined as the difference between nominal measurement and Tight identification selection.\n'
+    slideText['ID'] = 'Systematic defined as the difference between nominal measurement (medium) and tight identification selection..\n'
     slideText['fBrem' ] = 'Systematic defined as the difference between nominal measurement and an additional cut removing electrons with fBrem$>0.7$.\n'
     slideText['Meth' ] = 'Systematic taken from Run I: difference between nominal measurement and lineshape method.\n'
     slideText['EW' ] = 'Systematic taken from Run I: difference between nominal measurement and measurement using MC produced including EW processes. \n'
-    slideText['Inv' ] = 'Systematic taken from Run I: difference between measurement with $C_i>0$ and $C_{ij}>0$ for the inversion procedure.\n'
+    slideText['Inv' ] = 'Systematic defined as the difference between nominal measurement with $C_i>0$ and imposing $C_i^2>0$ for the inversion procedure.\n'
     slideText['Clos' ] = 'Systematic taken from Run I: difference between values measured with the template method and values chosen as input when using a MC as pseudo-data.\n'
-    slideText['Threshold' ] = 'Systematic defined as the difference between nominal measurement and increasing the threshold mass from 70GeV to 75GeV. The threshold mass corresponds to the minimal $Z$ mass possible in a given ($\\eta_i$,$\\eta_j$) configuration.\n'
+    slideText['Threshold' ] = 'Systematic defined as the difference between nominal measurement and increasing the threshold mass $M_{th}$ from 70GeV to 75GeV, $M_{th}$ being the minimal $Z$ mass possible in a given ($\eta_{i}$,$\eta_{j}$) configuration for $p_{T, cut}=$27GeV.\n'
 
     effSyst = [ syst for syst in systs if 'Eff' in syst ]
     for syst in effSyst :
@@ -316,8 +318,9 @@ def createSystBoost( directory, syst, var, mode ) :
 
     boostFile.write( '\n'.join( syst.GetPlotOptions() ) +'\n' )
     boostFile.write( 'plotDirectory='+directory+'\n')
-    if syst.GetName() not in ['EW', 'Clos', 'Meth'] : boostFile.write( 'loadFiles='+directory+'Label.txt\n')
-
+    boostFile.write( 'xTitle=__ETA_CALO\n')
+    boostFile.write( 'loadFiles='+directory+'Label.txt\n' if syst.GetName() not in ['EW', 'Clos', 'Meth'] else 'latex = __ATLAS Work in progress\nlatexOpt = 0.13 0.9')
+    
     boostFile.close()
     
     return output
@@ -404,9 +407,9 @@ def createRestBoost( directory, ID, var ) :
         optionsUnique['rangeUserY'] = '0 0.99'
 
     elif ID == 'run1Syst' :
-        options['rootFileName'] = ['/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root', directory+'EnergyScaleFactors.root']
-        options['objName'] = [ 'Run1/' + ( 'ct' if var=='c' else 'alpha' ) + 'ErrZee_run1_totSyst', 'totSyst_' + var ]
-        options['legend']= [ 'Run1', 'Run2' ]
+        options['rootFileName'] = ['/sps/atlas/a/aguerguichon/Calibration/Run1/EnergyScaleFactors.root', '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/ICHEP2016/EnergyScaleFactors.root', directory+'EnergyScaleFactors.root']
+        options['objName'] = [ 'Run1/' + ( 'ct' if var=='c' else 'alpha' ) + 'ErrZee_run1_totSyst', 'totSyst_' + var,'totSyst_' + var ]
+        options['legend']= [ 'Run1', 'ICHEP recommandations', 'Current recommandations' ]
         optionsUnique['rangeUserY'] = '0 0.99'
 
     elif ID == 'cutFlow' : 

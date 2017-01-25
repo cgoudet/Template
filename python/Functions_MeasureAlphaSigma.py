@@ -78,7 +78,7 @@ FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c
 
 #====================== Test ===============================//
 
-FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_NewGeom_Lkh1/user.aguergui.MC_13TeV_Zee_NewGeom_Lkh1_1_Ntuple.root/user.aguergui.10415591*root']
+FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_NewGeom_Lkh1/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
 
