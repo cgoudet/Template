@@ -523,7 +523,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( string(TString::Format("legend=Template : alpha=%i; m=__MEAN",(int) ( m_scaleValues.front()*1e6)) ) );
       legends.push_back( string(TString::Format("legend=Template : alpha=%i", (int) (m_scaleValues.back()*1e6)) ) );
       legends.push_back("doRatio=1");
-      legends.push_back( "outName=" + path + m_name + "_CompareAlpha" );
+      plotName=path + m_name + "_CompareAlpha";
+      legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[0][bestSigma], m_MCZMass.back()[bestSigma]};
       drawOpt.FillOptions( legends );
       drawOpt.Draw( dumVect );
@@ -536,7 +537,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       legends.push_back( "legend=Data" );
       legends.push_back( string(TString::Format("legend=Template : sigma=%i",(int) ( m_sigmaValues.front()*1e6) ) ));
       legends.push_back( string(TString::Format("legend=Template : sigma=%i", (int) (m_sigmaValues.back()*1e6) )));
-      legends.push_back( "outName=" + path + m_name + "_CompareSigma" );
+      plotName = path + m_name + "_CompareSigma";
+      legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front(), m_MCZMass[bestAlpha].back()};
       drawOpt.FillOptions( legends );
       drawOpt.Draw( dumVect );
@@ -545,7 +547,8 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
 
     }
   }
-  
+
+  drawOpt.AddOption( "doRatio=0");
   plotName = path + m_name + "_chi2FitConstVar";
   dumVect = { m_chi2FitConstVar };
 
@@ -563,12 +566,14 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   WriteLatexMinipage( ss, plotNames, 2 );
 
   plotNames.clear();
-  // for ( int i=0; i< (int) m_chi2FitNonConstVar.size(); i++ ) {
-  //   plotName = path + m_chi2FitNonConstVar[i]->GetName();
-  //   DrawPlot( { m_chi2FitNonConstVar[i] }, plotName );
-  //   plotNames.push_back( plotName );
-  // }
-  // WriteLatexMinipage( ss, plotNames, 4 );
+  for ( int i=0; i< static_cast<int>(m_chi2FitNonConstVar.size()); ++i ) {
+    plotName = path + m_chi2FitNonConstVar[i]->GetName();
+    drawOpt.AddOption( "outName", plotName );
+    dumVect = { m_chi2FitNonConstVar[i] };
+    drawOpt.Draw( dumVect );
+    plotNames.push_back( plotName );
+  }
+  WriteLatexMinipage( ss, plotNames, 4 );
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot Done" << endl;
 }
@@ -818,18 +823,18 @@ TF1* TemplateMethod::ChiMatrix::FitHist( TH1D* hist, unsigned int mode, double c
     delete cubicFit; cubicFit=0;
     return 0;
   }
-
   switch ( mode ) {
   case 1 : case 2  :
     fittingFunction = cubicFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     break;
-  default :
+  case 3 :
     fittingFunction = quadraticFit;
     minCentral=max( 0., hist->GetXaxis()->GetXmin() );
     minBin = hist->GetMinimumBin();
     break;
-
+  default :
+    fittingFunction = quadraticFit;
   }
 
   fittingFunction->SetParameter( 0, hist->GetMinimum() );
