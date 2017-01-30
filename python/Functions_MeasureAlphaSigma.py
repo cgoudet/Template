@@ -2,7 +2,7 @@ import os
 import sys
 
 isAntinea=1
-isSaskia=0
+isSaskia=1
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
@@ -16,10 +16,10 @@ FILESETS={}
 
 
 #======================= eos ===========================//
-FILESETS['MC15c_eos']       =[ PREFIXDATASETS + 'eosNtuples/Zee_mc.root'] 
-FILESETS['Data15_eos']       =[ PREFIXDATASETS + 'eosNtuples/Zee_data15.root'] 
-FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/Zee_data16.root'] 
-
+FILESETS['MC15c_eos']       =[ PREFIXDATASETS + 'eosNtuples/mc_Zee.root'] 
+FILESETS['Data15_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root'] 
+FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
+FILESETS['Data1516_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
 
 #==============
 FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
@@ -176,9 +176,11 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
-    dataLine = ' '.join( [ (' --dataFileName ' + StripString( name, 1, 0 ) + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) ) for name in dataFiles ] ) 
+    dataLine = ' '.join( [ (' --dataFileName ' 
+                            + StripString( name, 1, 0 ) 
+                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
     
-    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) for name in MCFiles ] )
+    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
 
 #Fill the command line
 
@@ -282,7 +284,7 @@ def CreateConfig( configName, inOptions = [] ) :
         #options['branchVarNames']['PT_1']='pt1'
         #options['branchVarNames']['PT_2']='pt2'
         options['MCBranchVarNames']['MASS']='m12'
-        options['MCBranchWeightName']=''
+        options['MCBranchWeightName']='weight_1516'
 
     else:
          options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'

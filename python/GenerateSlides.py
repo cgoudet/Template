@@ -110,10 +110,10 @@ def applyCorrection( directory ) :
 
 
     commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesGeom_c.boost --noExtraction'
-    #commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_NewGeom_Lkh1/MC*root' ) ) 
-    commandLine+= ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC*root' ) ) 
-#    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'NewGeom/ScalesGeom.root \n'
-    commandLine+= ' --correctSigmaHistName measScale_c --correctSigmaFileName '+directory+'NewGeom/ScalesGeom_c.root \n'
+    commandLine+= ' --dataFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC_13TeV_Zee_NewGeom_Lkh1/MC*root' ) ) 
+    #commandLine+= ' --MCFileName '.join( [''] + listFiles( '/sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_noGain_Lkh1/MC*root' ) ) 
+    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + directory + 'ScalesGeom.root \n'
+    #commandLine+= ' --correctSigmaHistName measScale_c --correctSigmaFileName '+directory+'ScalesGeom_c.root \n'
 #    commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/PreRec/Results/ScalesGeom.root \n'
     #os.system( commandLine )
     
@@ -161,7 +161,7 @@ def createSingleFile( directory, var, systList, suffix='' ) :
         systFile.write('\n'.join( [ 
             ( 'rootFileName='+directory if '/' not in systList[0].GetNomFile() else '' ) + systList[0].GetNomFile() + systList[0].GetNomSuffixes()[var] + '.root', 
             'histName=measScale_' + var,
-            ( 'systName=centVal_'+var if systList[0].GetNomFile()== 'ScalesOff_1516' else '' ), 
+            ( 'systName=centVal_'+var+'_1516' if systList[0].GetNomFile()== 'ScalesOff_1516' else '' ), 
             'mode=0'])
                        +'\n'
             )
@@ -391,6 +391,7 @@ def createRestBoost( directory, ID, var ) :
         options['objName'] += [ 'syst_' + plotName.replace('Syst', '' ) + '_' + var for plotName in systs ]
         options['legend'] += [ plotName.replace('Syst', '' ) for plotName in systs ]
         optionsUnique['doTabular']=1
+        optionsUnique['xTitle']='__ETA_CALO'
 
     elif ID == 'correction' : 
         options['rootFileName']=[ ' '.join( listFiles( directory + varName + '*corrected.root' ) ) for varName in ['MC','Data'] ] 

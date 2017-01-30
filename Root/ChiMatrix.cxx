@@ -273,26 +273,22 @@ int TemplateMethod::ChiMatrix::FillChiMatrix(  ) {
 
   //Normalize data distribution
   //  m_dataZMass->Sumw2();
-  if ( m_dataZMass->Integral() !=0 ) m_dataZMass->Scale( 1/ m_dataZMass->Integral() );
-  else {
-    cout << "null integral for dataZMass in fillChiMatrix " << endl;
-    cout << "entries : " << m_dataZMass->GetEntries() << " " << m_dataZMass->Integral() << endl;
-    exit(0);
-  }
+  m_dataZMass->Scale( 1/ m_dataZMass->Integral() );
   
   //Fill the chi2 matrix
   for ( unsigned int i_alpha = 0; i_alpha < m_MCZMass.size(); i_alpha++ ) {
 
       int i_sigmaEnd   = ( m_setting->GetDoSmearing() ) ? (int) m_MCZMass[i_alpha].size() : 1;
-    for ( int i_sigma = 0; i_sigma < i_sigmaEnd; i_sigma++ ) {
-      //Normalize MC distribution
-      //      m_MCZMass[i_alpha][i_sigma]->Sumw2();
-      m_MCZMass[i_alpha][i_sigma]->Scale( 1/ m_MCZMass[i_alpha][i_sigma]->Integral() );
-
-      double chi = ComputeChi2( m_MCZMass[i_alpha][i_sigma], m_setting->GetNUseEl() );
-      m_chiMatrix->SetBinContent( i_alpha+1, i_sigma+1, chi );
-      m_chiMatrix->SetBinError( i_alpha+1, i_sigma+1, 0.1);
-
+      for ( int i_sigma = 0; i_sigma < i_sigmaEnd; i_sigma++ ) {
+	//Normalize MC distribution
+	//m_MCZMass[i_alpha][i_sigma]->Sumw2();
+	if (!m_MCZMass[i_alpha][i_sigma]->Integral()) continue;
+	m_MCZMass[i_alpha][i_sigma]->Scale( 1/ m_MCZMass[i_alpha][i_sigma]->Integral() );
+	
+	double chi = ComputeChi2( m_MCZMass[i_alpha][i_sigma], m_setting->GetNUseEl() );
+	m_chiMatrix->SetBinContent( i_alpha+1, i_sigma+1, chi );
+	m_chiMatrix->SetBinError( i_alpha+1, i_sigma+1, 0.1);
+	
     }
   }
 
@@ -345,12 +341,10 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 	  double sigmaVal = m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0;
 	  const double factor1Sigma = sqrt( (1 + randVal1 * sigmaVal)*(1+randVal2*sigmaVal) );
 
-	  //	  const double newMass =  mass*sqrt(factor1Alpha*factor1Sigma);
+	  //const double newMass =  mass*sqrt(factor1Alpha*factor1Sigma);
 	  const double newMass =  mass*factor1Alpha*factor1Sigma;
 	  if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;
-
 	  m_MCZMass[i_alpha][i_sigma]->Fill( newMass, weight );
-	  
       }}}
   }
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates Done" << endl;
@@ -658,8 +652,8 @@ unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
   vector< double > etaBins( m_setting->GetEtaBins());
 
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
-  if ( m_MCZMass[0][0]->GetEntries() < nentries ) m_quality.set( 4, 1 );
-  if ( m_dataZMass->GetEntries() < nentries ) m_quality.set( 5, 1 );
+  if ( m_MCZMass[0][0]->GetEntries() < nentries) m_quality.set( 4, 1 );
+  if ( m_dataZMass->GetEntries() < nentries || m_dataZMass->Integral() == 0) m_quality.set( 5, 1 );
   if ( m_setting->GetThresholdMass() >0 ) {
     double mTh=27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin]+etaBins[m_eta1Bin+1]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) ;
     if ( mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
@@ -677,18 +671,19 @@ double TemplateMethod::ChiMatrix::ComputeChi2( TH1D *MCHist, bool isIncreasedSta
        || MCHist->GetXaxis()->GetXmin() != m_dataZMass->GetXaxis()->GetXmin() 
        || MCHist->GetXaxis()->GetXmax() != m_dataZMass->GetXaxis()->GetXmax() ) 
     throw invalid_argument("Histograms for chi do not match");
-  
+
   double chi2 = 0;
   for ( int i = 0; i < MCHist->GetNbinsX(); i++ ) {
-    if ( MCHist->GetBinError( i+1 )==0 || m_dataZMass->GetBinError( i+1 )==0 ) continue; 
+    if ( MCHist->GetBinError( i+1 )==0 || m_dataZMass->GetBinError( i+1 )==0 ) continue;
     double valdif =  MCHist->GetBinContent( i+1 ) - m_dataZMass->GetBinContent( i+1 );
     double sigmaMC = MCHist->GetBinError( i+1 ) * ((isIncreasedStat) ? sqrt( m_setting->GetNUseEl() ) : 1 );
     double sigma2 =  sigmaMC*sigmaMC + m_dataZMass->GetBinError( i+1 ) * m_dataZMass->GetBinError( i+1 );
-    // cout << "hists : " << MCHist->GetBinContent( i+1 ) << " " <<  m_dataZMass->GetBinContent( i+1 ) << " " << sigmaMC << " " << m_dataZMass->GetBinError( i+1 ) << endl;
+    // cout <<" bin i " <<i<<" hists : " << MCHist->GetBinContent( i+1 ) << " " <<  m_dataZMass->GetBinContent( i+1 ) << " " << sigmaMC << " " << m_dataZMass->GetBinError( i+1 ) << endl;
     // cout << "chi2 : " << valdif << " " << sqrt(sigma2) << endl;
-    chi2 += valdif * valdif / sigma2; 
+    chi2 += valdif * valdif / sigma2;
   }
-  //  cout << "totChi2 : " << chi2 << endl;
+  
+  //cout << "totChi2 : " << chi2 << endl;
   return chi2;
 }
 
@@ -864,21 +859,21 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
 
       FillChiMatrix();
 
-      // if ( debugOptimize ) {
+      if ( debugOptimize ) {
 
-      // 	for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
-      // 	  for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
-      // 	    DrawOptions drawOpt;
-      // 	    vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
-      // 	    vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
-      // 	    options.push_back( string(TString::Format( "latex=alpha : %2.2f", m_scaleValues[i_alpha]*1e6 )));	  
-      // 	    options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
-      // 	    //options.push_back( "outName=/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
-      // 	    options.push_back( "outName=/sps/atlas/a/aguerguichon/Calibration/Test/TestOptim/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
-      // 	    drawOpt.FillOptions( options );
-      // 	    drawOpt.Draw( drawVect );
-      // 	  }}
-      // }
+      	for ( int i_alpha = 0; i_alpha <= (iScale ? 0 : 10); ++i_alpha ) {
+      	  for ( int i_sigma = 0; i_sigma <= (iScale ? 10 : 0); ++i_sigma ) {
+      	    DrawOptions drawOpt;
+      	    vector<TObject*> drawVect = { m_MCZMass[i_alpha][i_sigma], m_dataZMass };
+      	    vector<string> options = { "latexOpt=0.16 0.9", "latexOpt=0.16 0.85", "legend=MC", "legend=data" };
+      	    options.push_back( string(TString::Format( "latex=alpha : %2.2f", m_scaleValues[i_alpha]*1e6 )));	  
+      	    options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
+      	    //options.push_back( "outName=/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
+      	    options.push_back( "outName=/sps/atlas/a/aguerguichon/Calibration/Test/TestOptim/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
+      	    drawOpt.FillOptions( options );
+      	    drawOpt.Draw( drawVect );
+      	  }}
+      }
 
 
       TH1D* histScale = iScale ? m_chiMatrix->ProjectionY( m_name.c_str() + TString("histSigma"), 1, 1, "o" )

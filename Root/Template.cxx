@@ -307,7 +307,7 @@ int TemplateMethod::Template::CreateTemplate() {
   //Create templates for each configuration
   for ( unsigned int i_eta = 0; i_eta < m_chiMatrix.size(); i_eta++ ) { 
     for ( unsigned int j_eta = 0; j_eta < m_chiMatrix[i_eta].size(); j_eta++ ) {
-      //if (i_eta!=16 || j_eta!=6) continue;
+      //if (i_eta!=38 || j_eta!=5) continue;
       m_chiMatrix[i_eta][j_eta]->CreateTemplates();
     }}  
   
@@ -475,7 +475,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( !dumTree->GetEntries() ) throw runtime_error( "Template::FillDistrib : The desired selection leads to no events" );
     }
  
-    //    inputTree->SetDirectory( 0 );
+    //inputTree->SetDirectory( 0 );
     m_mapBranches.LinkTreeBranches( inputTree, 0, m_branchesToLink );
 
     for ( unsigned int iEvent = 0; iEvent < inputTree->GetEntries(); iEvent++ ) {
@@ -486,7 +486,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
-
+      //      if (iEvent<100) cout<<"mass: "<<mass<<" weight: "<<weight<<endl;
       //##############################
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
@@ -767,7 +767,8 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   latex << "\\end{document}" << endl;
   latex.close();
 
-  string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
+  //  string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
+    string commandLine = "pdflatex " + path + latexFileName;
 
   cout << "latexFileName : " << commandLine << endl;
   int err = system( commandLine.c_str() );

@@ -13,7 +13,7 @@ dataset='Data15_13TeV_Zee_noGain_Lkh1'
 
 #print ' --dataFileName '.join( dataFiles )
 #command= 'MeasureScale --configFile ~/private/Calibration/Template/python/Config25_noAlpha.boost --noExtraction '
-command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/CorrectedData/Delta.root '
+command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/CorrectedData/Delta.root'
 
 
 # os.system( command
@@ -44,12 +44,12 @@ command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/Cor
 #            )
 # os.system( 'mv '+dataPath+dataset+'/Data15*corrected.root '+path+'Results/CorrectedData/'+dataset+'_Window_corrected.root' )
 
-# os.system( command
-#            + ' --configFile '+path+'Config/AlphaOff_15_noIso.boost'
-#            + ' --dataFileName '+dataPath+dataset+'_doIso0/Data15*.root'
-#            + ' --correctAlphaHistName delta_doIso0'
-#            )
-# os.system( 'mv '+dataPath+dataset+'_doIso0/Data15*corrected.root '+path+'Results/CorrectedData/')
+os.system( command
+           + ' --configFile '+path+'Config/AlphaOff_15_noIso.boost'
+           + ' --dataFileName '+dataPath+dataset+'_doIso0/Data15*.root'
+           + ' --correctAlphaHistName delta_doIso0'
+           )
+os.system( 'mv '+dataPath+dataset+'_doIso0/Data15*corrected.root '+path+'Results/CorrectedData/')
 
 os.system( command
            + ' --configFile '+path+'Config/AlphaOff_15_fBrem.boost'
@@ -57,7 +57,7 @@ os.system( command
            + ' --correctAlphaHistName delta_fBrem70'
            )
 os.system( 'mv '+dataPath+dataset+'_fBrem70/Data15*corrected.root '+path+'Results/CorrectedData/')
-#os.system( 'mv '+dataPath+dataset+'_fBrem70/Data15*corrected.root .')
+
 
          
 # execution = ( command + ' --dataFileName ' + ' --dataFileName '.join( dataFiles ) 
