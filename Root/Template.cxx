@@ -8,6 +8,7 @@
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 #include "TError.h"
+#include "TROOT.h"
 
 #include <iterator>
 #include <iostream>
@@ -517,12 +518,21 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
 }
 //###############################==
 void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
-  cout << "Template : CreateDistordedTree" << endl;
+  cout << "Template::CreateDistordedTree" << endl;
 
   const vector< double > &alphaSimEta = m_setting.GetAlphaSimEta();
   const vector< double > &alphaSimPt = m_setting.GetAlphaSimPt();
   const vector< double > &sigmaSimEta = m_setting.GetSigmaSimEta();
   const vector< double > &sigmaSimPt = m_setting.GetSigmaSimPt();
+
+  vector< TTree* > vectorTree;
+  TFile *inFile {0};
+  TTree *MCTree {0};
+  TFile *distordedFile {0};
+  TTree *bootTree {0};
+  TFile *distorded {0};
+  TTree *dataTree {0};
+  TFile *MCFile {0};
 
   if ( alphaSimEta.size()!= sigmaSimEta.size()
        || ( m_setting.GetEtaBins().size() && ( alphaSimEta.size() != m_setting.GetEtaBins().size()-1) )
@@ -543,41 +553,35 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   else if ( m_setting.GetIndepDistorded() ) m_rand.SetSeed(  m_setting.GetIndepDistorded() );
 
   if ( m_setting.GetBootstrap() ) {
-    cout << "bootstrap" << endl;
-    vector< TTree* > vectorTree;
     for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); ++iFile ) {
-      TFile inFile( m_MCFileNames[iFile].c_str() );
-      TTree *MCTree = static_cast<TTree*>(inFile.Get( m_MCTreeNames[iFile].c_str() ));
-      MCTree->SetDirectory( 0 );
+      inFile =TFile::Open( m_MCFileNames[iFile].c_str() );
+      MCTree = static_cast<TTree*>(inFile->Get( m_MCTreeNames[iFile].c_str() ));
       vectorTree.push_back(MCTree);
-      inFile.Close("R");
     }
 
-    TFile distordedFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
-    TTree* bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap(), 1);
-    distordedFile.cd();
+    distordedFile=new TFile( string( StripString( m_MCFileNames.front() )+ "_bootstrap.root").c_str(), "RECREATE" );
+    bootTree = Bootstrap( vectorTree, m_setting.GetNUseEvent(), m_setting.GetBootstrap(), 1);
     bootTree->Write( "", TObject::kOverwrite );
-    m_MCFileNames = { distordedFile.GetName() };
+    m_MCFileNames = { distordedFile->GetName() };
     m_MCTreeNames = { bootTree->GetName() };
 
-    delete bootTree; bootTree=0;
     DeleteContainer( vectorTree );
-    distordedFile.Close( "R" );
-  }//end boosttrap
+
+  }//end bootstrap
 
 
   if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
   cout << "outDistordedFileName : " << outFileName << endl;
   string treeName = StripString(outFileName);
-  TTree *dataTree = new TTree( treeName.c_str(), treeName.c_str() );
+  distorded = new TFile( outFileName.c_str(), "RECREATE" );
+  dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
-  dataTree->SetDirectory(0);
-  int counterEvent=0;
+    
   const map<string,string> &mapBranchNames = m_setting.GetMCBranchVarNames();
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
-    TFile *MCFile = new TFile( m_MCFileNames[iFile].c_str() );
-    TTree *MCTree = static_cast<TTree*>(MCFile->Get( m_MCTreeNames[iFile].c_str() ));
+    MCFile = new TFile( m_MCFileNames[iFile].c_str() );
+    MCTree = static_cast<TTree*>(MCFile->Get( m_MCTreeNames[iFile].c_str() ));
     m_mapBranches.LinkTreeBranches( MCTree, dataTree, m_branchesToLink );
     for ( unsigned int iEvent = 0; iEvent < MCTree->GetEntries(); ++iEvent ) {
       MCTree->GetEntry( iEvent );
@@ -587,32 +591,35 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
       if ( m_setting.GetMode() == "2VAR" && FindBin( i_eta, j_eta, 1, mapBranchNames ) ) continue;
 
       double factor1=1, factor2=1;
-      for ( unsigned int iSwap = 0; iSwap < (m_setting.GetMode()=="2VAR" ? 2 : 1); iSwap++ ) {
+      for ( unsigned int iSwap = 0; iSwap < (m_setting.GetMode()=="2VAR" ? 2 : 1); iSwap++ ){
         FindBin( i_eta, j_eta, iSwap, mapBranchNames );
         factor1 *= ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
         factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
       }
 
-
       RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
       dataTree->Fill();
-
-      ++counterEvent;
     }
-    delete MCTree; MCTree=0;
-    MCFile->Close();
-    delete MCFile; MCFile=0;
   }
+
   cout << "tree entries : " << dataTree->GetEntries() << endl;
-  TFile *distorded = new TFile( outFileName.c_str(), "RECREATE" );
   cout << "Writting in : " << outFileName.c_str() << endl;
+
+  distorded->cd();
   dataTree->Write( "", TObject::kOverwrite );
 
   m_dataFileNames = { distorded->GetName() };
   m_dataTreeNames = { dataTree->GetName() };
-  delete dataTree; dataTree = 0;
+
+  MCFile->Close();
+  delete MCFile; MCFile = 0;
   distorded->Close();
   delete distorded; distorded = 0;
+  distordedFile->Close();
+  delete distordedFile; distordedFile = 0;
+  inFile->Close();
+  delete inFile; inFile = 0;
+  
   if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }
 
@@ -767,8 +774,8 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
   latex << "\\end{document}" << endl;
   latex.close();
 
-  //  string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
-    string commandLine = "pdflatex " + path + latexFileName;
+  string commandLine = "pdflatex -interaction=batchmode " + path + latexFileName;
+  //string commandLine = "pdflatex " + path + latexFileName;
 
   cout << "latexFileName : " << commandLine << endl;
   int err = system( commandLine.c_str() );
@@ -884,6 +891,7 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
       dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
       TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
 
+
       m_mapBranches.LinkTreeBranches( dataTree, dumTree, m_branchesToLink );
 
       for ( unsigned int iEvent = 0; iEvent < dataTree->GetEntries(); iEvent++ ) {
@@ -901,7 +909,6 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
         }
 
         RescaleMapVar( factors.front(), factors.back(), mapBranchNames.at("MASS") );
-
         dumTree->Fill();
       }
       delete dataTree;
@@ -919,9 +926,10 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
       else {
         m_dataFileNames[iFile] = distorded->GetName();
         m_dataTreeNames[iFile] = dumTree->GetName();
-      }
+     }
       distorded->Close();
       delete distorded;
+
     }//end iFile
 
   }//end if correctionAlpha

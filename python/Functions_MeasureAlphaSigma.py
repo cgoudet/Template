@@ -2,14 +2,14 @@ import os
 import sys
 
 isAntinea=1
-isSaskia=1
+isSaskia=0
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
-#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -19,8 +19,8 @@ FILESETS={}
 FILESETS['MC15c_eos']       =[ PREFIXDATASETS + 'eosNtuples/mc_Zee.root'] 
 FILESETS['Data15_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root'] 
 FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
-FILESETS['Data1516_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
-
+FILESETS['CorrectedData_eos']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
+FILESETS['CorrectedData_eos_Window']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected_Window.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
 #==============
 FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
 FILESETS['CorrectedDataThreshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Threshold_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
@@ -81,6 +81,10 @@ FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c
 FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_NewGeom_Lkh1/']
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
+
+#==================== Toys =====================
+FILESETS['MC15c_evenEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_evenEvents.root']
+FILESETS['MC15c_oddEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_oddEvents.root']
 
 #================================================================
 #FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
@@ -179,10 +183,10 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     dataLine = ' '.join( [ (' --dataFileName ' 
                             + StripString( name, 1, 0 ) 
                             + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
-    
+
     MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
 
-#Fill the command line
+  #Fill the command line
 
 #Perform a closure
     if doDistorded and mode != 2 : 

@@ -109,7 +109,7 @@ int main( int argc, char* argv[] ) {
 	cout << "iStat : " << inputStat[iStat] << endl;
 	cout << "iInput : " << inputValues[iInput] << endl;
 	toyNumberTmp = toyNumber+iIteration;
-	cout << "toyNumber" << toyNumberTmp << endl;
+	cout << "toyNumber : " << toyNumberTmp << endl;
 
 	if ( true ) { //Only to free memory	
 	  Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
@@ -117,23 +117,17 @@ int main( int argc, char* argv[] ) {
 	  if ( settingDistorded.GetIndepDistorded()>1 ) settingDistorded.SetIndepDistorded( toyNumberTmp+2 );
 	  if ( settingDistorded.GetBootstrap()>1 ) settingDistorded.SetBootstrap( 2*toyNumberTmp+3 );
 
-	  cout<<" setting ok"<<endl;
-
 	  settingDistorded.SetDebug( 1 );
 	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
 	  inputC = inputValues[iInput];
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
-	  cout << "end if" << endl;
 	}
 
 	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
-
-	
-	cout << "measurement step " << endl;
        
 	//This part is usefull for deviation sigma plots if needed later
 	//if (indepTemplates > 1 ) indepTemplates =2;

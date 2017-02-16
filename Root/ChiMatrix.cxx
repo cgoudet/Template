@@ -558,14 +558,15 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   WriteLatexMinipage( ss, plotNames, 2 );
 
   plotNames.clear();
-  for ( int i=0; i< static_cast<int>(m_chi2FitNonConstVar.size()); ++i ) {
-    plotName = path + m_chi2FitNonConstVar[i]->GetName();
-    drawOpt.AddOption( "outName", plotName );
-    dumVect = { m_chi2FitNonConstVar[i] };
-    drawOpt.Draw( dumVect );
-    plotNames.push_back( plotName );
-  }
-  WriteLatexMinipage( ss, plotNames, 4 );
+
+  // for ( int i=0; i< static_cast<int>(m_chi2FitNonConstVar.size()); ++i ) {
+  //   plotName = path + m_chi2FitNonConstVar[i]->GetName();
+  //   drawOpt.AddOption( "outName", plotName );
+  //   dumVect = { m_chi2FitNonConstVar[i] };
+  //   drawOpt.Draw( dumVect );
+  //   plotNames.push_back( plotName );
+  // }
+  // WriteLatexMinipage( ss, plotNames, 4 );
 
   if ( m_setting->GetDebug() )  cout << "ChiMatrix::MakePlot Done" << endl;
 }
@@ -652,14 +653,14 @@ unsigned int TemplateMethod::ChiMatrix::IsGoodQuality() {
   vector< double > etaBins( m_setting->GetEtaBins());
 
   if ( !m_dataZMass || !m_MCZMass.front().front() ) m_quality.set( 3, 1 );
-  if ( m_MCZMass[0][0]->GetEntries() < nentries) m_quality.set( 4, 1 );
+  if ( m_MCZMass[0][0]->GetEntries() < nentries) {cout<<"GetEntries: "<<m_MCZMass[0][0]->GetEntries()<<" nentries: "<<nentries<<endl;m_quality.set( 4, 1 );}
   if ( m_dataZMass->GetEntries() < nentries || m_dataZMass->Integral() == 0) m_quality.set( 5, 1 );
   if ( m_setting->GetThresholdMass() >0 ) {
     double mTh=27*sqrt(2*(TMath::CosH( (etaBins[m_eta1Bin]+etaBins[m_eta1Bin+1]-etaBins[m_eta2Bin+1]-etaBins[m_eta2Bin])/2.)+1)) ;
     if ( mTh > m_setting->GetThresholdMass() ) m_quality.set( 6, 1 );
   }
 
-  //  cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;
+  //cout << m_name << " m_quality : " << m_quality.to_ulong() << endl;
   return m_quality.to_ulong();
 }
 

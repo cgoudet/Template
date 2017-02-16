@@ -14,17 +14,20 @@ switch=0
 if switch==0 :
         configFiles=[ 
 			
-# 		Mesure des scales
+#=================Nominal
 		 #['AlphaOff_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[], 0 ], #nominal
 		 #['AlphaOff_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[], 0 ], #nominal
 		#['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal to compute systematics
 		#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_noGain_Lkh1',['MCBranchWeightName=weight', 'dataBranchWeightName=weight',"nUseEl=3"] ], #nominal
 
-		#['Scales_eos_16.root', 'Data16_eos', 'MC15c_eos',[] ], #eosNtuples
-		#['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',[] ], #eosNtuples
-		['Scales_eos_1516.root', 'Data1516_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70000'] ], #eosNtuples
-		
-			       
+#================eos
+
+		#['Scales_eos_16.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'MCBranchWeightName=weight_16', 'doSmearing=0','nUseEl=3'],0 ], #eosNtuples
+		#['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'MCBranchWeightName=weight_15','doSmearing=0','nUseEl=3'],0 ], #eosNtuples
+		#['Scales_eos_1516.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'nUseEl=3'] ], #eosNtuples
+		# ['Scales_eos_15_Window.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500','MCBranchWeightName=weight_15', 'doSmearing=0'],0 ], #eosNtuples
+		# ['Scales_eos_16_Window.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500','MCBranchWeightName=weight_16', 'doSmearing=0'],0 ], #eosNtuples
+#		['Scales_eos_1516_Window.root', 'CorrectedData_eos_Window', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500', 'thresholdMass=70', 'MCBranchWeightName=weight_1516','nUseEl=3'] ], #eosNtuples
 #============Systematics
 		#For residuals
  		# ['DataOff_13TeV_dataScaled.root', 'Data1615_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],

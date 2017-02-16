@@ -1,6 +1,8 @@
 import os
 
 
-os.system('MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/Scales_eos_1516.boost --dataFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/data15_Zee.root --dataFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/data16_Zee.root  --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/mc_Zee.root --outFileName test.root --MCTreeName CollectionTree --dataTreeName CollectionTree --dataTreeName CollectionTree')
 
-#os.system('MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/AlphaOff_15.boost --dataFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/Data15_13TeV_Zee_noGain_Lkh1/Data15_13TeV_Zee_noGain_Lkh1.root   --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/MC15c_13TeV_Zee_2015_noGain_Lkh1/MC15c_13TeV_Zee_2015_noGain_Lkh1.root --outFileName test2.root ')
+#os.system('MeasureScale --noExtraction --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Deltaeos.root --correctAlphaHistName delta_eos_Window --dataFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/data15_Zee.root --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/Scales_eos_15_Window.boost --dataTreeName CollectionTree')
+
+os.system('GenerateToyTemplates --configFile /sps/atlas/a/aguerguichon/Calibration/Bias/Toys/Config/TreeToyTemplates_522746222.boost --dataFileName /sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_evenEvents.root --MCFileName /sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_oddEvents.root --inputC 0.007 --inputStat 1000000 --nIteration 2 --toyNumber 0  --outFileName test.root')
+
