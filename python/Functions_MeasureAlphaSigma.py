@@ -208,7 +208,7 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         corrLine=''
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
 
-#        if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
+        #if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
         if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
 
 
