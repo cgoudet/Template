@@ -55,7 +55,7 @@ int main( int argc, char* argv[] ) {
   //===================================================
   int err = 0;
 
-  double sigma, errSigma, inputC, rms, meanDataZ;
+  double scale, errScale, inputC, rms, meanDataZ;
   unsigned int iConf, jConf, statConf, statTree, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
   unsigned long long runNumber;
@@ -64,8 +64,8 @@ int main( int argc, char* argv[] ) {
 
   TTree *outTree = new TTree( "ConfigurationsCTree","ConfigurationsCTree" );
   outTree->SetDirectory( 0 );
-  outTree->Branch( "sigma", &sigma );
-  outTree->Branch( "errSigma", &errSigma );
+  outTree->Branch( "scale", &scale );
+  outTree->Branch( "errScale", &errScale );
   outTree->Branch( "inputC", &inputC );
   outTree->Branch( "iConf", &iConf );
   outTree->Branch( "jConf", &jConf );
@@ -84,8 +84,8 @@ int main( int argc, char* argv[] ) {
 
   TTree *scalesTree = new TTree( "scalesTree", "scalesTree" );
   scalesTree->SetDirectory( 0 );
-  scalesTree->Branch( "sigma", &sigma );
-  scalesTree->Branch( "errSigma", &errSigma );
+  scalesTree->Branch( "scale", &scale );
+  scalesTree->Branch( "errScale", &errScale );
   scalesTree->Branch( "inputC", &inputC );
   scalesTree->Branch( "iBin", &iConf );
   scalesTree->Branch( "statTree", &statTree );
@@ -104,15 +104,16 @@ int main( int argc, char* argv[] ) {
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
       for ( unsigned int iIteration = 0; iIteration < nIteration; iIteration++ ) {
-	cout << endl << "===================================================" << endl;;	
+	cout << endl << "===================================================" << endl;	
 	cout << "New loop : " << iIteration << endl;
 	cout << "iStat : " << inputStat[iStat] << endl;
 	cout << "iInput : " << inputValues[iInput] << endl;
 	toyNumberTmp = toyNumber+iIteration;
 	cout << "toyNumber : " << toyNumberTmp << endl;
 
-	if ( true ) { //Only to free memory	
-	  Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
+	//	if ( true ) { //Only to free memory	
+	//Pseudo-data  
+	Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
 	  if ( settingDistorded.GetIndepDistorded()>1 ) settingDistorded.SetIndepDistorded( toyNumberTmp+2 );
 	  if ( settingDistorded.GetBootstrap()>1 ) settingDistorded.SetBootstrap( 2*toyNumberTmp+3 );
@@ -122,14 +123,14 @@ int main( int argc, char* argv[] ) {
 	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
 	  inputC = inputValues[iInput];
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
-	}
+	  //}
 
+	  //MC Templates
 	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
 	cout << "template created" << endl;
 	Setting &settingMeasure = TempMeasure.GetSetting();
 	settingMeasure.SetDebug( 1 );
        
-	//This part is usefull for deviation sigma plots if needed later
 	//if (indepTemplates > 1 ) indepTemplates =2;
 	indepTemplates = settingMeasure.GetIndepTemplates();
 	if ( settingMeasure.GetIndepTemplates()>1 ) settingMeasure.SetIndepTemplates( 3*toyNumberTmp+4 );
@@ -151,8 +152,9 @@ int main( int argc, char* argv[] ) {
 	dumString = dumString.substr( dumString.find_last_of( "/" )+1 );
 	cout << "latex file : " << dumString + ".tex" << endl;
 	runNumber = std::stol( dumString.substr( dumString.find_last_of( "_") +1 ) );
-	TMatrixD *combinSigma = TempMeasure.GetMatrix( "sigma" );
-	TMatrixD* combinErrSigma = TempMeasure.GetMatrix( "errSigma" );
+	bool isSmearing = settingMeasure.GetDoSmearing();
+	TMatrixD *combinScale = isSmearing? TempMeasure.GetMatrix( "sigma" ) : TempMeasure.GetMatrix( "alpha" );
+	TMatrixD* combinErrScale = TempMeasure.GetMatrix( "errAlpha" );
 
 	nBins = settingMeasure.GetEtaBins().size()-1;
 	nOptim = settingMeasure.GetOptimizeRanges();
@@ -164,9 +166,9 @@ int main( int argc, char* argv[] ) {
 	cout << "filling confTree" << endl;
 	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
 	  for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
-	    sigma = (*combinSigma)(i1, i2);
-	    errSigma = (*combinErrSigma)(i1,i2);
-	    if ( errSigma == 100 ) continue;
+	    scale = (*combinScale)(i1, i2);
+	    errScale = (*combinErrScale)(i1,i2);
+	    if ( errScale == 100 ) continue;
 	    iConf = i1;
 	    jConf = i2;
 	    ChiMatrix *chiMatrix = TempMeasure.GetChiMatrix( i1, i2 );
@@ -180,11 +182,11 @@ int main( int argc, char* argv[] ) {
 	}
 
 	cout << "filling binTree" << endl;
-	TH1D* sigmaResult = (TH1D*) TempMeasure.GetResults( "sigma" );
+	TH1D* scaleResult = isSmearing? (TH1D*) TempMeasure.GetResults( "sigma" ) : (TH1D*)  TempMeasure.GetResults( "alpha" );
 	for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
 	  iConf = iBin;
-	  sigma = sigmaResult->GetBinContent(iBin+1);
-	  errSigma = sigmaResult->GetBinError(iBin+1);
+	  scale = scaleResult->GetBinContent(iBin+1);
+	  errScale = scaleResult->GetBinError(iBin+1);
 	  scalesTree->Fill();
 	}
 

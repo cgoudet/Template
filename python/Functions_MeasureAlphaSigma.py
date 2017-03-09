@@ -82,6 +82,10 @@ FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_Ne
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
 
+FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/mc15c_wCal_noSF.root" ]
+FILESETS['Data_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/data_wCal_noSF_2016.root" ]
+
+
 #==================== Toys =====================
 FILESETS['MC15c_evenEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_evenEvents.root']
 FILESETS['MC15c_oddEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_oddEvents.root']
@@ -180,11 +184,21 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
+    # dataLine = ' '.join( [ (' --dataFileName ' 
+    #                         + StripString( name, 1, 0 ) 
+    #                         + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
+
+    # MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
+
+
     dataLine = ' '.join( [ (' --dataFileName ' 
                             + StripString( name, 1, 0 ) 
-                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
+                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName tree' if isSaskia else '') ) for name in dataFiles ] ) 
 
-    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
+    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName tree' if isSaskia else '') for name in MCFiles ] )
+
+
+
 
   #Fill the command line
 
@@ -204,12 +218,14 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
 
     for iFit in range( 0, len( configName ) ) :
-        outNameFile = ' --outFileName ' + StripString( configName[iFit] ) + '.root '
+        outNameFile = ' --outFileName ' + StripString( configName[iFit] )+ '.root '
         corrLine=''
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
 
         #if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
-        if mode == 2 : batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  outNameFile for i in range(0, len (optionLine)) ]) +'\n') 
+        if mode == 2 : 
+            outNameFile = ' --outFileName ' + StripString( configName[iFit] ) +str(iFit)+ '.root '
+            batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  ' --outFileName ' + StripString( configName[iFit] ) +str(i)+ '.root --makePlot ' for i in range(0, len (optionLine)) ]) +' \n') 
 
 
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine +' --makePlot \n')
@@ -219,8 +235,8 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     #batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
     #batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
     for iFit in range( 0, len( configName ) ) :
-        batch.write( 'cp -v '+ StripString( configName[iFit] ) +'.root ' + PREFIXPATH + resultPath + '. \n')
-        batch.write( 'cp -v '+StripString( configName[iFit] ) +'.pdf ' + PREFIXPATH + plotPath + '. \n')
+        batch.write( 'cp -v '+ StripString( configName[iFit] ) +'*.root ' + PREFIXPATH + resultPath + '. \n')
+        batch.write( 'cp -v '+StripString( configName[iFit] ) +'*.pdf ' + PREFIXPATH + plotPath + '. \n')
     batch.close()
     return fileName
 
@@ -275,20 +291,39 @@ def CreateConfig( configName, inOptions = [] ) :
     options['dataBranchVarNames']={}
     options['MCBranchVarNames']={}
 
+
+
     if isSaskia:
-        options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-        options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+        options['dataBranchVarNames']['ETA_CALO_1']='eta_calo0'
+        options['dataBranchVarNames']['ETA_CALO_2']='eta_calo1'
         #options['branchVarNames']['PT_1']='pt1'
         #options['branchVarNames']['PT_2']='pt2'
-        options['dataBranchVarNames']['MASS']='m12'
+        options['dataBranchVarNames']['MASS']='mZ'
         options['dataBranchWeightName']=''
 
-        options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-        options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+        options['MCBranchVarNames']['ETA_CALO_1']='eta_calo0'
+        options['MCBranchVarNames']['ETA_CALO_2']='eta_calo1' 
         #options['branchVarNames']['PT_1']='pt1'
         #options['branchVarNames']['PT_2']='pt2'
-        options['MCBranchVarNames']['MASS']='m12'
-        options['MCBranchWeightName']='weight_1516'
+        options['MCBranchVarNames']['MASS']='mZ'
+        options['MCBranchWeightName']='weight'
+
+
+
+    # if isSaskia:
+    #     options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+    #     options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+    #     #options['branchVarNames']['PT_1']='pt1'
+    #     #options['branchVarNames']['PT_2']='pt2'
+    #     options['dataBranchVarNames']['MASS']='m12'
+    #     options['dataBranchWeightName']=''
+
+    #     options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+    #     options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+    #     #options['branchVarNames']['PT_1']='pt1'
+    #     #options['branchVarNames']['PT_2']='pt2'
+    #     options['MCBranchVarNames']['MASS']='m12'
+    #     options['MCBranchWeightName']='weight_1516'
 
     else:
          options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'
