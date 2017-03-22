@@ -96,16 +96,20 @@ elif switch == 1 :
 spsPath="/sps/atlas/a/aguerguichon/Calibration/PreRec/"
 logPath="Log/"
 
-for confFile in range( 0, len( configFiles ) ) :
-	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
-	else : mode = 3
-	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
+# for confFile in range( 0, len( configFiles ) ) :
+# 	if  len( configFiles[confFile] ) > 4 : mode = configFiles[confFile][4]
+# 	else : mode = 3
+# 	launcherFile=CreateLauncher( configFiles[confFile], mode, "" )
 	
-	logFile = StripString( configFiles[confFile][0] )
+# 	logFile = StripString( configFiles[confFile][0] )
 	
-	launchLine='~/sub1.sh ' + logFile + ' ' \
-	    + spsPath + logPath + logFile + '.log ' \
-	    + spsPath + logPath + logFile + '.err ' \
-	    + launcherFile
+# 	launchLine='~/sub1.sh ' + logFile + ' ' \
+# 	    + spsPath + logPath + logFile + '.log ' \
+# 	    + spsPath + logPath + logFile + '.err ' \
+# 	    + launcherFile
 
-	os.system( launchLine )
+# 	os.system( launchLine )
+
+
+	
+[ LaunchBatchTemplate( c, spsPath+logPath ) for c in configFiles ]
