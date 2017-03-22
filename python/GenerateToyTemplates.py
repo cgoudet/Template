@@ -8,12 +8,12 @@ isAntinea=1
 #One config file correspond to one job
 
 configFiles=[ 
-    ['', 'MC15c_evenEvents', 'MC15c_oddEvents', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=2', 'etaBins=ETA68', 'doSmearing=0']]
+    ['', 'MC15c_evenEvents', 'MC15c_oddEvents', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=2', 'etaBins=ETA68', 'doSmearing=0', 'alphaSimEta=SIMALPHAETA68']]
     ]
 
-inputC = [ 0.007 ]
+inputC = [ 0 ]
 inputStat = [ 1000000 ]
-nIteration = 5000 #total number of jobs
+nIteration = 25 #total number of jobs
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl= 1

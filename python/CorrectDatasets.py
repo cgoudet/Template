@@ -13,7 +13,15 @@ dataset='Data15_13TeV_Zee_noGain_Lkh1'
 
 #print ' --dataFileName '.join( dataFiles )
 #command= 'MeasureScale --configFile ~/private/Calibration/Template/python/Config25_noAlpha.boost --noExtraction '
-command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/CorrectedData/Delta.root'
+command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/CorrectedData/Deltaeos.root'
+
+os.system( command
+           + ' --configFile '+path+'Config/Alphaeos_15.boost'
+           + ' --dataFileName '+dataPath+'eosNtuples/data15*'
+           + ' --dataTreeName CollectionTree'
+           + ' --correctAlphaHistName delta'
+           )
+os.system( 'mv '+dataPath+'eosNtuples/data15*corrected.root '+dataPath+'eosNtuples/' )
 
 
 # os.system( command

@@ -325,6 +325,7 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 
   for ( unsigned int iEvent = 0; iEvent<m_MCTree->GetEntries(); iEvent++ ) {
     m_MCTree->GetEntry( iEvent );
+
     const double mass = m_mapBranch.GetDouble("mass");
     const double weight = m_mapBranch.GetDouble("weight");
 
@@ -340,7 +341,6 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
 
 	  double sigmaVal = m_MCZMass[i_alpha].size()!=1 ? m_sigmaValues[i_sigma] : 0;
 	  const double factor1Sigma = sqrt( (1 + randVal1 * sigmaVal)*(1+randVal2*sigmaVal) );
-
 	  //const double newMass =  mass*sqrt(factor1Alpha*factor1Sigma);
 	  const double newMass =  mass*factor1Alpha*factor1Sigma;
 	  if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;

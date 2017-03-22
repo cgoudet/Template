@@ -526,9 +526,8 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   const vector< double > &sigmaSimPt = m_setting.GetSigmaSimPt();
 
   vector< TTree* > vectorTree;
-  TFile *inFile {0};
+
   TTree *MCTree {0};
-  TFile *distordedFile {0};
   TTree *bootTree {0};
   TFile *distorded {0};
   TTree *dataTree {0};
@@ -553,6 +552,9 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   else if ( m_setting.GetIndepDistorded() ) m_rand.SetSeed(  m_setting.GetIndepDistorded() );
 
   if ( m_setting.GetBootstrap() ) {
+    TFile *inFile {0};
+    TFile *distordedFile {0};
+
     for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); ++iFile ) {
       inFile =TFile::Open( m_MCFileNames[iFile].c_str() );
       MCTree = static_cast<TTree*>(inFile->Get( m_MCTreeNames[iFile].c_str() ));
@@ -567,10 +569,14 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 
     DeleteContainer( vectorTree );
 
+    distordedFile->Close();
+    delete distordedFile; distordedFile = 0;
+    inFile->Close();
+    delete inFile; inFile = 0;
   }//end bootstrap
 
 
-  if ( outFileName=="" ) outFileName= m_name + "_distorded.root";
+  if ( outFileName=="" ) outFileName= m_name + "_distorted.root";
   cout << "outDistordedFileName : " << outFileName << endl;
   string treeName = StripString(outFileName);
   distorded = new TFile( outFileName.c_str(), "RECREATE" );
@@ -599,6 +605,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 
       RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
       dataTree->Fill();
+      if (iEvent%100000==0) cout<<iEvent<<" factor1 "<<factor1<<endl;
     }
   }
 
@@ -615,10 +622,6 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   delete MCFile; MCFile = 0;
   distorded->Close();
   delete distorded; distorded = 0;
-  distordedFile->Close();
-  delete distordedFile; distordedFile = 0;
-  inFile->Close();
-  delete inFile; inFile = 0;
   
   if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }

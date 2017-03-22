@@ -2,14 +2,14 @@ import os
 import sys
 
 isAntinea=1
-isSaskia=0
+isSaskia=1
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
-#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -21,6 +21,10 @@ FILESETS['Data15_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root']
 FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
 FILESETS['CorrectedData_eos']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
 FILESETS['CorrectedData_eos_Window']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected_Window.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
+FILESETS['pseudoData'] = ['/sps/atlas/a/aguerguichon/Calibration/Closure/pseudoData_both_distorted.root']
+FILESETS['pseudoData_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_data.root']
+FILESETS['MC_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_MC.root']
+
 #==============
 FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
 FILESETS['CorrectedDataThreshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Threshold_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
@@ -82,8 +86,8 @@ FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_Ne
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
 
-FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/mc15c_wCal_noSF.root" ]
-FILESETS['Data_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/data_wCal_noSF_2016.root" ]
+FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/v1_unShiftedWeights_noSmear_noScale/mc15c_wCal_v1.root" ]
+FILESETS['Data_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/v1_unShiftedWeights_noSmear_noScale/data_16_wCal_v1.root" ]
 
 
 #==================== Toys =====================
@@ -184,18 +188,18 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
+
+    dataLine = ' '.join( [ (' --dataFileName ' 
+                            + StripString( name, 1, 0 ) 
+                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName pseudoData_both_distorted' if isSaskia else '') ) for name in dataFiles ] ) 
+
+    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
+
     # dataLine = ' '.join( [ (' --dataFileName ' 
     #                         + StripString( name, 1, 0 ) 
     #                         + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
 
     # MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
-
-
-    dataLine = ' '.join( [ (' --dataFileName ' 
-                            + StripString( name, 1, 0 ) 
-                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName tree' if isSaskia else '') ) for name in dataFiles ] ) 
-
-    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName tree' if isSaskia else '') for name in MCFiles ] )
 
 
 
@@ -249,9 +253,11 @@ def CreateConfig( configName, inOptions = [] ) :
     defaultBinning['ETA6']='-2.47 -1.55 -1.37 0 1.37 1.55 2.47'
     defaultBinning['SIMSIGMAETA6']='0.007 0.007 0.007 0.007 0.007 0.007'
     defaultBinning['ETA24']='-2.47 -2.3 -2 -1.80 -1.55 -1.37 -1.2 -1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1 1.2 1.37 1.55 1.8 2 2.3 2.47'
-    defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
     defaultBinning['SIMSIGMAETA24']='2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2'
+    defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
     defaultBinning['ETA68'] = '-2.47 -2.435 -2.4 -2.35 -2.3 -2.2 -2.1 -2.05 -2 -1.9 -1.8 -1.7625 -1.725 -1.6775 -1.63 -1.59 -1.55 -1.51 -1.47 -1.42 -1.37 -1.285 -1.2 -1.1 -1 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.285 1.37 1.42 1.47 1.51 1.55 1.59 1.63 1.6775 1.725 1.7625 1.8 1.9 2 2.05 2.1 2.2 2.3 2.35 2.4 2.435 2.47'
+    defaultBinning['SIMALPHAETA68'] = '1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2'
+
     defaultBinning['PT6'] = '0 100 200 300 400 500 1000'
     options = {}
     options['ZMassMin'] = 80
@@ -291,52 +297,26 @@ def CreateConfig( configName, inOptions = [] ) :
     options['dataBranchVarNames']={}
     options['MCBranchVarNames']={}
 
-
-
     if isSaskia:
-        options['dataBranchVarNames']['ETA_CALO_1']='eta_calo0'
-        options['dataBranchVarNames']['ETA_CALO_2']='eta_calo1'
-        #options['branchVarNames']['PT_1']='pt1'
-        #options['branchVarNames']['PT_2']='pt2'
-        options['dataBranchVarNames']['MASS']='mZ'
+        options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+        options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+        options['dataBranchVarNames']['MASS']='m12'
         options['dataBranchWeightName']=''
 
-        options['MCBranchVarNames']['ETA_CALO_1']='eta_calo0'
-        options['MCBranchVarNames']['ETA_CALO_2']='eta_calo1' 
-        #options['branchVarNames']['PT_1']='pt1'
-        #options['branchVarNames']['PT_2']='pt2'
-        options['MCBranchVarNames']['MASS']='mZ'
-        options['MCBranchWeightName']='weight'
+        options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+        options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+        options['MCBranchVarNames']['MASS']='m12'
+        options['MCBranchWeightName']='weight_1516'
 
-
-
-    # if isSaskia:
-    #     options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-    #     options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
-    #     #options['branchVarNames']['PT_1']='pt1'
-    #     #options['branchVarNames']['PT_2']='pt2'
-    #     options['dataBranchVarNames']['MASS']='m12'
-    #     options['dataBranchWeightName']=''
-
-    #     options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-    #     options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
-    #     #options['branchVarNames']['PT_1']='pt1'
-    #     #options['branchVarNames']['PT_2']='pt2'
-    #     options['MCBranchVarNames']['MASS']='m12'
-    #     options['MCBranchWeightName']='weight_1516'
 
     else:
          options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'
          options['dataBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
-         #options['branchVarNames']['PT_1']='pt_1'
-         #options['branchVarNames']['PT_2']='pt_2'
          options['dataBranchVarNames']['MASS']='m12'
          options['dataBranchWeightName']=''
 
          options['MCBranchVarNames']['ETA_CALO_1']='eta_calo_1'
          options['MCBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
-         #options['branchVarNames']['PT_1']='pt_1'
-         #options['branchVarNames']['PT_2']='pt_2'
          options['MCBranchVarNames']['MASS']='m12'
          options['MCBranchWeightName']='weight'
    
@@ -354,7 +334,7 @@ def CreateConfig( configName, inOptions = [] ) :
             else : options[optKey]=optValue
 
 #select a predefined binnin
-        if ( optKey in ['ptBins', 'etaBins', 'sigmaSimEta' ] ) and (  'PT' in optValue or 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
+        if ( optKey in ['ptBins', 'etaBins', 'sigmaSimEta', 'alphaSimEta' ] ) and (  'PT' in optValue or 'ETA' in optValue ) : options[optKey]=defaultBinning[optValue]
 
     with open( configName, 'w' ) as batch:
         for iLabel in options :
