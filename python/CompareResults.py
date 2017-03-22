@@ -18,7 +18,7 @@ def createBoost( inFiles, var, ID, addOptions={} ):
     options['legend'] = [ StripString( inFile ) for inFile in inFiles ]
     optionsUnique = {}
     optionsUnique['inputType']=0
-    optionsUnique['plotDirectory'] = '/sps/atlas/a/aguerguichon/cgoudet/Plots/'
+    optionsUnique['plotDirectory'] = '/sps/atlas/a/aguerguichon/Plots/'
     optionsUnique['doTabular'] = 1
     optionsUnique['doRatio']=2
 

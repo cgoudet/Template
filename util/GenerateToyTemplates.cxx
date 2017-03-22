@@ -53,9 +53,9 @@ int main( int argc, char* argv[] ) {
   
   if (vm.count("help")) {cout << desc; return 0;}
   //===================================================
-  int err = 0;
+  int err{0};
 
-  double sigma, errSigma, inputC, rms, meanDataZ;
+  double scale, errScale, inputC, rms, meanDataZ;
   unsigned int iConf, jConf, statConf, statTree, nBins, fitMethod, bootstrap, indepDistorded, indepTemplates, inversionMethod;
   double nOptim;
   unsigned long long runNumber;
@@ -64,8 +64,8 @@ int main( int argc, char* argv[] ) {
 
   TTree *outTree = new TTree( "ConfigurationsCTree","ConfigurationsCTree" );
   outTree->SetDirectory( 0 );
-  outTree->Branch( "sigma", &sigma );
-  outTree->Branch( "errSigma", &errSigma );
+  outTree->Branch( "scale", &scale );
+  outTree->Branch( "errScale", &errScale );
   outTree->Branch( "inputC", &inputC );
   outTree->Branch( "iConf", &iConf );
   outTree->Branch( "jConf", &jConf );
@@ -84,8 +84,8 @@ int main( int argc, char* argv[] ) {
 
   TTree *scalesTree = new TTree( "scalesTree", "scalesTree" );
   scalesTree->SetDirectory( 0 );
-  scalesTree->Branch( "sigma", &sigma );
-  scalesTree->Branch( "errSigma", &errSigma );
+  scalesTree->Branch( "scale", &scale );
+  scalesTree->Branch( "errScale", &errScale );
   scalesTree->Branch( "inputC", &inputC );
   scalesTree->Branch( "iBin", &iConf );
   scalesTree->Branch( "statTree", &statTree );
@@ -104,95 +104,120 @@ int main( int argc, char* argv[] ) {
   for ( unsigned int iInput = 0; iInput < inputValues.size(); iInput++ ) {
     for ( unsigned int iStat = 0; iStat < inputStat.size(); iStat++ ) {
       for ( unsigned int iIteration = 0; iIteration < nIteration; iIteration++ ) {
-	cout << endl << "===================================================" << endl;;	
+	cout << endl << "===================================================" << endl;	
 	cout << "New loop : " << iIteration << endl;
 	cout << "iStat : " << inputStat[iStat] << endl;
 	cout << "iInput : " << inputValues[iInput] << endl;
 	toyNumberTmp = toyNumber+iIteration;
 	cout << "toyNumber : " << toyNumberTmp << endl;
 
-	if ( true ) { //Only to free memory	
-	  Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
+	//	if ( true ) { //Only to free memory	
+	//Pseudo-data  
+	Template TempDistorded( "", configFile, {}, {}, dataFileNames, dataTreeNames );
 	  Setting &settingDistorded = TempDistorded.GetSetting();
 	  if ( settingDistorded.GetIndepDistorded()>1 ) settingDistorded.SetIndepDistorded( toyNumberTmp+2 );
 	  if ( settingDistorded.GetBootstrap()>1 ) settingDistorded.SetBootstrap( 2*toyNumberTmp+3 );
-
+	  bool isSmearing = settingDistorded.GetDoSmearing();
 	  settingDistorded.SetDebug( 1 );
-	  settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
-	  settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
+
+	  if (isSmearing) {
+	    if (settingDistorded.GetSigmaSimEta().size()==0) settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput] ) );
+	    else settingDistorded.GetSigmaSimEta();
+	    
+	    settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
+	  }
+	  else {
+	    settingDistorded.SetSigmaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, 0 ) );
+	    if (settingDistorded.GetAlphaSimEta().size()==0) settingDistorded.SetAlphaSimEta( vector<double>( settingDistorded.GetEtaBins().size()-1, inputValues[iInput]  ) );
+	    else settingDistorded.GetAlphaSimEta();
+	  }
+
 	  inputC = inputValues[iInput];
 	  TempDistorded.CreateDistordedTree( "MC_distorded.root" );
-	}
+	  //}
 
-	Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
-	cout << "template created" << endl;
-	Setting &settingMeasure = TempMeasure.GetSetting();
-	settingMeasure.SetDebug( 1 );
+	  //MC Templates
+	  Template TempMeasure( StripString( outFileName ), configFile, {"MC_distorded.root"}, {""}, MCFileNames, MCTreeNames  );
+	  cout << "template created" << endl;
+	  Setting &settingMeasure = TempMeasure.GetSetting();
+	  settingMeasure.SetDebug( 1 );
+	  isSmearing = settingMeasure.GetDoSmearing();
        
-	//This part is usefull for deviation sigma plots if needed later
-	//if (indepTemplates > 1 ) indepTemplates =2;
-	indepTemplates = settingMeasure.GetIndepTemplates();
-	if ( settingMeasure.GetIndepTemplates()>1 ) settingMeasure.SetIndepTemplates( 3*toyNumberTmp+4 );
-	settingMeasure.SetSigmaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, inputValues[iInput] ) );
-	settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
+	  //if (indepTemplates > 1 ) indepTemplates =2;
+	  indepTemplates = settingMeasure.GetIndepTemplates();
+	  if ( settingMeasure.GetIndepTemplates()>1 ) settingMeasure.SetIndepTemplates( 3*toyNumberTmp+4 );
+	  if (isSmearing) {
+	    if (settingMeasure.GetSigmaSimEta().size()==0) settingMeasure.SetSigmaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, inputValues[iInput] ) );
+	    else settingMeasure.GetSigmaSimEta();
 
-	settingMeasure.SetNUseEvent( inputStat[iStat] );
-	cout << "extracting" << endl;
-   
-	err = TempMeasure.ExtractFactors( );
-	if ( err ) {
-	  cout << "Template::Extraction failed : " << err << endl;
-	  return 1;
-	}
-
-	if ( makePlot ) TempMeasure.MakePlot();
-	statTree=settingMeasure.GetNEventData();
-	string dumString = outFileName.substr( 0, outFileName.find_last_of( "." ) );
-	dumString = dumString.substr( dumString.find_last_of( "/" )+1 );
-	cout << "latex file : " << dumString + ".tex" << endl;
-	runNumber = std::stol( dumString.substr( dumString.find_last_of( "_") +1 ) );
-	TMatrixD *combinSigma = TempMeasure.GetMatrix( "sigma" );
-	TMatrixD* combinErrSigma = TempMeasure.GetMatrix( "errSigma" );
-
-	nBins = settingMeasure.GetEtaBins().size()-1;
-	nOptim = settingMeasure.GetOptimizeRanges();
-	fitMethod = settingMeasure.GetFitMethod();
-	bootstrap = settingMeasure.GetBootstrap();
-	indepDistorded = settingMeasure.GetIndepDistorded();
-	inversionMethod = settingMeasure.GetInversionMethod();
-
-	cout << "filling confTree" << endl;
-	for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
-	  for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
-	    sigma = (*combinSigma)(i1, i2);
-	    errSigma = (*combinErrSigma)(i1,i2);
-	    if ( errSigma == 100 ) continue;
-	    iConf = i1;
-	    jConf = i2;
-	    ChiMatrix *chiMatrix = TempMeasure.GetChiMatrix( i1, i2 );
-	    if ( !chiMatrix ) continue;
-	    statConf = chiMatrix->GetStat();
-	    rms = chiMatrix->GetDataRMS();
-	    meanDataZ = chiMatrix->GetDataMean();
-	    if ( !statConf ) continue;
-	    outTree->Fill();
+	    settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
 	  }
-	}
+	  else {
+	    settingMeasure.SetSigmaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, 0 ) );
+	    if (settingMeasure.GetAlphaSimEta().size()==0) settingMeasure.SetAlphaSimEta( vector<double>( settingMeasure.GetEtaBins().size()-1, inputValues[iInput]  ) );
+	    else settingMeasure.GetAlphaSimEta();
+	  }
 
-	cout << "filling binTree" << endl;
-	TH1D* sigmaResult = (TH1D*) TempMeasure.GetResults( "sigma" );
-	for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
-	  iConf = iBin;
-	  sigma = sigmaResult->GetBinContent(iBin+1);
-	  errSigma = sigmaResult->GetBinError(iBin+1);
-	  scalesTree->Fill();
-	}
+	  settingMeasure.SetNUseEvent( inputStat[iStat] );
+	  cout << "extracting" << endl;
+   
+	  err = TempMeasure.ExtractFactors( );
+	  if ( err ) {
+	    cout << "Template::Extraction failed : " << err << endl;
+	    return 1;
+	  }
 
-	outFile->cd();
-	outTree->Write("", TObject::kOverwrite);
-	scalesTree->Write("", TObject::kOverwrite);
-	outFile->ls();
-	outFile->SaveSelf();
+	  if ( makePlot ) TempMeasure.MakePlot();
+	  statTree=settingMeasure.GetNEventData();
+	  string dumString = outFileName.substr( 0, outFileName.find_last_of( "." ) );
+	  dumString = dumString.substr( dumString.find_last_of( "/" )+1 );
+	  cout << "latex file : " << dumString + ".tex" << endl;
+	  runNumber = std::stol( dumString.substr( dumString.find_last_of( "_") +1 ) );
+	  TMatrixD *combinScale = isSmearing? TempMeasure.GetMatrix( "sigma" ) : TempMeasure.GetMatrix( "alpha" );
+	  TMatrixD* combinErrScale = TempMeasure.GetMatrix( "errAlpha" );
+
+	  nBins = settingMeasure.GetEtaBins().size()-1;
+	  nOptim = settingMeasure.GetOptimizeRanges();
+	  fitMethod = settingMeasure.GetFitMethod();
+	  bootstrap = settingMeasure.GetBootstrap();
+	  indepDistorded = settingMeasure.GetIndepDistorded();
+	  inversionMethod = settingMeasure.GetInversionMethod();
+
+	  cout << "filling confTree" << endl;
+	  for ( unsigned int i1 = 0; i1 < nBins; i1++ ) {
+	    for ( unsigned int i2 = 0; i2 <=i1; i2++ ) {
+	      scale = (*combinScale)(i1, i2);
+	      errScale = (*combinErrScale)(i1,i2);
+	      if ( errScale == 100 ) continue;
+	      iConf = i1;
+	      jConf = i2;
+	      ChiMatrix *chiMatrix = TempMeasure.GetChiMatrix( i1, i2 );
+	      if ( !chiMatrix ) continue;
+	      statConf = chiMatrix->GetStat();
+	      rms = chiMatrix->GetDataRMS();
+	      meanDataZ = chiMatrix->GetDataMean();
+	      if ( !statConf ) continue;
+	      outTree->Fill();
+	    }
+	  }
+
+	  cout << "filling binTree" << endl;
+	  TH1D* scaleResult = isSmearing? (TH1D*) TempMeasure.GetResults( "sigma" ) : (TH1D*)  TempMeasure.GetResults( "alpha" );
+	  TH1D *histInput = new TH1D ("histInput", "", nBins, 0, nBins);
+	  for ( unsigned int iBin = 0; iBin < nBins; iBin++ ) {
+	    iConf = iBin;
+	    scale = scaleResult->GetBinContent(iBin+1);
+	    errScale = scaleResult->GetBinError(iBin+1);
+	    if ( settingMeasure.GetSigmaSimEta().size()!=0 || settingMeasure.GetAlphaSimEta().size()!=0 ) histInput->SetBinContent( iBin, isSmearing? settingMeasure.GetSigmaSimEta()[iBin] : settingMeasure.GetAlphaSimEta()[iBin] );
+	    scalesTree->Fill();
+	  }
+
+	  outFile->cd();
+	  outTree->Write("", TObject::kOverwrite);
+	  scalesTree->Write("", TObject::kOverwrite);
+	  histInput->Write("", TObject::kOverwrite);
+	  outFile->ls();
+	  outFile->SaveSelf();
       }
     }
   }

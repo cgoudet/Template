@@ -18,11 +18,17 @@ if switch==0 :
 		 #['AlphaOff_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[], 0 ], #nominal
 		 #['AlphaOff_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[], 0 ], #nominal
 		#['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal to compute systematics
+		#['customSF_unShiftedWeights_n10.root', 'Data_Kirill', 'MC_Kirill',['nUseEl=10']], #nominal to compute systematics
+		['Closure.root', 'pseudoData', 'MC15c_eos',['nUseEl=5', 'ZMassMin=80000', 'ZMassMax=100000'] ], #nominal
+		#['Closure_Saskia.root', 'pseudoData_Saskia', 'MC_Saskia',['nUseEl=5'] ], #nominal
+		
 		#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_noGain_Lkh1',['MCBranchWeightName=weight', 'dataBranchWeightName=weight',"nUseEl=3"] ], #nominal
 
 #================eos
-
-		#['Scales_eos_16.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'MCBranchWeightName=weight_16', 'doSmearing=0','nUseEl=3'],0 ], #eosNtuples
+		# ['Alphaeos_16.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
+		# ['Alphaeos_15.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
+		# ['Scaleseos_smearing3_16.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516', 'nUseEl=3'] ], #eosNtuples
+		# ['Scaleseos_smearing1_16.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516', 'nUseEl=1'] ], #eosNtuples
 		#['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'MCBranchWeightName=weight_15','doSmearing=0','nUseEl=3'],0 ], #eosNtuples
 		#['Scales_eos_1516.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'nUseEl=3'] ], #eosNtuples
 		# ['Scales_eos_15_Window.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500','MCBranchWeightName=weight_15', 'doSmearing=0'],0 ], #eosNtuples
@@ -35,10 +41,12 @@ if switch==0 :
 		#['AlphaOff_16_Threshold.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1', ['thresholdMass=75'],0],
 		#['AlphaOff_15_Threshold.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1', ['thresholdMass=75'],0],
 		#['ScalesOff_1516_Threshold.root', 'CorrectedDataThreshold', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'thresholdMass=75']],
+
 		# Changing mass window of interest
 		#['AlphaOff_16_Window.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0],
 		#['AlphaOff_15_Window.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0], 
 		#['ScalesOff_1516_Window.root', 'CorrectedDataWindow', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'ZMassMin=82.5', 'ZMassMax=97.5']],
+
 		#  # Electron tight
 		#['AlphaOff_16_ID.root', 'Data16_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2016_noGain_Lkh2', [], 0 ],
 		#['AlphaOff_15_ID.root', 'Data15_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2015_noGain_Lkh2', [], 0 ],
