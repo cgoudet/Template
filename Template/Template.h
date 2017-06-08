@@ -13,12 +13,6 @@
 #include "boost/multi_array.hpp"
 #include <sstream>
 
-using std::stringstream;
-using boost::multi_array;
-using std::vector;
-using std::string;
-using std::map;
-
 namespace TemplateMethod {
   /**\brief Main Class
 
@@ -42,7 +36,7 @@ namespace TemplateMethod {
   class Template
   {
 
-  public : 
+  public :
 
     Template();
 
@@ -61,19 +55,19 @@ namespace TemplateMethod {
        - If no Ntuple is given, the program exits. \n
        - Accept one missing Ntuple, cases dealt with at template creation.
     */
-    Template( const string &outFileName, const string &configFile,  
-	      vector<string> dataFileNames, vector<string> dataTreeNames,
-	      vector<string> MCFileNames, vector<string> MCTreeNames );
+    Template( const std::string &outFileName, const std::string &configFile,
+              std::vector<std::string> dataFileNames, std::vector<std::string> dataTreeNames,
+              std::vector<std::string> MCFileNames, std::vector<std::string> MCTreeNames );
 
     /**\brief Destructor
      */
     ~Template();
 
     Setting& GetSetting()  { return m_setting; }
-    TMatrixD *GetMatrix( string matrixName );
-    TH1 *GetResults( string resultName );
+    TMatrixD *GetMatrix( std::string matrixName );
+    TH1 *GetResults( std::string resultName );
     ChiMatrix* GetChiMatrix( unsigned int iMatrix, unsigned int jMatrix );
-    string GetName() const { return m_name; };
+    std::string GetName() const { return m_name; };
 
     /**\brief Read a boost configuration file
        \param configFile Name of the configuration file
@@ -82,7 +76,7 @@ namespace TemplateMethod {
 
        Examples of configuration files given in configFiles directory
     */
-    void Configure( const string &configFile );
+    void Configure( const std::string &configFile );
 
     /**\brief Compute alpha_ij and sigma_ij
        \return 0 OK
@@ -116,7 +110,7 @@ namespace TemplateMethod {
        - Call ChiMatrix::ExtractFactors() for each chiMatrix
        - Fill factor matrices with extracted values
     */
-    int Load( const string &inFileName, bool justTemplate = false );
+    int Load( const std::string &inFileName, bool justTemplate = false );
 
     /**\brief Create the matrices of templates
 
@@ -153,13 +147,13 @@ namespace TemplateMethod {
        To call preferably after Template::Save() because changes colors, etc...\n
        - Calls ChiMatrix::MakePlot() : \n
     */
-    void MakePlot( string path = "", string latexFileName = "" );
+    void MakePlot( std::string path = "", std::string latexFileName = "" );
 
     /**\brief Apply scale factors to MC and data Ntuples
        \param correctionAlpha histogram containing corrections of energy scale factor.
        \param correctionSigma histogram containing constant term correction.
 
-       The variable which bin the detector are automatically taken from the x axis title. 
+       The variable which bin the detector are automatically taken from the x axis title.
        This title must me among a predefined list : ETA_TRK, ETA_CALO, ETA_CLUSTER, PHI, PT
     */
     int ApplyCorrection( TH1D* correctionAlpha = 0, TH1D *correctionSigma = 0);
@@ -174,10 +168,13 @@ namespace TemplateMethod {
 
        I locally have issue when saving heavy root file. Saving the distorded merging of heavy file have NOT BEEN TESTED.
     */
-    void CreateDistordedTree( string outFileName = "");
+    void CreateDistordedTree( std::string outFileName = "");
 
 
   private :
+
+    bool RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData );
+
     void FillBranchesToLink( bool isData );
 
     /**\brief Change the electrons pt and Z mass with scales
@@ -211,13 +208,13 @@ namespace TemplateMethod {
        - blue : < 3 sigma
        - red : >3 sigma
     */
-    string GetColorTabular( double inputVal, double measVal, double uncertVal );
+    std::string GetColorTabular( double inputVal, double measVal, double uncertVal );
 
     /**\brief Generate histogram name
        \param objName name of the object we want to create
        \param iVar Tells if the object is created for alpha (iVar=0) or for C (iVar=1)
     */
-    static string CreateHistMatName( string objName, unsigned int iVar ) { return objName + ( iVar ? "_c" : "_alpha" ); }
+    static std::string CreateHistMatName( std::string objName, unsigned int iVar ) { return objName + ( iVar ? "_c" : "_alpha" ); }
 
     /**\brief Find the configuration to put an event into
        \return 0 OK
@@ -230,35 +227,35 @@ namespace TemplateMethod {
        \param isData Tell wich role has the input tree
 
        Calls ChiMatrix::FillDistrib()
-     
+
        When binning with only one variable, the electron with the highest value of the variable will be labeled as first electron.
-     
+
        In case of binning in pt and eta, the event is used twice with a weight of 0.5 whith the selection on 1 electron
     */
     void FillDistrib( bool isData );
-  
+
     /**\brief Class containing all configuration attributes
      */
     Setting m_setting;
 
     /**\brief Class which perform the template fit
      */
-    vector< vector< ChiMatrix* > > m_chiMatrix;
+    std::vector< std::vector< ChiMatrix* > > m_chiMatrix;
 
     /**\brief Input Ntuple with Data role
      */
-    vector<string> m_dataFileNames;
-    vector<string> m_dataTreeNames;
+    std::vector<std::string> m_dataFileNames;
+    std::vector<std::string> m_dataTreeNames;
 
-    vector<string> m_MCFileNames;
-    vector<string> m_MCTreeNames;
+    std::vector<std::string> m_MCFileNames;
+    std::vector<std::string> m_MCTreeNames;
 
     /**\brief Random generator for creation of distorded tree
      */
     TRandom3 m_rand;
 
     ChrisLib::MapBranches m_mapBranches;
-    string m_name;
+    std::string m_name;
 
     /**\brief 2D vector containing usefull histograms for alpha and c
        Dim 2 :
@@ -268,10 +265,10 @@ namespace TemplateMethod {
 
        Dim 1 :
        0 : alpha
-       1 : C 
+       1 : C
     */
-    multi_array<TH1*, 2> m_vectHist;
-    vector<string> m_histNames;
+    boost::multi_array<TH1*, 2> m_vectHist;
+    std::vector<std::string> m_histNames;
 
     /**\brief 2D vector containing usefull matrices for alpha and c
        Dim 2 :
@@ -282,9 +279,9 @@ namespace TemplateMethod {
        0 : alpha
        1 : C
     */
-    multi_array< TMatrixD*, 2> m_vectMatrix;
-    vector<string> m_matrixNames;
-    stringstream m_sStream;
+    boost::multi_array< TMatrixD*, 2> m_vectMatrix;
+    std::vector<std::string> m_matrixNames;
+    std::stringstream m_sStream;
 
     double GetWeight( bool isData );
     std::list<std::string> m_branchesToLink;
@@ -293,5 +290,3 @@ namespace TemplateMethod {
 //#########################################
 
 #endif
-
-

@@ -462,6 +462,11 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
   FillBranchesToLink( isData );
 
+  vector<string> requiredBranches = { "RUNNUMER", "PHI_CALO_1", "PHI_CALO_2"};
+  bool doRemoveHV = 1;
+  for ( auto &s : requiredBranches )
+    if ( mapBranchNames.find(s) == mapBranchNames.end() ) doRemoveHV=0;
+
   for ( unsigned int iFile = 0; iFile < nFiles; iFile++ ) {
 
     TFile *inputFile = new TFile( isData  ? m_dataFileNames[iFile].c_str() : m_MCFileNames[iFile].c_str() );
@@ -483,11 +488,10 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
       if ( nEntry && counterEntry== nEntry ) { cout << "returning : " << counterEntry << endl;return;}
 
       inputTree->GetEntry( iEvent );
-      //      if ( !(counterEntry % 1000000) ) cout << "Event : " << counterEntry << endl;
+      if ( doRemoveHV && !RemoveHVDeadZones( m_mapBranches, isData ) ) continue;
 
       double mass = m_mapBranches.GetDouble(mapBranchNames.at("MASS"));
       weight = GetWeight(isData);
-      //      if (iEvent<100) cout<<"mass: "<<mass<<" weight: "<<weight<<endl;
       //##############################
       if ( isData ) m_setting.SetNEventData();
       else m_setting.SetNEventMC();
@@ -510,8 +514,6 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
     inputFile->Close("R");
     delete inputFile; inputFile = 0;
   }//end loop iFile
-  // cout << "entries filled (" << isData << ") : " << counterEntry << endl;
-  // cout << "time to fill : " << (clock() - tStart)/CLOCKS_PER_SEC << endl;
 
   if ( m_setting.GetDebug() )  cout << "Template : FillDistrib Done" << endl;
 
@@ -582,7 +584,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   distorded = new TFile( outFileName.c_str(), "RECREATE" );
   dataTree = new TTree( treeName.c_str(), treeName.c_str() );
   m_setting.SetDataName( dataTree->GetName() );
-    
+
   const map<string,string> &mapBranchNames = m_setting.GetMCBranchVarNames();
 
   for ( unsigned int iFile = 0; iFile < m_MCFileNames.size(); iFile++ ) {
@@ -622,7 +624,7 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   delete MCFile; MCFile = 0;
   distorded->Close();
   delete distorded; distorded = 0;
-  
+
   if ( m_setting.GetDebug() )  cout << "Template : CreateDistordedTree Done " << endl;
 }
 
@@ -1007,5 +1009,46 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 
   m_branchesToLink.sort();
   m_branchesToLink.erase( unique( m_branchesToLink.begin(), m_branchesToLink.end()), m_branchesToLink.end() );
+
+}
+//=======================================
+bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData ) {
+
+  const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+  double runnumber = event.GetDouble( mapBranchNames.at("RUNNUMBER"));
+
+  for ( int iEl=1; iEl<=2; ++iEl ) {
+    double eta_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
+    double phi_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
+
+    if ((runnumber>=296938.5 && runnumber<298966.5) ||
+        (runnumber>=299143.5 && runnumber<300278.5)){
+      if (   eta_calo > - 1.825
+             && eta_calo < -1.5
+             && phi_calo > -1.104921
+             && phi_calo < -0.956748){
+        return false;
+      }
+    }
+
+    if ((runnumber>=298966.5 && runnumber<299143.5 ) ||
+        (runnumber>=300278.5 && runnumber< 305290.5)){
+      if (eta_calo > - 1.825
+          && eta_calo < -1.5
+          && phi_calo > -1.104921
+          && phi_calo < -0.956748){
+        return false;
+      }
+
+      if (eta_calo> - 1.825
+          && eta_calo < -1.5
+          && phi_calo > 1.054922
+          && phi_calo < 1.203097){
+        return false;
+      }
+    }
+  }
+
+  return true;
 
 }
