@@ -876,6 +876,9 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
     if (  iCorrection && !correctionSigma ) continue;
     if ( !iCorrection && !correctionAlpha ) continue;
     const map<string, string> &mapBranchNames = iCorrection ? m_setting.GetMCBranchVarNames() : m_setting.GetDataBranchVarNames();
+
+    FillBranchesToLink (!iCorrection);
+
     if ( m_setting.GetDebug() )cout << "correcting : " << iCorrection << endl;
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
@@ -895,7 +898,6 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 
       dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
       TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
-
 
       m_mapBranches.LinkTreeBranches( dataTree, dumTree, m_branchesToLink );
 
@@ -999,9 +1001,10 @@ double TemplateMethod::Template::GetWeight( bool isData ) {
 void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   m_branchesToLink.clear();
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+
   for ( auto it=mapBranchNames.begin(); it!=mapBranchNames.end(); ++it )
     m_branchesToLink.push_back( it->second );
-
+  
   const vector<string> weightNames = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
@@ -1014,10 +1017,11 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 }
 //=======================================
 bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData ) {
-
+  
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+  
   int runnumber = event.GetInt( mapBranchNames.at("RUNNUMBER"));
-
+  
   for ( int iEl=1; iEl<=2; ++iEl ) {
     double eta_calo = event.GetDouble( mapBranchNames.at("ETA_CALO_"+to_string(iEl)));
     double phi_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
@@ -1049,7 +1053,7 @@ bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, 
       }
     }
   }
-
+  
   return true;
 
 }

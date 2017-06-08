@@ -12,16 +12,17 @@ dataPath='/sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/'
 
 #print ' --dataFileName '.join( dataFiles )
 #command= 'MeasureScale --configFile ~/private/Calibration/Template/python/Config25_noAlpha.boost --noExtraction '
+
 command= 'MeasureScale --noExtraction --correctAlphaFileName '+path+'Results/CorrectedData/DeltaSummer.root'
 
 #nominal
 os.system( command
-           + ' --configFile '+path+'Config/AlphaOffSummer_15.boost'
-           + ' --dataFileName '+dataPath+'NominalZeeSelection/data15.root'
+           + ' --configFile '+path+'Config/AlphaOffSummer_15_noDeadCells.boost'
+           + ' --dataFileName '+dataPath+'Latest/data15.root'
            + ' --dataTreeName CollectionTree'
-           + ' --correctAlphaHistName delta_Nom'
+           + ' --correctAlphaHistName delta_Nom_noDead'
            )
-os.system( 'mv '+dataPath+'NominalZeeSelection/data15*corrected.root '+path+'Results/CorrectedData/.' )
+os.system( 'mv '+dataPath+'NominalZeeSelection/data15*corrected.root '+path+'Results/CorrectedData/data15_noDead_corrected.root' )
 
 # #EW
 # os.system( command
