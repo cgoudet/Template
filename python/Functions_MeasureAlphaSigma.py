@@ -1,8 +1,10 @@
 import os
 import sys
 
-isAntinea=1
+
+isAntinea=0
 isSaskia=1
+
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
 sys.path.append(os.path.abspath(libPath))
@@ -97,21 +99,22 @@ def FillDatasetContainer( container, datasets ) :
     
 
 def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
-
-    print "Mode: "+str(mode)
-#mode 
-    # 0 MeasureScale
-    # 1 2Steps
-    # 2 GenerateToyTemplates
-    # 3 MeasureScale + sigmaOnly with correction -> default
-    # 4 MeasureScale + alphaOnly with correction -> compare mode 3 to 0
-    #? 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected ??
-    # to perform a closure: doDistorded=1 and any mode different from 2
+    """
+    mode  : 
+    0 MeasureScale
+    1 2Steps
+    2 GenerateToyTemplates
+    3 MeasureScale + sigmaOnly with correction -> default
+    4 MeasureScale + alphaOnly with correction -> compare mode 3 to 0
+    ? 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected ??
+    to perform a closure: doDistorded=1 and any mode different from 2
+    """
+    print( "Mode: "+str(mode))
 
     global PREFIXPATH
     global FILESETS
 
-    if len( inVector ) < 4  : print 'In vector does not have the right length,  the attributes must be : \nConfigFile DataFiles MCFiles outNameFile'; exit(1)
+    if len( inVector ) < 4  : print( 'In vector does not have the right length,  the attributes must be : \nConfigFile DataFiles MCFiles outNameFile'); exit(1)
 
 
     configOptions=inVector[3]
@@ -140,7 +143,6 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     if mode in [ 1, 3 ] : configName.append( PREFIXPATH + configPath + StripString( outNameFile ) + '_c.boost' )
 
     fileName = PREFIXPATH + batchPath + StripString( outNameFile ) + '.sh' 
-
 
     batch = open( fileName, 'w+')
 #Configure the server
@@ -313,3 +315,27 @@ def CreateConfig( configName, inOptions = [] ) :
             else : batch.write( iLabel  + '=' + str( options[iLabel] ) + '\n' )
         
     return
+
+
+def LaunchBatchTemplate( configFile, path = '' ) :
+    """
+    Take an input with the right format and launch the template measuremetn with the corresponding options to the batch
+    Format is a list 
+    - 0 : Name of the job (and output file)
+    - 1 : Directory of data
+    - 2 : MC directory
+    - 3 : harcoded options for the template method
+    - 4 : modes for template measurement
+    """
+    path = AddSlash(path)
+    mode = configFile[4]  if len( configFile ) > 4 else 3
+    
+    launcherFile=CreateLauncher( configFile, mode, "" )
+    logFile = StripString( configFile[0] )
+    
+    launchLine='~/sub1.sh ' + logFile + ' ' \
+	    + path + logFile + '.log ' \
+	    + path + logFile + '.err ' \
+	    + launcherFile
+    
+    os.system( launchLine )
