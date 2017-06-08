@@ -8,98 +8,88 @@ from SideFunction import *
 
 #One config file correspond to one job
 configFiles=[]
-switch=0
 
 
-if switch==0 :
-        configFiles=[ 
-			
+
+configFiles=[ 
+		
 #=================Nominal
-		 #['AlphaOff_16.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',[], 0 ], #nominal
-		 #['AlphaOff_15.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',[], 0 ], #nominal
-		#['ScalesOff_1516.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3']], #nominal to compute systematics
-		#['customSF_unShiftedWeights_n10.root', 'Data_Kirill', 'MC_Kirill',['nUseEl=10']], #nominal to compute systematics
-		['Closure.root', 'pseudoData', 'MC15c_eos',['nUseEl=5', 'ZMassMin=80000', 'ZMassMax=100000'] ], #nominal
-		#['Closure_Saskia.root', 'pseudoData_Saskia', 'MC_Saskia',['nUseEl=5'] ], #nominal
-		
-		#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_noGain_Lkh1',['MCBranchWeightName=weight', 'dataBranchWeightName=weight',"nUseEl=3"] ], #nominal
+	#['AlphaOffSummer_16.root', 'Data16', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
+	#['AlphaOffSummer_15.root', 'Data15', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
+	#['ScalesOffSummer_1516.root', 'CorrectedData', 'MC15c',['nUseEl=3']], #nominal to compute systematics
+#	['AlphaOffSummer_16_xcheck.root', 'Data16_xcheck', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
+#	['AlphaOffSummer_15_xcheck.root', 'Data15_xcheck', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
 
-#================eos
-		# ['Alphaeos_16.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
-		# ['Alphaeos_15.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
-		# ['Scaleseos_smearing3_16.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516', 'nUseEl=3'] ], #eosNtuples
-		# ['Scaleseos_smearing1_16.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516', 'nUseEl=1'] ], #eosNtuples
-		#['Scales_eos_15.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'MCBranchWeightName=weight_15','doSmearing=0','nUseEl=3'],0 ], #eosNtuples
-		#['Scales_eos_1516.root', 'CorrectedData_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'thresholdMass=70', 'nUseEl=3'] ], #eosNtuples
-		# ['Scales_eos_15_Window.root', 'Data15_eos', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500','MCBranchWeightName=weight_15', 'doSmearing=0'],0 ], #eosNtuples
-		# ['Scales_eos_16_Window.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500','MCBranchWeightName=weight_16', 'doSmearing=0'],0 ], #eosNtuples
-#		['Scales_eos_1516_Window.root', 'CorrectedData_eos_Window', 'MC15c_eos',['ZMassMin=82500', 'ZMassMax=97500', 'thresholdMass=70', 'MCBranchWeightName=weight_1516','nUseEl=3'] ], #eosNtuples
-#============Systematics
-		#For residuals
- 		# ['DataOff_13TeV_dataScaled.root', 'Data1615_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],
-		# Changing mass threshold from 70 to 75GeV
-		#['AlphaOff_16_Threshold.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1', ['thresholdMass=75'],0],
-		#['AlphaOff_15_Threshold.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1', ['thresholdMass=75'],0],
-		#['ScalesOff_1516_Threshold.root', 'CorrectedDataThreshold', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'thresholdMass=75']],
+	#['customSF.root', 'Data_Kirill', 'MC_Kirill',['nUseEl=3']], #nominal to compute systematics
+	#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_noGain_Lkh1',['MCBranchWeightName=weight', 'dataBranchWeightName=weight',"nUseEl=3"] ], #nominal
 
-		# Changing mass window of interest
-		#['AlphaOff_16_Window.root', 'Data16_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2016_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0],
-		#['AlphaOff_15_Window.root', 'Data15_13TeV_Zee_noGain_Lkh1', 'MC15c_13TeV_Zee_2015_noGain_Lkh1',  ['ZMassMin=82.5', 'ZMassMax=97.5'],0], 
-		#['ScalesOff_1516_Window.root', 'CorrectedDataWindow', 'MC15c_13TeV_Zee_noGain_Lkh1',['nUseEl=3', 'ZMassMin=82.5', 'ZMassMax=97.5']],
+#================ Systematics
+	#For residuals
+	# ['DataOff_13TeV_dataScaled.root', 'Data1615_13TeV_Zee_Lkh1_scaled', 'MC15c_13TeV_Zee_Lkh1', [] ],
 
-		#  # Electron tight
-		#['AlphaOff_16_ID.root', 'Data16_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2016_noGain_Lkh2', [], 0 ],
-		#['AlphaOff_15_ID.root', 'Data15_13TeV_Zee_noGain_Lkh2', 'MC15c_13TeV_Zee_2015_noGain_Lkh2', [], 0 ],
-		#['ScalesOff_1516_ID.root', 'CorrectedDataID', 'MC15c_13TeV_Zee_noGain_Lkh2',['nUseEl=3']],
-		#  #mesure avec fBrem
-		#['AlphaOff_16_fBrem.root', 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70', [ ], 0],
-		#['AlphaOff_15_fBrem.root', 'Data15_13TeV_Zee_noGain_Lkh1_fBrem70', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70', [ ], 0],
-		#['ScalesOff_1516_fBrem.root', 'CorrectedDatafBrem', 'MC15c_13TeV_Zee_noGain_Lkh1_fBrem70',['nUseEl=3'] ],
-
-		# #Removing isolation 
-		#['AlphaOff_16_noIso.root', 'Data16_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2016_noGain_Lkh1_noIso', [ ], 0],
-		#['AlphaOff_15_noIso.root', 'Data15_13TeV_Zee_noGain_Lkh1_noIso', 'MC15c_13TeV_Zee_2015_noGain_Lkh1_noIso', [], 0],
-		#['ScalesOff_1516_noIso.root', 'CorrectedDataIso', 'MC15c_13TeV_Zee_noGain_Lkh1_noIso',['nUseEl=3'] ],
+	# #EW
+	 #['AlphaOffSummer_16_EW.root', 'Data16', 'MC15c_EWBkg',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16 weightNorm_16', 'doSmearing=0',],0 ], #eosNtuples
+#	 ['AlphaOffSummer_15_EW.root', 'Data15', 'MC15c_EWBkg',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15 weightNorm_15', 'doSmearing=0',],0 ], #eosNtuples
+	['ScalesOffSummer_1516_EW.root', 'CorrectedData_EW', 'MC15c',['nUseEl=3', 'MCBranchWeightName=weight_1516 weightNorm_1516']], #nominal to compute systematics
 
 
-		# #Efficiencies
-		# ['ScalesOff_1516_IDEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1_IDSyst',['nUseEl=3'] ], 
-		# ['ScalesOff_1516_recoEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1_recoSyst',['nUseEl=3'] ], 
-		# ['ScalesOff_1516_isoEff.root', 'CorrectedData', 'MC15c_13TeV_Zee_noGain_Lkh1_isoSyst',['nUseEl=3']], 
+	# #Removing isolation 
+	 #['AlphaOffSummer_16_noIsoCut.root', 'Data16_noIsoCut', 'MC15c_noIsoCut',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
+	 #['AlphaOffSummer_15_noIsoCut.root', 'Data15_noIsoCut', 'MC15c_noIsoCut',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
+#	['ScalesOffSummer_1516_noIsoCut.root', 'CorrectedData_noIsoCut', 'MC15c_noIsoCut',['nUseEl=3']], #nominal to compute systematics
 
-		# #bkg
-		# #['DataOff_13TeV_25ns_EW.root', 'Data1615_13TeV_Zee_Lkh1', 'MC_13TeV_bkg_25ns_Lkh1', [] ],
-		
-		#['DataOff_13TeV_2Steps.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
-		##Syst matiere
-		#['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco']],
+	# Changing mass threshold from 70 to 75GeV
+	#['AlphaOffSummer_16_Threshold.root', 'Data16', 'MC15c', ['thresholdMass=75', 'MCBranchWeightName=weight_16', 'doSmearing=0'],0],
+	#['AlphaOffSummer_15_Threshold.root', 'Data15', 'MC15c', ['thresholdMass=75', 'MCBranchWeightName=weight_15', 'doSmearing=0'],0],
+	#['ScalesOffSummer_1516_Threshold.root', 'CorrectedData_Threshold', 'MC15c',['nUseEl=3', 'thresholdMass=75']],
 
-		# #mesure globale avec pt seuil
-		# ['Data6_13TeV_25ns.root', 'Data_13TeV_Zee_25ns_Lkh1', 'MC_13TeV_Zee_25ns_Lkh1', ['etaBins=ETA6',] ],
-		# ['Data6_13TeV_25ns_pt20.root', 'Data_13TeV_Zee_25ns_Lkh1_pt20', 'MC_13TeV_Zee_25ns_Lkh1_pt20', ['etaBins=ETA6'] ],
-		# ['Data6_13TeV_25ns_pt30.root', 'Data_13TeV_Zee_25ns_Lkh1_pt30', 'MC_13TeV_Zee_25ns_Lkh1_pt30', ['etaBins=ETA6'] ],
-		# ['Data6_13TeV_25ns_pt35.root', 'Data_13TeV_Zee_25ns_Lkh1_pt35', 'MC_13TeV_Zee_25ns_Lkh1_pt35', ['etaBins=ETA6']],
+	# Changing mass window of interest
+	#['AlphaOffSummer_16_Window.root', 'Data16', 'MC15c',  ['ZMassMin=82500', 'ZMassMax=97500', 'MCBranchWeightName=weight_16', 'doSmearing=0'],0],
+	#['AlphaOffSummer_15_Window.root', 'Data15', 'MC15c',  ['ZMassMin=82500', 'ZMassMax=97500', 'MCBranchWeightName=weight_15', 'doSmearing=0'],0], 
+	#['ScalesOffSummer_1516_Window.root', 'CorrectedData_Window', 'MC15c',['nUseEl=3', 'ZMassMin=82500', 'ZMassMax=97500']],
 
-#		Mesure avec les geometries modifiees
-# 		['MCOff_13TeV_25ns_geo02.root', 'MC_13TeV_Zee_25ns_geo02_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
-# 		['MCOff_13TeV_25ns_geo11.root', 'MC_13TeV_Zee_25ns_geo11_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
-# 		['MCOff_13TeV_25ns_geo12.root', 'MC_13TeV_Zee_25ns_geo12_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
-# 		['MCOff_13TeV_25ns_geo13.root', 'MC_13TeV_Zee_25ns_geo13_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
-# 		['MCOff_13TeV_25ns_geo14.root', 'MC_13TeV_Zee_25ns_geo14_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
-# 		['MCOff_13TeV_25ns_geo15.root', 'MC_13TeV_Zee_25ns_geo15_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1',['nUseEl=2', 'symBin=1', 'debug=1', 'etaBins=ETA24'] ],
+	#  # Electron tight
+#	['AlphaOffSummer_16_tightID.root', 'Data16_tightID', 'MC15c_tightID', ['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ],
+#	['AlphaOffSummer_15_tightID.root', 'Data15_tightID', 'MC15c_tightID', ['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ],
+	#['ScalesOffSummer_1516_tightID.root', 'CorrectedData_tightID', 'MC15c_tightID',['nUseEl=3']],
+
+	#  #mesure avec fBrem
+	#['AlphaOffSummer_16_fBrem50.root', 'Data16_fBrem', 'MC15c_fBrem', ['MCBranchWeightName=weight_16', 'doSmearing=0' ], 0],
+	#['AlphaOffSummer_15_fBrem50.root', 'Data15_fBrem', 'MC15c_fBrem', ['MCBranchWeightName=weight_15', 'doSmearing=0' ], 0],
+	#['ScalesOffSummer_1516_fBrem50.root', 'CorrectedData_fBrem', 'MC15c_fBrem',['nUseEl=3'] ],
+	
+
+	# #Efficiencies
+	# ['ScalesOffSummer_1516_IDEff.root', 'CorrectedData', 'MC15c',['nUseEl=3', 'MCBranchWeightName= el2_trigger_SF el2_isEM_SFup el2_reconstruction_SF el2_isolation_SF weight_pileup_1516' ] ], 
+	# ['ScalesOffSummer_1516_recoEff.root', 'CorrectedData', 'MC15c',['nUseEl=3', 'MCBranchWeightName= el2_trigger_SF el2_isEM_SF el2_reconstruction_SFup el2_isolation_SF weight_pileup_1516' ] ], 
+	# ['ScalesOffSummer_1516_triggerEff.root', 'CorrectedData', 'MC15c',['nUseEl=3', 'MCBranchWeightName= el2_trigger_SFup el2_isEM_SF el2_reconstruction_SF el2_isolation_SF weight_pileup_1516' ] ], 
+	# ['ScalesOffSummer_1516_isoEff.root', 'CorrectedData', 'MC15c',['nUseEl=3', 'MCBranchWeightName= el2_trigger_SF el2_isEM_SF el2_reconstruction_SF el2_isolation_SFup weight_pileup_1516' ] ], 
+
+
+
+#================ Distorted
+	# ['AlphaDistorted_s2763.root', 'Data16', 'Distorted_s2763', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal 
+	# ['AlphaDistorted_s2764.root', 'Data16', 'Distorted_s2764', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal 
+	# ['AlphaDistorted_s2765.root', 'Data16', 'Distorted_s2765', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal
+	# ['AlphaDistorted_s2766.root', 'Data16', 'Distorted_s2766', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal
+	# ['AlphaDistorted_s2767.root', 'Data16','Distorted_s2767', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal
+	# ['AlphaDistorted_s2768.root', 'Data16','Distorted_s2768', ['MCBranchWeightName=weight_16', 'dataBranchWeightName=',"nUseEl=20", 'doSmearing=0'], 0 ], #nominal
+
+
+	#================ Closure
+	#['Closure.root', 'pseudoData', 'MC15c_eos',['nUseEl=5', 'ZMassMin=80000', 'ZMassMax=100000'] ], #nominal
+	#['Closure_Saskia.root', 'pseudoData_Saskia', 'MC_Saskia',['nUseEl=5'] ], #nominal
+	#['Test24bins_16.root', 'Data16_eos', 'MC15c_eos',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'nUseEl=3', "etaBins=ETA24"] ], #eosNtuples
+	
+#	['Closure.root', 'MC15c_evenEvents', 'MC15c_oddEvents',['nUseEl=5', 'ZMassMin=80000', 'ZMassMax=100000', 'alphaSimEta=SIMALPHAETA68', 'sigmaSimEta=SIMZEROETA68'], 0, 1 ], #nominal
+
+	#['DataOff_13TeV_2Steps.root', 'Data1615_13TeV_Zee_Lkh1', 'MC15c_13TeV_Zee_Lkh1', [], 1 ],
+	##Syst matiere
+	#['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco']],
+
+
 	]
-elif switch == 1 :
-        configFiles=[ 
-		#Mesure des scales
-#		['TestOptim.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_Lkh1', ['dataBranchWeightName=' ], 3 ],
-#		['DataOff_13TeV_25ns_rel201_IBL.root', 'Data_13TeV_Zee_25nsb_Lkh1', 'MC_13TeV_Zee_25nsb_IBL_Lkh1', ['dataBranchWeightName=', 'MCBranchWeightName=puWeight SFID SFReco'], 3 ],
-#		['Test2VAR1.root', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_PassSel', 'MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel', ['dataBranchWeightName=', 'MCBranchWeightName=', 'alphaSimEta=0.005 0.005 0.005 0.005 0.005 0.005', 'alphaSimPt=0 0 0 0 0', 'sigmaSimAlpha=0 0 0 0 0', 'sigmaSimEta=0 0 0 0 0 0', 'sigmaSimPt=0 0 0 0 0', 'etaBins=ETA6', 'ptBins=0 50000 100000 150000 200000 1000000', "var2=PT", "mode=2VAR", 'doSmearing=0' ], 0, 1 ],
-# 		['TestPT.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/Data_13TeV_Zee_25ns_Lkh1_0_corrected.root', 'MC_2015cPRE_corr', ['etaBins=PT6', 'var1=pt', 'branchVarNames=pt_1 pt_1', 'branchVarNames=pt_2 pt_2', 'doSmearing=0'] ],
-		# ['Closure_c.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA6', 'sigmaSimEta=SIMSIGMAETA6', 'alphaSimEta=0 0 0 0 0 0', 'doScale=0', 'nUseEvent=100000',  'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ]
-		['Closure.root'  , 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ],
-		['Closure_nUsel5.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'nUseEl=5', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ],
-		['Closure_nUsel10.root', 'ClosureData', 'ClosureMC', ['etaBins=ETA24', 'sigmaSimEta=2e-2 2e-2 5e-3 1.5e-2 1.5e-2 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3 8e-3  8e-3 8e-3 1.5e-2 1.5e-2 5e-3 2e-2 2e-2', 'alphaSimEta= -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2', 'nUseEl=10', 'dataBranchWeightName=' ,'MCBranchWeightName='], 0 ]
-		]	
+
 
 spsPath="/sps/atlas/a/aguerguichon/Calibration/PreRec/"
 logPath="Log/"
@@ -117,3 +107,4 @@ for confFile in range( 0, len( configFiles ) ) :
 	    + launcherFile
 
 	os.system( launchLine )
+

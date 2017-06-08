@@ -174,7 +174,7 @@ int main( int argc, char* argv[] ) {
 	  cout << "latex file : " << dumString + ".tex" << endl;
 	  runNumber = std::stol( dumString.substr( dumString.find_last_of( "_") +1 ) );
 	  TMatrixD *combinScale = isSmearing? TempMeasure.GetMatrix( "sigma" ) : TempMeasure.GetMatrix( "alpha" );
-	  TMatrixD* combinErrScale = TempMeasure.GetMatrix( "errAlpha" );
+	  TMatrixD* combinErrScale = isSmearing? TempMeasure.GetMatrix( "errSigma" ) : TempMeasure.GetMatrix( "errAlpha" );
 
 	  nBins = settingMeasure.GetEtaBins().size()-1;
 	  nOptim = settingMeasure.GetOptimizeRanges();
@@ -208,7 +208,7 @@ int main( int argc, char* argv[] ) {
 	    iConf = iBin;
 	    scale = scaleResult->GetBinContent(iBin+1);
 	    errScale = scaleResult->GetBinError(iBin+1);
-	    if ( settingMeasure.GetSigmaSimEta().size()!=0 || settingMeasure.GetAlphaSimEta().size()!=0 ) histInput->SetBinContent( iBin, isSmearing? settingMeasure.GetSigmaSimEta()[iBin] : settingMeasure.GetAlphaSimEta()[iBin] );
+	    if ( settingMeasure.GetSigmaSimEta().size()!=0 || settingMeasure.GetAlphaSimEta().size()!=0 ) histInput->SetBinContent( iBin+1, isSmearing? settingMeasure.GetSigmaSimEta()[iBin] : settingMeasure.GetAlphaSimEta()[iBin] );
 	    scalesTree->Fill();
 	  }
 

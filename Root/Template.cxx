@@ -78,7 +78,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
 
-      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "selectionTree" );
+      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "CollectionTree" );
       TTree *dumTree = static_cast<TTree*>(dumFile->Get(treeNames[iFile].c_str()));
       if ( !dumTree ) throw runtime_error( "TempalteMethod::Template::Configure : "+treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
 
@@ -604,8 +604,8 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
       }
 
       RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
+      distorded->cd();
       dataTree->Fill();
-      if (iEvent%100000==0) cout<<iEvent<<" factor1 "<<factor1<<endl;
     }
   }
 
@@ -1004,6 +1004,7 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
 
+  if (!isData) m_branchesToLink.push_back( "weightNorm_15"); m_branchesToLink.push_back( "weightNorm_16"); m_branchesToLink.push_back( "weightNorm_1516");
 
   m_branchesToLink.sort();
   m_branchesToLink.erase( unique( m_branchesToLink.begin(), m_branchesToLink.end()), m_branchesToLink.end() );
