@@ -462,7 +462,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
   FillBranchesToLink( isData );
 
-  vector<string> requiredBranches = { "RUNNUMER", "PHI_CALO_1", "PHI_CALO_2"};
+  vector<string> requiredBranches = { "RUNNUMBER", "PHI_CALO_1", "PHI_CALO_2"};
   bool doRemoveHV = 1;
   for ( auto &s : requiredBranches )
     if ( mapBranchNames.find(s) == mapBranchNames.end() ) doRemoveHV=0;
@@ -1016,14 +1016,14 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData ) {
 
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
-  double runnumber = event.GetDouble( mapBranchNames.at("RUNNUMBER"));
+  int runnumber = event.GetInt( mapBranchNames.at("RUNNUMBER"));
 
   for ( int iEl=1; iEl<=2; ++iEl ) {
-    double eta_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
+    double eta_calo = event.GetDouble( mapBranchNames.at("ETA_CALO_"+to_string(iEl)));
     double phi_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
 
-    if ((runnumber>=296938.5 && runnumber<298966.5) ||
-        (runnumber>=299143.5 && runnumber<300278.5)){
+    if ((runnumber>=296939 && runnumber<298967) ||
+        (runnumber>=299144 && runnumber<300279)){
       if (   eta_calo > - 1.825
              && eta_calo < -1.5
              && phi_calo > -1.104921
@@ -1032,8 +1032,8 @@ bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, 
       }
     }
 
-    if ((runnumber>=298966.5 && runnumber<299143.5 ) ||
-        (runnumber>=300278.5 && runnumber< 305290.5)){
+    if ((runnumber>=298967 && runnumber<299144 ) ||
+        (runnumber>=300279 && runnumber< 305291)){
       if (eta_calo > - 1.825
           && eta_calo < -1.5
           && phi_calo > -1.104921

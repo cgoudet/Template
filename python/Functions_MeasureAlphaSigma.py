@@ -2,11 +2,11 @@ import os
 import sys
 
 
-isAntinea=0
+isAntinea=1
 isSaskia=1
 
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
-libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
+libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python/'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
@@ -269,6 +269,9 @@ def CreateConfig( configName, inOptions = [] ) :
         options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
         options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
         options['dataBranchVarNames']['MASS']='m12'
+        options['dataBranchVarNames']['RUNNUMBER']='RunNumber'
+        options['dataBranchVarNames']['PHI_CALO_1']='el1_phiCalo'
+        options['dataBranchVarNames']['PHI_CALO_2']='el2_phiCalo'
         options['dataBranchWeightName']=''
 
         options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
