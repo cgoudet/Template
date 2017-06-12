@@ -248,14 +248,14 @@ int TemplateMethod::Template::Save( bool saveChiMatrix ) {
   //   return 2;
   // }
 
-  if ( saveChiMatrix ) {
+  // if ( saveChiMatrix ) {
   //   for ( auto vChiMatrixLine : m_chiMatrix ) {
   //     for ( auto vChiMatrix : vChiMatrixLine ) {
-  //    vChiMatrix->Save(outFile, 1);
-  //    vChiMatrix->Save(outFile, 0);
+  //       vChiMatrix->Save(outFile, 1);
+  //       vChiMatrix->Save(outFile, 0);
   //     }
   //   }
-  }
+  // }
 
   outFile->Close();
   delete outFile;
