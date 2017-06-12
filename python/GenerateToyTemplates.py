@@ -8,17 +8,17 @@ isAntinea=1
 #One config file correspond to one job
 
 configFiles=[ 
-    ['', 'MC15c_evenEvents', 'MC15c_oddEvents', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=2', 'etaBins=ETA68', 'doSmearing=0', 'alphaSimEta=SIMALPHAETA68']]
+    ['', 'MC15c_evenEvents', 'MC15c_oddEvents', ['indepDistorded=2', 'indepTemplates=2', 'bootstrap=2', 'etaBins=ETA68', 'doSmearing=0', 'doScale=1', 'alphaSimEta=SIMALPHAETA68', 'nUseEl=3']]
     ]
 
 inputC = [ 0 ]
-inputStat = [ 1000000 ]
-nIteration = 25 #total number of jobs
+inputStat = [ 0 ]
+nIteration = 1 #total number of jobs
 outName = 'TreeToyTemplates_' + str( int( time.time()%(2600*24*365*3) ) )
 counter =0
 nUseEl= 1
-fitPerJob= 5 # number of toys per command "GenerateToyTemplate"
-commandPerJob=5 # number of commands per job
+fitPerJob= 1 # number of toys per command "GenerateToyTemplate"
+commandPerJob=1 # number of commands per job
 
 nJobs= nIteration/ float((fitPerJob*commandPerJob))
 
@@ -48,7 +48,6 @@ for vInput in  inputC  :
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.log ' \
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.err ' \
                 + launcherFile
-
 
             os.system( launchLine )
 

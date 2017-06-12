@@ -115,6 +115,7 @@ void TemplateMethod::Setting::Configure( const string &configFile ) {
   
   po::variables_map vm;
   ifstream ifs( configFile, ifstream::in );
+  if (!ifs.is_open()) throw invalid_argument("Configuration file: "+configFile+" does not exist.");
   po::store(po::parse_config_file(ifs, configOptions), vm);
   po::notify( vm );
   

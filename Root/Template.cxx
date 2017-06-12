@@ -78,7 +78,7 @@ TemplateMethod::Template::Template( const string &outFileName, const string &con
 
       if ( treeNames.size() < iFile+1 ) treeNames.push_back( "" );
 
-      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "selectionTree" );
+      if ( treeNames[iFile] == "" ) treeNames[iFile] = FindDefaultTree( dumFile, "TTree", "CollectionTree" );
       TTree *dumTree = static_cast<TTree*>(dumFile->Get(treeNames[iFile].c_str()));
       if ( !dumTree ) throw runtime_error( "TempalteMethod::Template::Configure : "+treeNames[iFile] + " in " + fileNames[iFile] + " does not exist." );
 
@@ -462,7 +462,7 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
   FillBranchesToLink( isData );
 
-  vector<string> requiredBranches = { "RUNNUMER", "PHI_CALO_1", "PHI_CALO_2"};
+  vector<string> requiredBranches = { "RUNNUMBER", "PHI_CALO_1", "PHI_CALO_2"};
   bool doRemoveHV = 1;
   for ( auto &s : requiredBranches )
     if ( mapBranchNames.find(s) == mapBranchNames.end() ) doRemoveHV=0;
@@ -606,8 +606,8 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
       }
 
       RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
+      distorded->cd();
       dataTree->Fill();
-      if (iEvent%100000==0) cout<<iEvent<<" factor1 "<<factor1<<endl;
     }
   }
 
@@ -877,6 +877,9 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
     if (  iCorrection && !correctionSigma ) continue;
     if ( !iCorrection && !correctionAlpha ) continue;
     const map<string, string> &mapBranchNames = iCorrection ? m_setting.GetMCBranchVarNames() : m_setting.GetDataBranchVarNames();
+
+    FillBranchesToLink (!iCorrection);
+
     if ( m_setting.GetDebug() )cout << "correcting : " << iCorrection << endl;
     unsigned int nFile = ( iCorrection ) ? m_MCFileNames.size() : m_dataFileNames.size() ;
     cout << "nFile : " << nFile << endl;
@@ -896,7 +899,6 @@ int TemplateMethod::Template::ApplyCorrection( TH1D* correctionAlpha, TH1D *corr
 
       dumString = ( iCorrection ) ? "correctedMC" : "correctedData";
       TTree *dumTree = new TTree( dumString.c_str(), dumString.c_str() );
-
 
       m_mapBranches.LinkTreeBranches( dataTree, dumTree, m_branchesToLink );
 
@@ -1000,13 +1002,15 @@ double TemplateMethod::Template::GetWeight( bool isData ) {
 void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
   m_branchesToLink.clear();
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
+
   for ( auto it=mapBranchNames.begin(); it!=mapBranchNames.end(); ++it )
     m_branchesToLink.push_back( it->second );
-
+  
   const vector<string> weightNames = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
 
+  if (!isData) m_branchesToLink.push_back( "weightNorm_15"); m_branchesToLink.push_back( "weightNorm_16"); m_branchesToLink.push_back( "weightNorm_1516");
 
   m_branchesToLink.sort();
   m_branchesToLink.erase( unique( m_branchesToLink.begin(), m_branchesToLink.end()), m_branchesToLink.end() );
@@ -1014,16 +1018,17 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 }
 //=======================================
 bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData ) {
-
+  
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
-  double runnumber = event.GetDouble( mapBranchNames.at("RUNNUMBER"));
-
+  
+  int runnumber = event.GetInt( mapBranchNames.at("RUNNUMBER"));
+  
   for ( int iEl=1; iEl<=2; ++iEl ) {
-    double eta_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
+    double eta_calo = event.GetDouble( mapBranchNames.at("ETA_CALO_"+to_string(iEl)));
     double phi_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
 
-    if ((runnumber>=296938.5 && runnumber<298966.5) ||
-        (runnumber>=299143.5 && runnumber<300278.5)){
+    if ((runnumber>=296939 && runnumber<298967) ||
+        (runnumber>=299144 && runnumber<300279)){
       if (   eta_calo > - 1.825
              && eta_calo < -1.5
              && phi_calo > -1.104921
@@ -1032,8 +1037,8 @@ bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, 
       }
     }
 
-    if ((runnumber>=298966.5 && runnumber<299143.5 ) ||
-        (runnumber>=300278.5 && runnumber< 305290.5)){
+    if ((runnumber>=298967 && runnumber<299144 ) ||
+        (runnumber>=300279 && runnumber< 305291)){
       if (eta_calo > - 1.825
           && eta_calo < -1.5
           && phi_calo > -1.104921
@@ -1049,7 +1054,7 @@ bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, 
       }
     }
   }
-
+  
   return true;
 
 }

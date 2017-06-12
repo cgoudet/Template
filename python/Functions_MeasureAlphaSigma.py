@@ -2,11 +2,11 @@ import os
 import sys
 
 
-isAntinea=0
+isAntinea=1
 isSaskia=1
 
 user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
-libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python'
+libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python/'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
@@ -17,70 +17,66 @@ PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 FILESETS={}
 
 
-#======================= eos ===========================//
-FILESETS['MC15c_eos']       =[ PREFIXDATASETS + 'eosNtuples/mc_Zee.root'] 
-FILESETS['Data15_eos']       =[ PREFIXDATASETS + 'eosNtuples/data15_Zee.root'] 
-FILESETS['Data16_eos']       =[ PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
-FILESETS['CorrectedData_eos']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
-FILESETS['CorrectedData_eos_Window']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Zee_corrected_Window.root', PREFIXDATASETS + 'eosNtuples/data16_Zee.root'] 
+#======================= nominal ===========================//
+FILESETS['MC15c']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/mcZee.root'] 
+FILESETS['Data15']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data15.root'] 
+FILESETS['Data16']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
+
+FILESETS['Data15_xcheck']       =[ PREFIXDATASETS + 'eosNtuples/Latest/data15.root'] 
+FILESETS['Data16_xcheck']       =[ PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
+#======================= systematics ===========================//
+
+
+FILESETS['MC15c_noIsoCut']       =[ PREFIXDATASETS + 'eosNtuples/NoElectronIsolationCut/mcZee_noIsoCut.root'] 
+FILESETS['Data15_noIsoCut']       =[ PREFIXDATASETS + 'eosNtuples/NoElectronIsolationCut/data15_noIsoCut.root'] 
+FILESETS['Data16_noIsoCut']       =[ PREFIXDATASETS + 'eosNtuples/NoElectronIsolationCut/data16_noIsoCut.root'] 
+
+FILESETS['MC15c_tightID']   =   [ PREFIXDATASETS + 'eosNtuples/TightElectronID/mcZee_tightID.root'] 
+FILESETS['Data15_tightID'] = [ PREFIXDATASETS + 'eosNtuples/TightElectronID/data15_tightID.root'] 
+FILESETS['Data16_tightID'] = [ PREFIXDATASETS + 'eosNtuples/TightElectronID/data16_tightID.root'] 
+
+FILESETS['MC15c_fBrem']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/mcZee_fBrem.root'] 
+FILESETS['Data15_fBrem']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data15_fBrem.root'] 
+FILESETS['Data16_fBrem']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16_fBrem.root'] 
+
+
+
+PREFIXBKG=PREFIXDATASETS+'eosNtuples/NominalZeeSelection/'
+FILESETS['MC15c_EWBkg']   =   [ PREFIXBKG + 'mcBkg_WqqZll.root', PREFIXBKG + 'mcBkg_ZqqZll.root', PREFIXBKG + 'mcBkg_Ztautau.root', PREFIXBKG + 'mcBkg_llll.root', PREFIXBKG + 'mcBkg_lllv.root', PREFIXBKG + 'mcBkg_llvv.root', PREFIXBKG +'mcBkg_ttbar_DiLepton.root', PREFIXBKG +'mcZee.root'] 
+
+#===================== distorted =======================
+FILESETS['Distorted_s2763']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2763.root'] 
+FILESETS['Distorted_s2764']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2764.root'] 
+FILESETS['Distorted_s2765']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2765.root'] 
+FILESETS['Distorted_s2766']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2766.root'] 
+FILESETS['Distorted_s2767']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2767.root'] 
+FILESETS['Distorted_s2768']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2768.root'] 
+
+#====================== corrected ======================
+
+FILESETS['CorrectedData_noDeadCells']       =[ '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170601/data15_noDeadCells_corrected.root', PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
+
+FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
+
+FILESETS['CorrectedData_Window']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Window_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
+
+FILESETS['CorrectedData_EW']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_corrected_EW.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
+
+FILESETS['CorrectedData_noIsoCut']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_noIsoCut_corrected.root', PREFIXDATASETS + 'eosNtuples/NoElectronIsolationCut/data16_noIsoCut.root'] 
+
+FILESETS['CorrectedData_Threshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Threshold_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root']
+
+FILESETS['CorrectedData_tightID']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_tightID_corrected.root', PREFIXDATASETS + 'eosNtuples/TightElectronID/data16_tightID.root']
+
+FILESETS['CorrectedData_fBrem']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_fBrem_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16_fBrem.root']
+
+
+#===================== pseudo data ===================
+
 FILESETS['pseudoData'] = ['/sps/atlas/a/aguerguichon/Calibration/Closure/pseudoData_both_distorted.root']
 FILESETS['pseudoData_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_data.root']
 FILESETS['MC_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_MC.root']
 
-#==============
-FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
-FILESETS['CorrectedDataThreshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Threshold_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
-FILESETS['CorrectedDataWindow']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_Window_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']
-FILESETS['CorrectedDataID']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh2_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh2/']
-FILESETS['CorrectedDataIso']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_doIso0_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_doIso0/']
-FILESETS['CorrectedDatafBrem']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/Data15_13TeV_Zee_noGain_Lkh1_fBrem70_corrected.root', PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70/']
-
-#======================== 2015 ========================//
-
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1/']#nominal
-FILESETS['Data15_13TeV_Zee_noGain_Lkh1'] = [ PREFIXDATASETS + 'Data15_13TeV_Zee_noGain_Lkh1/']#nominal
-
-
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh2']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh2/'] 
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1_IDSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1_IDSyst/'] 
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1_recoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1_recoSyst/'] 
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1_isoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1_isoSyst/']
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1_noIso']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1_doIso0/']  
-FILESETS['MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2015_noGain_Lkh1_fBrem70/']  
-
-
-FILESETS['Data15_13TeV_Zee_noGain_Lkh1_noIso'] = [ PREFIXDATASETS + 'Data15_13TeV_Zee_noGain_Lkh1_doIso0/'] 
-FILESETS['Data15_13TeV_Zee_noGain_Lkh1_fBrem70'] = [ PREFIXDATASETS + 'Data15_13TeV_Zee_noGain_Lkh1_fBrem70/'] 
-FILESETS['Data15_13TeV_Zee_noGain_Lkh2'] = [ PREFIXDATASETS + 'Data15_13TeV_Zee_noGain_Lkh2/'] 
-
-
-#======================== 2016 ===========================//
-
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1/']#nominal
-FILESETS['Data16_13TeV_Zee_noGain_Lkh1'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1/']#nominal
-
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh2']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh2/'] 
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1_IDSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1_IDSyst/'] 
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1_recoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1_recoSyst/'] 
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1_isoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1_isoSyst/']
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1_noIso']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1_doIso0/']  
-FILESETS['MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_2016_noGain_Lkh1_fBrem70/']  
-
-FILESETS['Data16_13TeV_Zee_noGain_Lkh1_noIso'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_doIso0/'] 
-FILESETS['Data16_13TeV_Zee_noGain_Lkh1_fBrem70'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh1_fBrem70/'] 
-FILESETS['Data16_13TeV_Zee_noGain_Lkh2'] = [ PREFIXDATASETS + 'Data16_13TeV_Zee_noGain_Lkh2/'] 
-
-
-#====================== 2015 + 2016 ======================//
-
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1/'] #nominal
-
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh2']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh2/'] 
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_IDSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1_IDSyst/'] 
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_recoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1_recoSyst/'] 
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_isoSyst']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1_isoSyst/']
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_noIso']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1_doIso0/']  
-FILESETS['MC15c_13TeV_Zee_noGain_Lkh1_fBrem70']       =[ PREFIXDATASETS + 'MC15c_13TeV_Zee_noGain_Lkh1_fBrem70/']  
 
 #====================== Test ===============================//
 
@@ -88,35 +84,16 @@ FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_Ne
 FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
 FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
 
-FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/v1_unShiftedWeights_noSmear_noScale/mc15c_wCal_v1.root" ]
+FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/outputs/mc/wCal_noCT_p3012fullsim/mc15c_wCal_p3012fs.root"]
 FILESETS['Data_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/v1_unShiftedWeights_noSmear_noScale/data_16_wCal_v1.root" ]
 
 
 #==================== Toys =====================
-FILESETS['MC15c_evenEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_evenEvents.root']
-FILESETS['MC15c_oddEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Test/MC15c_13TeV_Zee_noGain_Lkh1_oddEvents.root']
+FILESETS['MC15c_evenEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Closure/mc_Zee_evenEvents.root']
+FILESETS['MC15c_oddEvents']       =['/sps/atlas/a/aguerguichon/Calibration/Closure/mc_Zee_oddEvents.root']
 
-#================================================================
-#FILESETS['MC_13TeV_bkg_25ns_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Ztautau_25ns_Lkh1/', PREFIXDATASETS + 'MC_13TeV_Zttbar_25ns_Lkh1/' ]
-FILESETS['MC_13TeV_Zee_25nsb_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_1.root']
-FILESETS['MC_13TeV_Zee_25nsb_IBL_Lkh1']       =[ PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_0.root', PREFIXDATASETS + 'Archive/MC_13TeV_Zee_25ns_rel201_IBL_1.root']
-FILESETS['MC_13TeV_Zee_25nsb_Lkh1_scaled']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_0.root', PREFIXDATASETS + 'MC_13TeV_Zee_25ns_Lkh1_scaled/archive/MC_13TeV_Zee_25nsb_Lkh1_scaled_1.root']
 
-FILESETS['ClosureMC'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root' ]
-FILESETS['ClosureData'] = [ '/sps/atlas/c/cgoudet/Calibration/Closure/MC_distorded.root' ]
-#    [ 0.2923, 0.2923, 0.2923, 0.32194 ],
-
-FILESETS['MC_13TeV_Zee_50ns_Lkh1_PairEvents_RejSel'] = [ PREFIXDATASETS + 'MC_13TeV_Zee_50ns_Lkh1_0_PairEvents_RejSel.root']
-FILESETS['Data_8TeV_Zee_Lkh1'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1/' ]
-FILESETS['Data_8TeV_Zee_Lkh1_scaled'] = [ PREFIXDATASETS + 'Data_8TeV_Zee_Lkh1_scaled' ]
-FILESETS['MC_13TeV_Zee_25ns_geo02_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo02_Lkh1' ]
-FILESETS['MC_13TeV_Zee_25ns_geo11_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo11_Lkh1' ]
-FILESETS['MC_13TeV_Zee_25ns_geo12_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo12_Lkh1' ]
-FILESETS['MC_13TeV_Zee_25ns_geo13_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo13_Lkh1' ]
-FILESETS['MC_13TeV_Zee_25ns_geo14_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo14_Lkh1' ]
-FILESETS['MC_13TeV_Zee_25ns_geo15_Lkh1'] =[ PREFIXDATASETS + 'MC_13TeV_Zee_25ns_geo15_Lkh1' ]
-
-FILESETS['MC_2015cPRE_corr']=['/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_0_corrected.root', '/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_1_corrected.root','/sps/atlas/c/cgoudet/Calibration/ScaleResults/160519/MC_13TeV_Zee_25ns_Lkh1_2_corrected.root']
+#=================================================
 def FillDatasetContainer( container, datasets ) :
     for dataset in datasets : 
         if '.root' in dataset : container.append( dataset )
@@ -190,28 +167,19 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
     batch.write( '\n'.join( [ 'cp -v ' + dataFile + ' . ' for dataFile in dataFiles + MCFiles ] ) + '\n' )
     
-
     dataLine = ' '.join( [ (' --dataFileName ' 
                             + StripString( name, 1, 0 ) 
-                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName pseudoData_both_distorted' if isSaskia else '') ) for name in dataFiles ] ) 
+                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +' --dataTreeName '+(' CollectionTree' if isSaskia else ' Analysis_selectionTree') ) for name in dataFiles ] ) 
 
-    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
-
-    # dataLine = ' '.join( [ (' --dataFileName ' 
-    #                         + StripString( name, 1, 0 ) 
-    #                         + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +(' --dataTreeName CollectionTree' if isSaskia else '') ) for name in dataFiles ] ) 
-
-    # MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +(' --MCTreeName CollectionTree' if isSaskia else '') for name in MCFiles ] )
-
-
+    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +' --MCTreeName ' +(' CollectionTree' if isSaskia else ' Analysis_selectionTree') for name in MCFiles ] )
 
 
   #Fill the command line
 
 #Perform a closure
     if doDistorded and mode != 2 : 
-        batch.write( 'MeasureScale --configFile ' + StripString(configName[0], 1, 0) + dataLine.replace( '--dataFileName', '--MCFileName' ) + ' --outFileName ' + outNameFile + ' --createDistorded MC_distorded.root --noExtraction \n')
-        dataLine = ' --dataFileName MC_distorded.root '
+        batch.write( 'MeasureScale --configFile ' + StripString(configName[0], 1, 0) + dataLine.replace( '--dataFileName', '--MCFileName' ) + ' --outFileName ' + outNameFile + ' --createDistorded MC_distorded.root --noExtraction --dataTreeName CollectionTree --MCTreeName CollectionTree \n')
+        dataLine = ' --dataFileName MC_distorded.root --dataTreeName Closure_distorded '
 
 
 #Copy the output pdf and root file to result folder
@@ -259,11 +227,11 @@ def CreateConfig( configName, inOptions = [] ) :
     defaultBinning['SIMALPHAETA24']=' -2e-2 0 -1.5e-2 1e-2 -2e-2 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -15e-3 -2e-2 1e-2 -1.5e-2 0 -2e-2'
     defaultBinning['ETA68'] = '-2.47 -2.435 -2.4 -2.35 -2.3 -2.2 -2.1 -2.05 -2 -1.9 -1.8 -1.7625 -1.725 -1.6775 -1.63 -1.59 -1.55 -1.51 -1.47 -1.42 -1.37 -1.285 -1.2 -1.1 -1 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 1.1 1.2 1.285 1.37 1.42 1.47 1.51 1.55 1.59 1.63 1.6775 1.725 1.7625 1.8 1.9 2 2.05 2.1 2.2 2.3 2.35 2.4 2.435 2.47'
     defaultBinning['SIMALPHAETA68'] = '1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 -1.5e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2'
+    defaultBinning['SIMZEROETA24'] = '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+    defaultBinning['SIMZEROETA68'] = '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
 
     defaultBinning['PT6'] = '0 100 200 300 400 500 1000'
     options = {}
-    options['ZMassMin'] = 80
-    options['ZMassMax'] = 100
     options['ZMassNBins'] = 20
     options['mode'] = "1VAR"
     options['doScale'] = 1
@@ -303,12 +271,18 @@ def CreateConfig( configName, inOptions = [] ) :
         options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
         options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
         options['dataBranchVarNames']['MASS']='m12'
+        options['dataBranchVarNames']['RUNNUMBER']='RunNumber'
+        options['dataBranchVarNames']['PHI_CALO_1']='el1_phiCalo'
+        options['dataBranchVarNames']['PHI_CALO_2']='el2_phiCalo'
         options['dataBranchWeightName']=''
 
         options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
         options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
         options['MCBranchVarNames']['MASS']='m12'
         options['MCBranchWeightName']='weight_1516'
+        
+        options['ZMassMin'] = 80000
+        options['ZMassMax'] = 100000
 
 
     else:
@@ -322,7 +296,9 @@ def CreateConfig( configName, inOptions = [] ) :
          options['MCBranchVarNames']['MASS']='m12'
          options['MCBranchWeightName']='weight'
    
-
+         options['ZMassMin'] = 80
+         options['ZMassMax'] = 100
+        
 
     for inOpt in inOptions :
         optKey = inOpt.split('=')[0]
