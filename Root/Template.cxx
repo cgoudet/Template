@@ -759,7 +759,7 @@ void TemplateMethod::Template::MakePlot( string path, string latexFileName ) {
         vector<TH1*> histPlot = { m_vectHist[iVar][iHist] };
         if ( m_vectHist[iVar][histInputBin] && iHist==histMeasBin ) histPlot.insert( histPlot.begin(), m_vectHist[iVar][histInputBin] );
         drawOpt.AddOption( "outName", plotName );
-        if ( isClosure )drawOpt.AddOption( "doRatio", "1");
+        if ( isClosure ) drawOpt.AddOption( "doRatio", "2");
         drawOpt.Draw( histPlot );
         plotNames.push_back( plotName );
       }
