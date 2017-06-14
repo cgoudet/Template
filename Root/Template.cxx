@@ -521,7 +521,6 @@ void TemplateMethod::Template::FillDistrib( bool isData ) {
 //###############################==
 void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
   cout << "Template::CreateDistordedTree" << endl;
-
   const vector< double > &alphaSimEta = m_setting.GetAlphaSimEta();
   const vector< double > &alphaSimPt = m_setting.GetAlphaSimPt();
   const vector< double > &sigmaSimEta = m_setting.GetSigmaSimEta();
@@ -579,7 +578,6 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
 
 
   if ( outFileName=="" ) outFileName= m_name + "_distorted.root";
-  cout << "outDistordedFileName : " << outFileName << endl;
   string treeName = StripString(outFileName);
   distorded = new TFile( outFileName.c_str(), "RECREATE" );
   dataTree = new TTree( treeName.c_str(), treeName.c_str() );

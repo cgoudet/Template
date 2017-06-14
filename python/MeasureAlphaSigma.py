@@ -1,4 +1,4 @@
-import os
+[5~import os
 import sys
 from Functions_MeasureAlphaSigma import *
 import sys
@@ -19,9 +19,9 @@ configFiles=[
 	#['ScalesOffSummer_1516.root', 'CorrectedData', 'MC15c',['nUseEl=3']], #nominal to compute systematics
 	#['AlphaOffSummer_16_noDeadCells.root', 'Data16_xcheck', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_16', 'doSmearing=0',],0 ], #eosNtuples
 	#['AlphaOffSummer_15_noDeadCells.root', 'Data15_xcheck', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15', 'doSmearing=0',],0 ], #eosNtuples
-    #['ScalesOffSummer_1516_noDeadCells.root', 'CorrectedData_noDeadCells', 'MC15c',['nUseEl=3', 'ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516']], #nominal to compute systematics
+    ['ScalesOffSummer_1516_noDeadCells.root', 'CorrectedData_noDeadCells', 'MC15c',['nUseEl=3', 'ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_1516']], #nominal to compute systematics
 
-    ['Test.root', 'Data15_xcheck', 'MC15c',['ZMassMin=80000', 'ZMassMax=100000', 'MCBranchWeightName=weight_15'] ], #eosNtuples
+
 	#['customSF.root', 'Data_Kirill', 'MC_Kirill',['nUseEl=3']], #nominal to compute systematics
 	#['ScalesGeom.root', 'MC_13TeV_Zee_NewGeom_Lkh1', 'MC15c_13TeV_Zee_noGain_Lkh1',['MCBranchWeightName=weight', 'dataBranchWeightName=weight',"nUseEl=3"] ], #nominal
 

@@ -41,7 +41,7 @@ int main( int argc, char* argv[] ) {
     ("correctAlphaHistName", po::value<string>(&correctAlphaHistName), "")
     ("correctSigmaFileName", po::value<string>(&correctSigmaFileName), "")
     ("correctSigmaHistName", po::value<string>(&correctSigmaHistName), "")
-    ("createDistorded", po::value<string>(&distordedTreeName)->implicit_value( "" ), "" )
+    ("createDistorded", po::value<string>(&distordedTreeName)->default_value( "" ), "" )
 ;
 
   // Create a map vm that contains options and all arguments of options       
