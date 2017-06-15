@@ -41,7 +41,7 @@ int main( int argc, char* argv[] ) {
     ("correctAlphaHistName", po::value<string>(&correctAlphaHistName), "")
     ("correctSigmaFileName", po::value<string>(&correctSigmaFileName), "")
     ("correctSigmaHistName", po::value<string>(&correctSigmaHistName), "")
-    ("createDistorded", po::value<string>(&distordedTreeName)->default_value( "" ), "" )
+    ("createDistorded", po::value<string>(&distordedTreeName), "" )
 ;
 
   // Create a map vm that contains options and all arguments of options       
@@ -55,11 +55,11 @@ int main( int argc, char* argv[] ) {
   TH1D *correctAlphaHist=0, *correctSigmaHist=0;
   if ( vm.count( "correctAlphaFileName" ) && vm.count( "correctAlphaHistName" ) )  {
     correctAlphaFile = TFile::Open( correctAlphaFileName.c_str() );
-    correctAlphaHist = (TH1D*) correctAlphaFile->Get( correctAlphaHistName.c_str() );
+    correctAlphaHist = static_cast<TH1D*>(correctAlphaFile->Get( correctAlphaHistName.c_str() ));
   }
   if ( vm.count( "correctSigmaFileName" ) && vm.count( "correctSigmaHistName" ) )  {
     correctSigmaFile = TFile::Open( correctSigmaFileName.c_str() );
-    correctSigmaHist = (TH1D*) correctSigmaFile->Get( correctSigmaHistName.c_str() );
+    correctSigmaHist = static_cast<TH1D*>(correctSigmaFile->Get( correctSigmaHistName.c_str() ));
   }
 
   Template Temp( outFileName, configFile, dataFileNames, dataTreeNames, MCFileNames, MCTreeNames  );

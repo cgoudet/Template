@@ -296,10 +296,7 @@ int TemplateMethod::Template::CreateTemplate() {
   // Checks are made at the crettion of the Class : if there is no data, there MUST be a MC to create pseudo data
   if ( !m_dataFileNames.size() ) {
     if ( m_setting.GetDoSimulation() ) CreateDistordedTree();
-    else {
-      cout << "Error : No data and simulation off" << endl;
-      return 2;
-    }
+    else throw runtime_error( "Template::CreateTemplate : No data and simulation off" );
     cout << "create distorded" << endl;
   }
   //If data events haven't been filled
