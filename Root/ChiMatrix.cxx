@@ -378,6 +378,7 @@ void TemplateMethod::ChiMatrix::FitChi2() {
 
     //Create the histograms accrodingly to the parameters
     m_chi2FitConstVar = new TH1D( TString( m_name + "_chi2FitConstVar" ), "chi2FitConstVar",  constVarBins  , constVarMin, constVarMax );
+    m_chi2FitConstVar->GetXaxis()->SetTitle( constVarLabel.c_str() );
 
     m_corAngle = new TH1D( TString( m_name + "_corAngle" ), "corAngle",  constVarBins , constVarMin, constVarMax );
     m_corAngle->GetXaxis()->SetTitle( constVarLabel.c_str() );
@@ -408,8 +409,11 @@ void TemplateMethod::ChiMatrix::FitChi2() {
       if ( fittingFunction ) delete fittingFunction; fittingFunction=0;
     }//End loop on constVar bins
   }//end if doScale && doSmearing
-  else m_chi2FitConstVar =  ( m_setting->GetDoScale() ) ? m_chiMatrix->ProjectionX( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o") : m_chiMatrix->ProjectionY( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o");
-  m_chi2FitConstVar->GetXaxis()->SetTitle( constVarLabel.c_str() );
+  else {
+    m_chi2FitConstVar =  ( m_setting->GetDoScale() ) ? m_chiMatrix->ProjectionX( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o") : m_chiMatrix->ProjectionY( TString::Format("%s_chi2FitConstVarFit", m_name.c_str() ), 1, 1, "o");
+    m_chi2FitConstVar->GetXaxis()->SetTitle( m_setting->GetDoScale() ? "#alpha" : "c" );
+  }
+
   m_chi2FitConstVar->GetYaxis()->SetTitle( "#chi^{2}" );
 
 
@@ -508,6 +512,7 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
   WriteLatexMinipage( ss, {plotName}, 2 );
 
   // //Comparison data and extrmal alpha templates
+  drawOpt.AddOption( "rangeUserY", "0 X");
   if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
     if ( m_setting->GetDoScale() ) {
       legends.clear();
