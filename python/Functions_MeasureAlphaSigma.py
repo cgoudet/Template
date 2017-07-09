@@ -54,7 +54,7 @@ FILESETS['Distorted_s2768']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeo
 
 #====================== corrected ======================
 
-FILESETS['CorrectedData_noDeadCells']       =[ '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170601/data15_noDeadCells_corrected.root', PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
+FILESETS['CorrectedData_noDeadCells']       =[ '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/data15_noDeadCells_corrected.root', PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
 
 FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
 
