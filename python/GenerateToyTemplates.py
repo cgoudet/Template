@@ -4,7 +4,6 @@ from math import *
 from Functions_MeasureAlphaSigma import *
 import time;
  
-isAntinea=1
 #One config file correspond to one job
 
 configFiles=[ 
@@ -26,7 +25,7 @@ nJobs=int(ceil(nJobs))
 
 toyNumber=0
 
-plotPath= '/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else '/sps/atlas/c/cgoudet/Calibration/PreRec/'
+plotPath= '/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/'
 commandCount=0
 for vInput in  inputC  :
     for vStat in inputStat :
@@ -41,15 +40,12 @@ for vInput in  inputC  :
 
             if nUseEl != 1 :
                 configFiles[0][3].append( 'nUseEl=' + str( nUseEl ) )
-            #print(optionLine, configFiles[0][0]) 
             logPath="Log/"
             launcherFile=CreateLauncher( configFiles[0], 2, optionLine )
-            launchLine='~/sub1.sh ' + StripString( configFiles[0][0] ) + ' ' \
+            launchLine='./sub1.sh ' + StripString( configFiles[0][0] ) + ' ' \
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.log ' \
                 + plotPath + logPath  + StripString( configFiles[0][0] ) + '.err ' \
                 + launcherFile
 
             os.system( launchLine )
-
-
 

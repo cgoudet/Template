@@ -78,7 +78,7 @@ int main( int argc, char* argv[] ) {
   
   if ( vm.count("makePlot") )  {
     //string title = outFileName.substr( 0, outFileName.find_last_of( "." ) ) + ".tex";
-    string path= "";///sps/atlas/a/aguerguichon/Calibration/ScaleResults/";
+    string path= "";
     Temp.MakePlot( path, "" );
   }
 

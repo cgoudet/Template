@@ -1,17 +1,13 @@
 import os
 import sys
 
-
-isAntinea=1
-isSaskia=1
-
-user='a/aguergui/public' if isAntinea else 'c/cgoudet/private'
+user='a/aguergui/public'
 libPath= '/afs/in2p3.fr/home/' +user +'/Calibration/PlotFunctions/python/'
 sys.path.append(os.path.abspath(libPath))
 from SideFunction import *
 
-#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
-PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/' if isAntinea else "/sps/atlas/c/cgoudet/Calibration/PreRec/"
+#PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/Bias/Toys/'
+PREFIXPATH='/sps/atlas/a/aguerguichon/Calibration/PreRec/'
 PREFIXDATASETS="/sps/atlas/a/aguerguichon/Calibration/DataxAOD/"
 
 FILESETS={}
@@ -19,11 +15,15 @@ FILESETS={}
 
 #======================= nominal ===========================//
 FILESETS['MC15c']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/mcZee.root'] 
-FILESETS['Data15']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data15.root'] 
-FILESETS['Data16']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
+FILESETS['Data15']       =[ PREFIXDATASETS + 'eosNtuples/Data_PUHVCorrections1706/data15.root'] 
+FILESETS['Data16']       =[ PREFIXDATASETS + 'eosNtuples/Data_PUHVCorrections1706/data16.root'] 
 
-FILESETS['Data15_xcheck']       =[ PREFIXDATASETS + 'eosNtuples/Latest/data15.root'] 
-FILESETS['Data16_xcheck']       =[ PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
+
+#========================= release 21=========================
+FILESETS['MC15c_21']       =[ PREFIXDATASETS + 'eosNtuples/Release21/MC_Zee_r21.root'] 
+FILESETS['Data16_21']       =[ PREFIXDATASETS + 'eosNtuples/Release21/data16_r21.root']
+
+
 #======================= systematics ===========================//
 
 
@@ -44,48 +44,13 @@ FILESETS['Data16_fBrem']       =[ PREFIXDATASETS + 'eosNtuples/NominalZeeSelecti
 PREFIXBKG=PREFIXDATASETS+'eosNtuples/NominalZeeSelection/'
 FILESETS['MC15c_EWBkg']   =   [ PREFIXBKG + 'mcBkg_WqqZll.root', PREFIXBKG + 'mcBkg_ZqqZll.root', PREFIXBKG + 'mcBkg_Ztautau.root', PREFIXBKG + 'mcBkg_llll.root', PREFIXBKG + 'mcBkg_lllv.root', PREFIXBKG + 'mcBkg_llvv.root', PREFIXBKG +'mcBkg_ttbar_DiLepton.root', PREFIXBKG +'mcZee.root'] 
 
-#===================== distorted =======================
-FILESETS['Distorted_s2763']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2763.root'] 
-FILESETS['Distorted_s2764']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2764.root'] 
-FILESETS['Distorted_s2765']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2765.root'] 
-FILESETS['Distorted_s2766']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2766.root'] 
-FILESETS['Distorted_s2767']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2767.root'] 
-FILESETS['Distorted_s2768']       =[ PREFIXDATASETS + 'eosNtuples/MCDistortedGeometry/mcZee_distorted_s2768.root'] 
-
-#====================== corrected ======================
-
-FILESETS['CorrectedData_noDeadCells']       =[ '/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/data15_noDeadCells_corrected.root', PREFIXDATASETS + 'eosNtuples/Latest/data16.root'] 
-
-FILESETS['CorrectedData']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
-
-FILESETS['CorrectedData_Window']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Window_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
-
-FILESETS['CorrectedData_EW']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_corrected_EW.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root'] 
-
-FILESETS['CorrectedData_noIsoCut']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_noIsoCut_corrected.root', PREFIXDATASETS + 'eosNtuples/NoElectronIsolationCut/data16_noIsoCut.root'] 
-
-FILESETS['CorrectedData_Threshold']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_Threshold_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16.root']
-
-FILESETS['CorrectedData_tightID']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_tightID_corrected.root', PREFIXDATASETS + 'eosNtuples/TightElectronID/data16_tightID.root']
-
-FILESETS['CorrectedData_fBrem']       =[ '/sps/atlas/a/aguerguichon/Calibration/PreRec/Results/CorrectedData/data15_fBrem_corrected.root', PREFIXDATASETS + 'eosNtuples/NominalZeeSelection/data16_fBrem.root']
 
 
 #===================== pseudo data ===================
 
 FILESETS['pseudoData'] = ['/sps/atlas/a/aguerguichon/Calibration/Closure/pseudoData_both_distorted.root']
-FILESETS['pseudoData_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_data.root']
+
 FILESETS['MC_Saskia'] = ['/sps/atlas/s/sfalke/CalibrationWork/PourAntinea/nTuple_MC.root']
-
-
-#====================== Test ===============================//
-
-FILESETS['MC_13TeV_Zee_NewGeom_Lkh1']       =[ PREFIXDATASETS + 'MC_13TeV_Zee_NewGeom_Lkh1/']
-FILESETS['Data_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/Data_13TeV_Zee_25ns_Lkh1']
-FILESETS['MC_13TeV_Zee_25ns_Lkh1']       =[ PREFIXDATASETS + 'BackUp/MC_13TeV_Zee_25ns_Lkh1/']
-
-FILESETS['MC_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/outputs/mc/wCal_noCT_p3012fullsim/mc15c_wCal_p3012fs.root"]
-FILESETS['Data_Kirill']       =["/sps/atlas/g/grevtsov/Calibration/CalibrationStudies/FILES/inputs/customSF/v1_unShiftedWeights_noSmear_noScale/data_16_wCal_v1.root" ]
 
 
 #==================== Toys =====================
@@ -133,7 +98,6 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     if  len( inVector ) > 5 :
         doDistorded = inVector[5]
 
-
     configPath="Config/"
     batchPath="Batch/"
     resultPath="Results/"
@@ -169,12 +133,10 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
     
     dataLine = ' '.join( [ (' --dataFileName ' 
                             + StripString( name, 1, 0 ) 
-                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +' --dataTreeName '+(' CollectionTree' if isSaskia else ' Analysis_selectionTree') ) for name in dataFiles ] ) 
+                            + ' --dataTreeName correctedData' )  if 'corrected' in name else (' --dataFileName ' + StripString( name, 1, 0 ) +' --dataTreeName  CollectionTree' ) for name in dataFiles ] ) 
 
-    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +' --MCTreeName ' +(' CollectionTree' if isSaskia else ' Analysis_selectionTree') for name in MCFiles ] )
+    MCLine = ' '.join( [ ' --MCFileName ' + StripString( name, 1, 0 ) +' --MCTreeName  CollectionTree' for name in MCFiles ] )
 
-
-  #Fill the command line
 
 #Perform a closure
     if doDistorded and mode != 2 : 
@@ -196,7 +158,6 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
         corrLine=''
         if iFit : corrLine = ' --correctAlphaHistName measScale_alpha --correctAlphaFileName ' + StripString(configName[iFit-1]) + '.root' 
 
-        #if mode == 2 : batch.write( 'GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine +  outNameFile + ' --makePlot \n' )
         if mode == 2 : 
             outNameFile = ' --outFileName ' + StripString( configName[iFit] ) +str(iFit)+ '.root '
             batch.write( '\n'.join( ['GenerateToyTemplates --configFile ' + StripString(configName[iFit], 1, 0)  + dataLine + MCLine + optionLine[i] +  ' --outFileName ' + StripString( configName[iFit] ) +str(i)+ '.root --makePlot ' for i in range(0, len (optionLine)) ]) +' \n') 
@@ -204,10 +165,8 @@ def CreateLauncher( inVector, mode = 3,optionLine=[] ) :
 
         else  :  batch.write( 'MeasureScale --configFile ' + StripString(configName[iFit], 1, 0 )  + dataLine + MCLine + outNameFile + corrLine + optionLine +' --makePlot \n')
 
-   # if mode==2 : batch.write( 'cp -v *bootstrap* ' + PREFIXPATH + plotPath + '. \n rm *distorded* \n' )
     batch.write( 'rm -v ' + ' '.join( [ StripString(dataset, 1, 0) for dataset in dataFiles+MCFiles ] ) + '\n' )
-    #batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.pdf ' + PREFIXPATH + plotPath + '. \n' ) 
-    #batch.write( 'cp -v `ls *.tex | awk -F "." \'{print $1 }\'`*.root ' + PREFIXPATH + resultPath + '. \n' ) 
+
     for iFit in range( 0, len( configName ) ) :
         batch.write( 'cp -v '+ StripString( configName[iFit] ) +'*.root ' + PREFIXPATH + resultPath + '. \n')
         batch.write( 'cp -v '+StripString( configName[iFit] ) +'*.pdf ' + PREFIXPATH + plotPath + '. \n')
@@ -266,39 +225,23 @@ def CreateConfig( configName, inOptions = [] ) :
     options['applySelection']=0
     options['dataBranchVarNames']={}
     options['MCBranchVarNames']={}
-
-    if isSaskia:
-        options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-        options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
-        options['dataBranchVarNames']['MASS']='m12'
-        options['dataBranchVarNames']['RUNNUMBER']='RunNumber'
-        options['dataBranchVarNames']['PHI_CALO_1']='el1_phiCalo'
-        options['dataBranchVarNames']['PHI_CALO_2']='el2_phiCalo'
-        options['dataBranchWeightName']=''
-
-        options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
-        options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
-        options['MCBranchVarNames']['MASS']='m12'
-        options['MCBranchWeightName']='weight_1516'
-        
-        options['ZMassMin'] = 80000
-        options['ZMassMax'] = 100000
+    options['MCBranchWeightName']=''
 
 
-    else:
-         options['dataBranchVarNames']['ETA_CALO_1']='eta_calo_1'
-         options['dataBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
-         options['dataBranchVarNames']['MASS']='m12'
-         options['dataBranchWeightName']=''
-
-         options['MCBranchVarNames']['ETA_CALO_1']='eta_calo_1'
-         options['MCBranchVarNames']['ETA_CALO_2']='eta_calo_2' 
-         options['MCBranchVarNames']['MASS']='m12'
-         options['MCBranchWeightName']='weight'
-   
-         options['ZMassMin'] = 80
-         options['ZMassMax'] = 100
-        
+    options['dataBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+    options['dataBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+    options['dataBranchVarNames']['MASS']='m12'
+    options['dataBranchVarNames']['RUNNUMBER']='RunNumber'
+    options['dataBranchVarNames']['PHI_CALO_1']='el1_phiCalo'
+    options['dataBranchVarNames']['PHI_CALO_2']='el2_phiCalo'
+    options['dataBranchWeightName']=''
+    
+    options['MCBranchVarNames']['ETA_CALO_1']='el1_etaCalo'
+    options['MCBranchVarNames']['ETA_CALO_2']='el2_etaCalo' 
+    options['MCBranchVarNames']['MASS']='m12'
+    
+    options['ZMassMin'] = 80000
+    options['ZMassMax'] = 100000
 
     for inOpt in inOptions :
         optKey = inOpt.split('=')[0]
@@ -324,7 +267,7 @@ def CreateConfig( configName, inOptions = [] ) :
 
 def LaunchBatchTemplate( configFile, path = '' ) :
     """
-    Take an input with the right format and launch the template measuremetn with the corresponding options to the batch
+    Take an input with the right format and launch the template measurement with the corresponding options to the batch
     Format is a list 
     - 0 : Name of the job (and output file)
     - 1 : Directory of data
@@ -338,7 +281,7 @@ def LaunchBatchTemplate( configFile, path = '' ) :
     launcherFile=CreateLauncher( configFile, mode, "" )
     logFile = StripString( configFile[0] )
     
-    launchLine='~/sub1.sh ' + logFile + ' ' \
+    launchLine='sub1.sh ' + logFile + ' ' \
 	    + path + logFile + '.log ' \
 	    + path + logFile + '.err ' \
 	    + launcherFile

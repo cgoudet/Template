@@ -96,65 +96,8 @@ def applyCorrection( directory ) :
     commandLine+= ' --dataFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/Latest/data15.root' 
     commandLine+= ' --correctAlphaHistName measScale_alpha --correctAlphaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/AlphaOffSummer_15_noDeadCells.root \n'
 
-#    os.system( commandLine )
- #   os.system( commandLine.replace('15', '16') )
-
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcZee.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    #os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_WqqZll.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_ZqqZll.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_Ztautau.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_llll.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_lllv.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_llvv.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-    commandLine = 'MeasureScale --configFile /sps/atlas/a/aguerguichon/Calibration/PreRec/Config/ScalesOffSummer_1516_noDeadCells_c.boost --noExtraction '
-    commandLine += ' --MCFileName /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/mcBkg_ttbar_DiLepton.root'
-    commandLine += ' --correctSigmaHistName measScale_c '
-    commandLine += ' --correctSigmaFileName /sps/atlas/a/aguerguichon/Calibration/ScaleResults/170608/ScalesOffSummer_1516_noDeadCells_c.root'
-    os.system( commandLine )
-
-
-
-    commandLine= 'mv /sps/atlas/a/aguerguichon/Calibration/DataxAOD/eosNtuples/NominalZeeSelection/*corrected* ' + directory
-
-    os.system( commandLine )
-    os.system( commandLine.replace('NominalZeeSelection','Latest') )
-    
+   os.system( commandLine )
+   os.system( commandLine.replace('15', '16') )    
 
 #===========================================
 def getSyst( mode = 0) :
