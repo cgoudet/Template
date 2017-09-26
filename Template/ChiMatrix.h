@@ -3,7 +3,7 @@
 
 #include "PlotFunctions/MapBranches.h"
 
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "Setting.h"
 #include "TH1D.h"
 #include "TTree.h"
@@ -23,14 +23,14 @@ namespace TemplateMethod {
     /**\brief Default Constructo
      */
     ChiMatrix();
- 
+
     /**\brief Constructor which initialize m_name
      */
     ChiMatrix( std::string name );
 
     /** Overloaded Constructor
-	\param name Name of the object
-	\param configSetting Setting to be used
+        \param name Name of the object
+        \param configSetting Setting to be used
     */
     ChiMatrix( std::string name, Setting &configSetting );
     ~ChiMatrix();
@@ -101,7 +101,7 @@ namespace TemplateMethod {
 
     /**\brief Create the content of the note for a configuration
        \param path directory path where to save the plots
-       \param latexFileName latex file to write in 
+       \param latexFileName latex file to write in
     */
     void MakePlot( std::stringstream &ss, std::string path = "" );
 
@@ -132,16 +132,16 @@ namespace TemplateMethod {
        \param isIncreasedStat Should the MC errors should be corrected for additionnal smearing
        \return chi2/ndf
 
-       When computing chi2 between data and MC of same number of events, we are sensitive to the statistical fluctuations induced by the smearing of the Template.  
-       These fluctuations are purely created by the method and give unstability to the fit. 
-       To correct that, MC events can be smeared several times independently and added. 
-       The fluctuations will be smoothed but statistical uncertainties of MC will be artificially low. 
-       isIncreasedStat is to switch on the error correction of the MC bin. 
+       When computing chi2 between data and MC of same number of events, we are sensitive to the statistical fluctuations induced by the smearing of the Template.
+       These fluctuations are purely created by the method and give unstability to the fit.
+       To correct that, MC events can be smeared several times independently and added.
+       The fluctuations will be smoothed but statistical uncertainties of MC will be artificially low.
+       isIncreasedStat is to switch on the error correction of the MC bin.
        The number of added events will be taken from the configuration file.
     */
     double ComputeChi2( TH1D *MCHist, bool isIncreasedStat = false );
 
-    /**\brief Fit an histogram 
+    /**\brief Fit an histogram
        \param hist histogram to be fitted
        \param mode choice of fitting function to chose
        \param chiMinLow value of chi2 on left side to use to find fitting range low value
@@ -167,7 +167,7 @@ namespace TemplateMethod {
        Call ChiMatrix.FitHist()
 
        When doing scale and smearing, user can choose through config file which variable is first fitted. (default for doc ALPHA )
-     
+
        User can choose the fitting method :
 
     */
@@ -178,7 +178,7 @@ namespace TemplateMethod {
     /**\brief Create templates
 
        Run over all event in the MC TTree of the configuration.
-       Scale each event with the set ot hypothesis scales and fill templates mass distribution. 
+       Scale each event with the set ot hypothesis scales and fill templates mass distribution.
        Unit change from MeV to GeV is done here
        Mass is computed from pt, eta, phi and the electron mass. Total energy not used.
     */
@@ -198,7 +198,7 @@ namespace TemplateMethod {
 
        N+1 values are computed according to the formula.
        m_alphaMin + ( m_alphaMax - m_alphaMin ) /  nTemplates * i_alpha
-       If only one scale is measure, the value of the other one is just 0.   
+       If only one scale is measure, the value of the other one is just 0.
     */
     void FillScaleValues( int nTemplates = 0 );
 
@@ -208,28 +208,28 @@ namespace TemplateMethod {
     void ClearTemplates();
 
     /** \brief Quality cut of the configuration
-	\return bitset integer with quality of the configuration. Good quality = 0
+        \return bitset integer with quality of the configuration. Good quality = 0
 
-	Quality requirements are the followings :
-	- MC and data event number higher than limit set in configuration file
-	- Threshold mass of the configuration higher than limit set in the conf file. 
-	When reconstructing the mass of the Z from both electron, the analysis cut on electron pt coupled with large eta separation will lead the lightest Z to be produced to be in our analysis range.
-	This would lead to highly deformed ditributions. So we decide to remove all configuration whose lightest possible Z is above a limit set in the configuration file.
+        Quality requirements are the followings :
+        - MC and data event number higher than limit set in configuration file
+        - Threshold mass of the configuration higher than limit set in the conf file.
+        When reconstructing the mass of the Z from both electron, the analysis cut on electron pt coupled with large eta separation will lead the lightest Z to be produced to be in our analysis range.
+        This would lead to highly deformed ditributions. So we decide to remove all configuration whose lightest possible Z is above a limit set in the configuration file.
     */
     unsigned int IsGoodQuality();
 
 
-    bool OptimizeVect( std::vector<double> &y, 
-		       const std::vector<double> &x, 
-		       const double allowedMaxRange,
-		       double &width,
-		       double &limit );
+    bool OptimizeVect( std::vector<double> &y,
+                       const std::vector<double> &x,
+                       const double allowedMaxRange,
+                       double &width,
+                       double &limit );
 
 
-    
+
     /** \brief Name og the object
 
-	Each ChiMatrix object must have a different name in order for the histograms not to overwrite each other.
+        Each ChiMatrix object must have a different name in order for the histograms not to overwrite each other.
     */
     std::string m_name;
 
@@ -257,7 +257,7 @@ namespace TemplateMethod {
      */
     double m_sigma;
 
-    TRandom m_rand;
+    TRandom3 m_rand;
 
     /**\brief Store the chi2 fits for the first non-const variable
      */
@@ -285,7 +285,7 @@ namespace TemplateMethod {
     /*\brief Local lower boundary for alpha
      */
     double m_alphaMin;
-  
+
     /*\brief Local upper boundary for alpha
      */
     double m_alphaMax;

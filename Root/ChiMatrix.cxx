@@ -312,13 +312,14 @@ void TemplateMethod::ChiMatrix::FillDistrib( double mass, bool isData, double we
 //=======================================
 void TemplateMethod::ChiMatrix::FillTemplates( ) {
   if ( m_setting->GetDebug() ) cout << "ChiMatrix::FillTemplates" << endl;
-  if (! m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );
-  else if ( m_setting->GetIndepTemplates() == 1 ) {
+  //if (! m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_eta1Bin*100+m_eta2Bin+1 );
+
+  if ( m_setting->GetIndepTemplates() == 1 ) {
     cout << "setting new Template seed ChiMatrix" << endl;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     m_rand.SetSeed( t1.time_since_epoch().count() );
   }
-  else m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );
+  else if ( m_setting->GetIndepTemplates() ) m_rand.SetSeed( m_setting->GetIndepTemplates()+m_eta1Bin*100+m_eta2Bin+1 );
 
   LinkMCTree();
   unsigned int imax = m_setting->GetNUseEl();
@@ -333,7 +334,6 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
       const double randVal1 =  m_rand.Gaus();
       const double randVal2 =  m_rand.Gaus();
 
-
       for ( unsigned i_alpha = 0; i_alpha < m_MCZMass.size(); ++i_alpha ) {
         for ( unsigned i_sigma = 0; i_sigma < m_MCZMass[i_alpha].size(); ++i_sigma ) {
 
@@ -343,6 +343,7 @@ void TemplateMethod::ChiMatrix::FillTemplates( ) {
           const double factor1Sigma = sqrt( (1 + randVal1 * sigmaVal)*(1+randVal2*sigmaVal) );
           //const double newMass =  mass*sqrt(factor1Alpha*factor1Sigma);
           const double newMass =  mass*factor1Alpha*factor1Sigma;
+
           if ( newMass < m_setting->GetZMassMin() || newMass > m_setting->GetZMassMax() ) continue;
           m_MCZMass[i_alpha][i_sigma]->Fill( newMass, weight );
       }}}
@@ -513,6 +514,7 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
 
   // //Comparison data and extrmal alpha templates
   drawOpt.AddOption( "rangeUserY", "0 X");
+  drawOpt.AddOption( "doRatio", "1");
   if ( m_MCZMass.size() && m_MCZMass.front().size() ) {
     if ( m_setting->GetDoScale() ) {
       legends.clear();
@@ -523,7 +525,7 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       plotName=path + m_name + "_CompareAlpha";
       legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[0][bestSigma], m_MCZMass.back()[bestSigma]};
-      drawOpt.FillOptions( legends );
+      drawOpt.AddOption( legends );
       drawOpt.Draw( dumVect );
       drawOpt.ResetLegends();
       plotNames.push_back( plotName   );
@@ -537,7 +539,7 @@ void TemplateMethod::ChiMatrix::MakePlot( stringstream &ss, string path ) {
       plotName = path + m_name + "_CompareSigma";
       legends.push_back( "outName="+ plotName  );
       dumVect = { m_dataZMass, m_MCZMass[bestAlpha].front(), m_MCZMass[bestAlpha].back()};
-      drawOpt.FillOptions( legends );
+      drawOpt.AddOption( legends );
       drawOpt.Draw( dumVect );
       drawOpt.ResetLegends();
       plotNames.push_back( plotName );
@@ -876,7 +878,7 @@ void TemplateMethod::ChiMatrix::OptimizeRanges( ) {
             options.push_back( "latex=sigma : " + to_string( m_sigmaValues[i_alpha] ));
             //options.push_back( "outName=/sps/atlas/c/cgoudet/Hgam/FrameWork/Results/Scales/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
             options.push_back( "outName=/sps/atlas/a/aguerguichon/Calibration/Test/TestOptim/TestOptim_" + to_string(i_alpha) + "_" + to_string(i_sigma)+"_"+to_string(counter) );
-            drawOpt.FillOptions( options );
+            drawOpt.AddOption( options );
             drawOpt.Draw( drawVect );
           }}
       }

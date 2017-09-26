@@ -596,11 +596,13 @@ void TemplateMethod::Template::CreateDistordedTree( string outFileName ) {
       double factor1=1, factor2=1;
       for ( unsigned int iSwap = 0; iSwap < (m_setting.GetMode()=="2VAR" ? 2 : 1); iSwap++ ){
         FindBin( i_eta, j_eta, iSwap, mapBranchNames );
-        factor1 *= ( 1 + alphaSimEta[i_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[i_eta] );
-        factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + m_rand.Gaus(0,1)*sigmaSimEta[j_eta] );
+        double randVal1 = m_rand.Gaus();
+        double randVal2 = m_rand.Gaus();
+        factor1 *= ( 1 + alphaSimEta[i_eta] ) * ( 1 + randVal1*sigmaSimEta[i_eta] );
+        factor2 *= ( 1 + alphaSimEta[j_eta] ) * ( 1 + randVal2*sigmaSimEta[j_eta] );
       }
-
       RescaleMapVar( factor1, factor2, mapBranchNames.at("MASS") );
+
       distorded->cd();
       dataTree->Fill();
     }
@@ -1000,7 +1002,7 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 
   for ( auto it=mapBranchNames.begin(); it!=mapBranchNames.end(); ++it )
     m_branchesToLink.push_back( it->second );
-  
+
   const vector<string> weightNames = isData ? m_setting.GetDataBranchWeightNames() : m_setting.GetMCBranchWeightNames();
   for ( auto it=weightNames.begin(); it!=weightNames.end(); ++it )
     m_branchesToLink.push_back( *it );
@@ -1013,11 +1015,11 @@ void TemplateMethod::Template::FillBranchesToLink( const bool isData ) {
 }
 //=======================================
 bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, bool isData ) {
-  
+
   const map<string, string> &mapBranchNames = isData ? m_setting.GetDataBranchVarNames() : m_setting.GetMCBranchVarNames();
-  
+
   int runnumber = event.GetInt( mapBranchNames.at("RUNNUMBER"));
-  
+
   for ( int iEl=1; iEl<=2; ++iEl ) {
     double eta_calo = event.GetDouble( mapBranchNames.at("ETA_CALO_"+to_string(iEl)));
     double phi_calo = event.GetDouble( mapBranchNames.at("PHI_CALO_"+to_string(iEl)));
@@ -1049,7 +1051,7 @@ bool TemplateMethod::Template::RemoveHVDeadZones( ChrisLib::MapBranches &event, 
       }
     }
   }
-  
+
   return true;
 
 }
