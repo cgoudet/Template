@@ -362,7 +362,7 @@ void BiasAnalysis::MakeBiasPlots(string path, string latexFileName, string comme
 
     if (m_methodStats == 3)  DrawPlot(m_mapRooVar[histName], {m_mapRooDataSet[histName], m_mapRooGauss[histName]}, path+histName,{vectOpt} );
     else {
-      drawOpt.FillOptions(vectOpt); 
+      drawOpt.AddOption(vectOpt); 
       drawOpt.AddOption("outName", path+histName);
       drawOpt.Draw( vectHistTmp );
     }       

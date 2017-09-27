@@ -1,0 +1,103 @@
+\hypertarget{namespaceFunctions__MeasureAlphaSigma}{\section{Functions\+\_\+\+Measure\+Alpha\+Sigma Namespace Reference}
+\label{namespaceFunctions__MeasureAlphaSigma}\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceFunctions__MeasureAlphaSigma_a5ca199823decf5d413745ed4215513ef}{Create\+Config}
+\item 
+def \hyperlink{namespaceFunctions__MeasureAlphaSigma_abb7aa99f16630a9b3c57581d6e3e6c0e}{Create\+Launcher}
+\item 
+def \hyperlink{namespaceFunctions__MeasureAlphaSigma_af02b87ac0724ae724185b01764abfc36}{Fill\+Dataset\+Container}
+\item 
+def \hyperlink{namespaceFunctions__MeasureAlphaSigma_af49595b895cf39dc10e31440eff33ae4}{Launch\+Batch\+Template}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+dictionary \hyperlink{namespaceFunctions__MeasureAlphaSigma_a13a3e320ea220c3b0e2da150d1964864}{F\+I\+L\+E\+S\+E\+T\+S} = \{\}
+\item 
+string \hyperlink{namespaceFunctions__MeasureAlphaSigma_a52886eac29193d86f31de45c05c23819}{lib\+Path} = '/afs/in2p3.\+fr/home/'
+\item 
+string \hyperlink{namespaceFunctions__MeasureAlphaSigma_a24db293caed1f3053a9e7d32ee0a34a7}{P\+R\+E\+F\+I\+X\+B\+K\+G} = \hyperlink{namespaceFunctions__MeasureAlphaSigma_a5e1f9170b324cbacbbb417d9b0b107e8}{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S}+'eos\+Ntuples/Nominal\+Zee\+Selection/'
+\item 
+string \hyperlink{namespaceFunctions__MeasureAlphaSigma_a5e1f9170b324cbacbbb417d9b0b107e8}{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S} = \char`\"{}/sps/atlas/a/aguerguichon/Calibration/Datax\+A\+O\+D/\char`\"{}
+\item 
+string \hyperlink{namespaceFunctions__MeasureAlphaSigma_ab5043c5c7e364338a5fc23d704a6d918}{P\+R\+E\+F\+I\+X\+P\+A\+T\+H} = '/sps/atlas/a/aguerguichon/Calibration/Pre\+Rec/'
+\item 
+string \hyperlink{namespaceFunctions__MeasureAlphaSigma_ae315dc7095b2ab26df1efb90a58f6345}{user} = 'a/aguergui/public'
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_a5ca199823decf5d413745ed4215513ef}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!Create\+Config@{Create\+Config}}
+\index{Create\+Config@{Create\+Config}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{Create\+Config}]{\setlength{\rightskip}{0pt plus 5cm}def Functions\+\_\+\+Measure\+Alpha\+Sigma.\+Create\+Config (
+\begin{DoxyParamCaption}
+\item[{}]{config\+Name, }
+\item[{}]{in\+Options = {\ttfamily \mbox{[}\mbox{]}}}
+\end{DoxyParamCaption}
+)}}\label{namespaceFunctions__MeasureAlphaSigma_a5ca199823decf5d413745ed4215513ef}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_abb7aa99f16630a9b3c57581d6e3e6c0e}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!Create\+Launcher@{Create\+Launcher}}
+\index{Create\+Launcher@{Create\+Launcher}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{Create\+Launcher}]{\setlength{\rightskip}{0pt plus 5cm}def Functions\+\_\+\+Measure\+Alpha\+Sigma.\+Create\+Launcher (
+\begin{DoxyParamCaption}
+\item[{}]{in\+Vector, }
+\item[{}]{mode = {\ttfamily 3}, }
+\item[{}]{option\+Line = {\ttfamily \mbox{[}\mbox{]}}}
+\end{DoxyParamCaption}
+)}}\label{namespaceFunctions__MeasureAlphaSigma_abb7aa99f16630a9b3c57581d6e3e6c0e}
+\begin{DoxyVerb}mode  : 
+0 MeasureScale
+1 2Steps
+2 GenerateToyTemplates
+3 MeasureScale + sigmaOnly with correction -> default
+4 MeasureScale + alphaOnly with correction -> compare mode 3 to 0
+? 5 AlphaOnly with lowaer ZMassMin+ MeasureScale corrected + sigmaOnly corrected ??
+to perform a closure: doDistorded=1 and any mode different from 2
+\end{DoxyVerb}
+ \hypertarget{namespaceFunctions__MeasureAlphaSigma_af02b87ac0724ae724185b01764abfc36}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!Fill\+Dataset\+Container@{Fill\+Dataset\+Container}}
+\index{Fill\+Dataset\+Container@{Fill\+Dataset\+Container}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{Fill\+Dataset\+Container}]{\setlength{\rightskip}{0pt plus 5cm}def Functions\+\_\+\+Measure\+Alpha\+Sigma.\+Fill\+Dataset\+Container (
+\begin{DoxyParamCaption}
+\item[{}]{container, }
+\item[{}]{datasets}
+\end{DoxyParamCaption}
+)}}\label{namespaceFunctions__MeasureAlphaSigma_af02b87ac0724ae724185b01764abfc36}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_af49595b895cf39dc10e31440eff33ae4}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!Launch\+Batch\+Template@{Launch\+Batch\+Template}}
+\index{Launch\+Batch\+Template@{Launch\+Batch\+Template}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{Launch\+Batch\+Template}]{\setlength{\rightskip}{0pt plus 5cm}def Functions\+\_\+\+Measure\+Alpha\+Sigma.\+Launch\+Batch\+Template (
+\begin{DoxyParamCaption}
+\item[{}]{config\+File, }
+\item[{}]{path = {\ttfamily ''}}
+\end{DoxyParamCaption}
+)}}\label{namespaceFunctions__MeasureAlphaSigma_af49595b895cf39dc10e31440eff33ae4}
+\begin{DoxyVerb}Take an input with the right format and launch the template measurement with the corresponding options to the batch
+Format is a list 
+- 0 : Name of the job (and output file)
+- 1 : Directory of data
+- 2 : MC directory
+- 3 : harcoded options for the template method
+- 4 : modes for template measurement
+\end{DoxyVerb}
+ 
+
+\subsection{Variable Documentation}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_a13a3e320ea220c3b0e2da150d1964864}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!F\+I\+L\+E\+S\+E\+T\+S@{F\+I\+L\+E\+S\+E\+T\+S}}
+\index{F\+I\+L\+E\+S\+E\+T\+S@{F\+I\+L\+E\+S\+E\+T\+S}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{F\+I\+L\+E\+S\+E\+T\+S}]{\setlength{\rightskip}{0pt plus 5cm}dictionary F\+I\+L\+E\+S\+E\+T\+S = \{\}}}\label{namespaceFunctions__MeasureAlphaSigma_a13a3e320ea220c3b0e2da150d1964864}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_a52886eac29193d86f31de45c05c23819}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!lib\+Path@{lib\+Path}}
+\index{lib\+Path@{lib\+Path}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{lib\+Path}]{\setlength{\rightskip}{0pt plus 5cm}string lib\+Path = '/afs/in2p3.\+fr/home/'}}\label{namespaceFunctions__MeasureAlphaSigma_a52886eac29193d86f31de45c05c23819}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_a24db293caed1f3053a9e7d32ee0a34a7}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!P\+R\+E\+F\+I\+X\+B\+K\+G@{P\+R\+E\+F\+I\+X\+B\+K\+G}}
+\index{P\+R\+E\+F\+I\+X\+B\+K\+G@{P\+R\+E\+F\+I\+X\+B\+K\+G}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{P\+R\+E\+F\+I\+X\+B\+K\+G}]{\setlength{\rightskip}{0pt plus 5cm}string P\+R\+E\+F\+I\+X\+B\+K\+G = {\bf P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S}+'eos\+Ntuples/Nominal\+Zee\+Selection/'}}\label{namespaceFunctions__MeasureAlphaSigma_a24db293caed1f3053a9e7d32ee0a34a7}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_a5e1f9170b324cbacbbb417d9b0b107e8}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S@{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S}}
+\index{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S@{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S}]{\setlength{\rightskip}{0pt plus 5cm}string P\+R\+E\+F\+I\+X\+D\+A\+T\+A\+S\+E\+T\+S = \char`\"{}/sps/atlas/a/aguerguichon/Calibration/Datax\+A\+O\+D/\char`\"{}}}\label{namespaceFunctions__MeasureAlphaSigma_a5e1f9170b324cbacbbb417d9b0b107e8}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_ab5043c5c7e364338a5fc23d704a6d918}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!P\+R\+E\+F\+I\+X\+P\+A\+T\+H@{P\+R\+E\+F\+I\+X\+P\+A\+T\+H}}
+\index{P\+R\+E\+F\+I\+X\+P\+A\+T\+H@{P\+R\+E\+F\+I\+X\+P\+A\+T\+H}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{P\+R\+E\+F\+I\+X\+P\+A\+T\+H}]{\setlength{\rightskip}{0pt plus 5cm}string P\+R\+E\+F\+I\+X\+P\+A\+T\+H = '/sps/atlas/a/aguerguichon/Calibration/Pre\+Rec/'}}\label{namespaceFunctions__MeasureAlphaSigma_ab5043c5c7e364338a5fc23d704a6d918}
+\hypertarget{namespaceFunctions__MeasureAlphaSigma_ae315dc7095b2ab26df1efb90a58f6345}{\index{Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}!user@{user}}
+\index{user@{user}!Functions\+\_\+\+Measure\+Alpha\+Sigma@{Functions\+\_\+\+Measure\+Alpha\+Sigma}}
+\subsubsection[{user}]{\setlength{\rightskip}{0pt plus 5cm}string user = 'a/aguergui/public'}}\label{namespaceFunctions__MeasureAlphaSigma_ae315dc7095b2ab26df1efb90a58f6345}

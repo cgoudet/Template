@@ -1,0 +1,271 @@
+\hypertarget{classBiasAnalysis}{\section{Bias\+Analysis Class Reference}
+\label{classBiasAnalysis}\index{Bias\+Analysis@{Bias\+Analysis}}
+}
+
+
+The \hyperlink{classBiasAnalysis}{Bias\+Analysis} class allows to analyze the toys generated with the \hyperlink{namespaceGenerateToyTemplates}{Generate\+Toy\+Templates} routine.  
+
+
+
+
+{\ttfamily \#include $<$Bias\+Analysis.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBiasAnalysis_a98577873df587bf30d78c6d6219c94d5}{Bias\+Analysis} (std\+::string config\+File\+Name)
+\item 
+\hyperlink{classBiasAnalysis_a555ca9c2f77ca83c8ba26295d570566d}{$\sim$\+Bias\+Analysis} ()
+\item 
+std\+::vector$<$ double $>$ \hyperlink{classBiasAnalysis_a56a695c4c739371428de1a6c9c0039eb}{Get\+Bias\+Stat} (T\+H1 $\ast$hist, std\+::string hist\+Name, unsigned int method=1)
+\begin{DoxyCompactList}\small\item\em Get mean, R\+M\+S and mean from each histogram of the map m\+\_\+map\+Hist in 3 different ways\+: \end{DoxyCompactList}\item 
+double \hyperlink{classBiasAnalysis_a2a1b5f0f7fa4b281d1dad9ba124fe3f4}{Get\+Input} (T\+H1\+D $\ast$h, unsigned int i\+Bin, unsigned int j\+Bin)
+\begin{DoxyCompactList}\small\item\em Retrieve the injected value in a given configuration from the injected value in each bin of the configuration. \end{DoxyCompactList}\item 
+double \hyperlink{classBiasAnalysis_a61defea4e1cfd21d5cf2f7e10c8337a9}{Get\+Input} (T\+H1\+D $\ast$h, unsigned int i\+Bin)
+\begin{DoxyCompactList}\small\item\em Retrieve the injected value in a given bin. \end{DoxyCompactList}\item 
+void \hyperlink{classBiasAnalysis_a2ccb521f462c9cdf80ac1f353383ef16}{Make\+Bias\+Plots} (std\+::string path, std\+::string latex\+File\+Name, std\+::string comment=\char`\"{} \char`\"{})
+\begin{DoxyCompactList}\small\item\em Draw bias distribution plots and save them into a pdf file. \end{DoxyCompactList}\item 
+void \hyperlink{classBiasAnalysis_ae8f92b0e686c150a046aafebeee2a099}{Make\+Pdf} (std\+::string latex\+File\+Name, std\+::vector$<$ std\+::string $>$ vect\+Hist\+Names, std\+::string comment=\char`\"{} \char`\"{})
+\item 
+void \hyperlink{classBiasAnalysis_aaf3df3d94b8fc3b95aefd9866b2c022b}{Remove\+Extremal\+Bins} (T\+H1\+D $\ast$\&hist)
+\begin{DoxyCompactList}\small\item\em Remove empty extremal bins. \end{DoxyCompactList}\item 
+void \hyperlink{classBiasAnalysis_a2a4e0023805dfb6a00a288d976c1cc61}{Save\+Bias\+Info} (std\+::string out\+Name)
+\begin{DoxyCompactList}\small\item\em Save some information (name of histogram, number of entries, mean, R\+M\+S and error on mean) from the map m\+\_\+map\+Hist in a root file and a csv file. \end{DoxyCompactList}\item 
+void \hyperlink{classBiasAnalysis_ad440a31c27ff6be1e4ec9c0303bfa4e6}{Select\+Variables} (std\+::vector$<$ std\+::string $>$ data\+Files, bool is\+Alpha=0)
+\begin{DoxyCompactList}\small\item\em Select the variable to analyze\+: \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \hyperlink{classBiasAnalysis_ab68b9ae883b88b32d4c19a3899547b6c}{m\+\_\+in\+Tree\+Name}
+\item 
+std\+::map$<$ unsigned long long, \\*
+T\+Matrix\+D $>$ \hyperlink{classBiasAnalysis_a4001a86dfd3b86e570c84d06d5ffbcda}{m\+\_\+map\+Ci}
+\item 
+std\+::map$<$ unsigned long long, \\*
+T\+Matrix\+D $>$ \hyperlink{classBiasAnalysis_ae41add82d66b3f3b94fa938f7d3173c7}{m\+\_\+map\+Cij}
+\item 
+std\+::map$<$ unsigned long long, \\*
+T\+Matrix\+D $>$ \hyperlink{classBiasAnalysis_a3dbd3ee5b793f0498b17eff9d6edd20f}{m\+\_\+map\+Err\+Ci}
+\item 
+std\+::map$<$ unsigned long long, \\*
+T\+Matrix\+D $>$ \hyperlink{classBiasAnalysis_abc3cdf3373df2ca1b633bf07d3fc0ed5}{m\+\_\+map\+Err\+Cij}
+\item 
+std\+::map$<$ std\+::string, T\+H1\+D $\ast$ $>$ \hyperlink{classBiasAnalysis_aa498719992c21c66b1a94805a729ff28}{m\+\_\+map\+Hist}
+\item 
+std\+::map$<$ std\+::string, \\*
+Roo\+Data\+Set $\ast$ $>$ \hyperlink{classBiasAnalysis_af76275d00d02cf4d86ed118b93137a95}{m\+\_\+map\+Roo\+Data\+Set}
+\item 
+std\+::map$<$ std\+::string, \\*
+Roo\+Gaussian $\ast$ $>$ \hyperlink{classBiasAnalysis_a0d48d7f2ff9f80845a9497424df41333}{m\+\_\+map\+Roo\+Gauss}
+\item 
+std\+::map$<$ std\+::string, \\*
+Roo\+Real\+Var $\ast$ $>$ \hyperlink{classBiasAnalysis_a97398da96a4afaf1b4b69a8bd834f555}{m\+\_\+map\+Roo\+Var}
+\item 
+std\+::map$<$ std\+::string, \\*
+std\+::vector$<$ double $>$ $>$ \hyperlink{classBiasAnalysis_a4012de0928fa751a15e9a6fecd2249ec}{m\+\_\+map\+Stat\+Hist}
+\item 
+std\+::map$<$ std\+::string, double $>$ \hyperlink{classBiasAnalysis_a01057845bb932055dd6a9607175b29a6}{m\+\_\+map\+Sum\+X}
+\item 
+std\+::map$<$ std\+::string, double $>$ \hyperlink{classBiasAnalysis_a37e8fb534be7789893a6d3fe269fad10}{m\+\_\+map\+Sum\+X\+M}
+\item 
+double \hyperlink{classBiasAnalysis_ae7615a78da69869d6c6c816ad5954f79}{m\+\_\+max\+X}
+\item 
+unsigned int \hyperlink{classBiasAnalysis_a05286bbff5c142f86d2b36b7ae165810}{m\+\_\+method\+Stats}
+\item 
+double \hyperlink{classBiasAnalysis_aa7f4587389f9282eef8f4742d022f669}{m\+\_\+min\+X}
+\item 
+unsigned int \hyperlink{classBiasAnalysis_a2ecea926aa21e65a5ca309808ba9821f}{m\+\_\+n\+Bins}
+\item 
+std\+::vector$<$ std\+::string $>$ \hyperlink{classBiasAnalysis_aaefeb0d9bee4e7e0ac1790edf5f04e8e}{m\+\_\+variables\+Bias}
+\item 
+std\+::vector$<$ unsigned int $>$ \hyperlink{classBiasAnalysis_a3d7b92e9a8d64907accd1ddf0db3426a}{m\+\_\+variables\+Stats}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classBiasAnalysis}{Bias\+Analysis} class allows to analyze the toys generated with the \hyperlink{namespaceGenerateToyTemplates}{Generate\+Toy\+Templates} routine. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classBiasAnalysis_a98577873df587bf30d78c6d6219c94d5}{\index{Bias\+Analysis@{Bias\+Analysis}!Bias\+Analysis@{Bias\+Analysis}}
+\index{Bias\+Analysis@{Bias\+Analysis}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Bias\+Analysis}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Bias\+Analysis} (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{config\+File\+Name}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a98577873df587bf30d78c6d6219c94d5}
+\hypertarget{classBiasAnalysis_a555ca9c2f77ca83c8ba26295d570566d}{\index{Bias\+Analysis@{Bias\+Analysis}!````~Bias\+Analysis@{$\sim$\+Bias\+Analysis}}
+\index{````~Bias\+Analysis@{$\sim$\+Bias\+Analysis}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{$\sim$\+Bias\+Analysis}]{\setlength{\rightskip}{0pt plus 5cm}$\sim${\bf Bias\+Analysis} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a555ca9c2f77ca83c8ba26295d570566d}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classBiasAnalysis_a56a695c4c739371428de1a6c9c0039eb}{\index{Bias\+Analysis@{Bias\+Analysis}!Get\+Bias\+Stat@{Get\+Bias\+Stat}}
+\index{Get\+Bias\+Stat@{Get\+Bias\+Stat}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Get\+Bias\+Stat}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ double $>$ Get\+Bias\+Stat (
+\begin{DoxyParamCaption}
+\item[{T\+H1 $\ast$}]{hist, }
+\item[{std\+::string}]{hist\+Name, }
+\item[{unsigned int}]{method = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a56a695c4c739371428de1a6c9c0039eb}
+
+
+Get mean, R\+M\+S and mean from each histogram of the map m\+\_\+map\+Hist in 3 different ways\+: 
+
+
+\begin{DoxyItemize}
+\item method=0 \+: exact computation
+\item method=1 (default)\+: get stat with R\+O\+O\+T methods (Get\+Mean()...)
+\item method 3 \+: Gauss Roo\+Fit. Idea was to be able in the future to fit the distribution with asymetric gaussians... 
+\end{DoxyItemize}\hypertarget{classBiasAnalysis_a2a1b5f0f7fa4b281d1dad9ba124fe3f4}{\index{Bias\+Analysis@{Bias\+Analysis}!Get\+Input@{Get\+Input}}
+\index{Get\+Input@{Get\+Input}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Get\+Input}]{\setlength{\rightskip}{0pt plus 5cm}double Get\+Input (
+\begin{DoxyParamCaption}
+\item[{T\+H1\+D $\ast$}]{h, }
+\item[{unsigned int}]{i\+Bin, }
+\item[{unsigned int}]{j\+Bin}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a2a1b5f0f7fa4b281d1dad9ba124fe3f4}
+
+
+Retrieve the injected value in a given configuration from the injected value in each bin of the configuration. 
+
+\hypertarget{classBiasAnalysis_a61defea4e1cfd21d5cf2f7e10c8337a9}{\index{Bias\+Analysis@{Bias\+Analysis}!Get\+Input@{Get\+Input}}
+\index{Get\+Input@{Get\+Input}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Get\+Input}]{\setlength{\rightskip}{0pt plus 5cm}double Get\+Input (
+\begin{DoxyParamCaption}
+\item[{T\+H1\+D $\ast$}]{h, }
+\item[{unsigned int}]{i\+Bin}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a61defea4e1cfd21d5cf2f7e10c8337a9}
+
+
+Retrieve the injected value in a given bin. 
+
+\hypertarget{classBiasAnalysis_a2ccb521f462c9cdf80ac1f353383ef16}{\index{Bias\+Analysis@{Bias\+Analysis}!Make\+Bias\+Plots@{Make\+Bias\+Plots}}
+\index{Make\+Bias\+Plots@{Make\+Bias\+Plots}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Make\+Bias\+Plots}]{\setlength{\rightskip}{0pt plus 5cm}void Make\+Bias\+Plots (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{path, }
+\item[{std\+::string}]{latex\+File\+Name, }
+\item[{std\+::string}]{comment = {\ttfamily \char`\"{}~\char`\"{}}}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a2ccb521f462c9cdf80ac1f353383ef16}
+
+
+Draw bias distribution plots and save them into a pdf file. 
+
+\hypertarget{classBiasAnalysis_ae8f92b0e686c150a046aafebeee2a099}{\index{Bias\+Analysis@{Bias\+Analysis}!Make\+Pdf@{Make\+Pdf}}
+\index{Make\+Pdf@{Make\+Pdf}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Make\+Pdf}]{\setlength{\rightskip}{0pt plus 5cm}void Make\+Pdf (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{latex\+File\+Name, }
+\item[{std\+::vector$<$ std\+::string $>$}]{vect\+Hist\+Names, }
+\item[{std\+::string}]{comment = {\ttfamily \char`\"{}~\char`\"{}}}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_ae8f92b0e686c150a046aafebeee2a099}
+\hypertarget{classBiasAnalysis_aaf3df3d94b8fc3b95aefd9866b2c022b}{\index{Bias\+Analysis@{Bias\+Analysis}!Remove\+Extremal\+Bins@{Remove\+Extremal\+Bins}}
+\index{Remove\+Extremal\+Bins@{Remove\+Extremal\+Bins}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Remove\+Extremal\+Bins}]{\setlength{\rightskip}{0pt plus 5cm}void Remove\+Extremal\+Bins (
+\begin{DoxyParamCaption}
+\item[{T\+H1\+D $\ast$\&}]{hist}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_aaf3df3d94b8fc3b95aefd9866b2c022b}
+
+
+Remove empty extremal bins. 
+
+\hypertarget{classBiasAnalysis_a2a4e0023805dfb6a00a288d976c1cc61}{\index{Bias\+Analysis@{Bias\+Analysis}!Save\+Bias\+Info@{Save\+Bias\+Info}}
+\index{Save\+Bias\+Info@{Save\+Bias\+Info}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Save\+Bias\+Info}]{\setlength{\rightskip}{0pt plus 5cm}void Save\+Bias\+Info (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{out\+Name}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_a2a4e0023805dfb6a00a288d976c1cc61}
+
+
+Save some information (name of histogram, number of entries, mean, R\+M\+S and error on mean) from the map m\+\_\+map\+Hist in a root file and a csv file. 
+
+\hypertarget{classBiasAnalysis_ad440a31c27ff6be1e4ec9c0303bfa4e6}{\index{Bias\+Analysis@{Bias\+Analysis}!Select\+Variables@{Select\+Variables}}
+\index{Select\+Variables@{Select\+Variables}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{Select\+Variables}]{\setlength{\rightskip}{0pt plus 5cm}void Select\+Variables (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ std\+::string $>$}]{data\+Files, }
+\item[{bool}]{is\+Alpha = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classBiasAnalysis_ad440a31c27ff6be1e4ec9c0303bfa4e6}
+
+
+Select the variable to analyze\+: 
+
+
+\begin{DoxyItemize}
+\item read files, link tree branches to local variables and sorting variables according to the ones selected. -\/ compute bias
+\item fill the map m\+\_\+map\+Hist with unique histogramms for each combination of all possible values of each variable. 
+\end{DoxyItemize}
+
+\subsection{Member Data Documentation}
+\hypertarget{classBiasAnalysis_ab68b9ae883b88b32d4c19a3899547b6c}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+in\+Tree\+Name@{m\+\_\+in\+Tree\+Name}}
+\index{m\+\_\+in\+Tree\+Name@{m\+\_\+in\+Tree\+Name}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+in\+Tree\+Name}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string m\+\_\+in\+Tree\+Name\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_ab68b9ae883b88b32d4c19a3899547b6c}
+\hypertarget{classBiasAnalysis_a4001a86dfd3b86e570c84d06d5ffbcda}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Ci@{m\+\_\+map\+Ci}}
+\index{m\+\_\+map\+Ci@{m\+\_\+map\+Ci}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Ci}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$unsigned long long, T\+Matrix\+D$>$ m\+\_\+map\+Ci\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a4001a86dfd3b86e570c84d06d5ffbcda}
+\hypertarget{classBiasAnalysis_ae41add82d66b3f3b94fa938f7d3173c7}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Cij@{m\+\_\+map\+Cij}}
+\index{m\+\_\+map\+Cij@{m\+\_\+map\+Cij}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Cij}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$unsigned long long, T\+Matrix\+D$>$ m\+\_\+map\+Cij\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_ae41add82d66b3f3b94fa938f7d3173c7}
+\hypertarget{classBiasAnalysis_a3dbd3ee5b793f0498b17eff9d6edd20f}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Err\+Ci@{m\+\_\+map\+Err\+Ci}}
+\index{m\+\_\+map\+Err\+Ci@{m\+\_\+map\+Err\+Ci}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Err\+Ci}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$unsigned long long, T\+Matrix\+D$>$ m\+\_\+map\+Err\+Ci\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a3dbd3ee5b793f0498b17eff9d6edd20f}
+\hypertarget{classBiasAnalysis_abc3cdf3373df2ca1b633bf07d3fc0ed5}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Err\+Cij@{m\+\_\+map\+Err\+Cij}}
+\index{m\+\_\+map\+Err\+Cij@{m\+\_\+map\+Err\+Cij}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Err\+Cij}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$unsigned long long, T\+Matrix\+D$>$ m\+\_\+map\+Err\+Cij\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_abc3cdf3373df2ca1b633bf07d3fc0ed5}
+\hypertarget{classBiasAnalysis_aa498719992c21c66b1a94805a729ff28}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Hist@{m\+\_\+map\+Hist}}
+\index{m\+\_\+map\+Hist@{m\+\_\+map\+Hist}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Hist}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, T\+H1\+D$\ast$$>$ m\+\_\+map\+Hist\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_aa498719992c21c66b1a94805a729ff28}
+\hypertarget{classBiasAnalysis_af76275d00d02cf4d86ed118b93137a95}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Roo\+Data\+Set@{m\+\_\+map\+Roo\+Data\+Set}}
+\index{m\+\_\+map\+Roo\+Data\+Set@{m\+\_\+map\+Roo\+Data\+Set}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Roo\+Data\+Set}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, Roo\+Data\+Set$\ast$$>$ m\+\_\+map\+Roo\+Data\+Set\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_af76275d00d02cf4d86ed118b93137a95}
+\hypertarget{classBiasAnalysis_a0d48d7f2ff9f80845a9497424df41333}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Roo\+Gauss@{m\+\_\+map\+Roo\+Gauss}}
+\index{m\+\_\+map\+Roo\+Gauss@{m\+\_\+map\+Roo\+Gauss}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Roo\+Gauss}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, Roo\+Gaussian$\ast$$>$ m\+\_\+map\+Roo\+Gauss\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a0d48d7f2ff9f80845a9497424df41333}
+\hypertarget{classBiasAnalysis_a97398da96a4afaf1b4b69a8bd834f555}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Roo\+Var@{m\+\_\+map\+Roo\+Var}}
+\index{m\+\_\+map\+Roo\+Var@{m\+\_\+map\+Roo\+Var}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Roo\+Var}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, Roo\+Real\+Var$\ast$$>$ m\+\_\+map\+Roo\+Var\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a97398da96a4afaf1b4b69a8bd834f555}
+\hypertarget{classBiasAnalysis_a4012de0928fa751a15e9a6fecd2249ec}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Stat\+Hist@{m\+\_\+map\+Stat\+Hist}}
+\index{m\+\_\+map\+Stat\+Hist@{m\+\_\+map\+Stat\+Hist}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Stat\+Hist}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, std\+::vector$<$double$>$ $>$ m\+\_\+map\+Stat\+Hist\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a4012de0928fa751a15e9a6fecd2249ec}
+\hypertarget{classBiasAnalysis_a01057845bb932055dd6a9607175b29a6}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Sum\+X@{m\+\_\+map\+Sum\+X}}
+\index{m\+\_\+map\+Sum\+X@{m\+\_\+map\+Sum\+X}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Sum\+X}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, double$>$ m\+\_\+map\+Sum\+X\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a01057845bb932055dd6a9607175b29a6}
+\hypertarget{classBiasAnalysis_a37e8fb534be7789893a6d3fe269fad10}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+map\+Sum\+X\+M@{m\+\_\+map\+Sum\+X\+M}}
+\index{m\+\_\+map\+Sum\+X\+M@{m\+\_\+map\+Sum\+X\+M}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+map\+Sum\+X\+M}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$std\+::string, double$>$ m\+\_\+map\+Sum\+X\+M\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a37e8fb534be7789893a6d3fe269fad10}
+\hypertarget{classBiasAnalysis_ae7615a78da69869d6c6c816ad5954f79}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+max\+X@{m\+\_\+max\+X}}
+\index{m\+\_\+max\+X@{m\+\_\+max\+X}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+max\+X}]{\setlength{\rightskip}{0pt plus 5cm}double m\+\_\+max\+X\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_ae7615a78da69869d6c6c816ad5954f79}
+\hypertarget{classBiasAnalysis_a05286bbff5c142f86d2b36b7ae165810}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+method\+Stats@{m\+\_\+method\+Stats}}
+\index{m\+\_\+method\+Stats@{m\+\_\+method\+Stats}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+method\+Stats}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int m\+\_\+method\+Stats\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a05286bbff5c142f86d2b36b7ae165810}
+\hypertarget{classBiasAnalysis_aa7f4587389f9282eef8f4742d022f669}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+min\+X@{m\+\_\+min\+X}}
+\index{m\+\_\+min\+X@{m\+\_\+min\+X}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+min\+X}]{\setlength{\rightskip}{0pt plus 5cm}double m\+\_\+min\+X\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_aa7f4587389f9282eef8f4742d022f669}
+\hypertarget{classBiasAnalysis_a2ecea926aa21e65a5ca309808ba9821f}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+n\+Bins@{m\+\_\+n\+Bins}}
+\index{m\+\_\+n\+Bins@{m\+\_\+n\+Bins}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+n\+Bins}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int m\+\_\+n\+Bins\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a2ecea926aa21e65a5ca309808ba9821f}
+\hypertarget{classBiasAnalysis_aaefeb0d9bee4e7e0ac1790edf5f04e8e}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+variables\+Bias@{m\+\_\+variables\+Bias}}
+\index{m\+\_\+variables\+Bias@{m\+\_\+variables\+Bias}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+variables\+Bias}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$std\+::string$>$ m\+\_\+variables\+Bias\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_aaefeb0d9bee4e7e0ac1790edf5f04e8e}
+\hypertarget{classBiasAnalysis_a3d7b92e9a8d64907accd1ddf0db3426a}{\index{Bias\+Analysis@{Bias\+Analysis}!m\+\_\+variables\+Stats@{m\+\_\+variables\+Stats}}
+\index{m\+\_\+variables\+Stats@{m\+\_\+variables\+Stats}!Bias\+Analysis@{Bias\+Analysis}}
+\subsubsection[{m\+\_\+variables\+Stats}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$unsigned int$>$ m\+\_\+variables\+Stats\hspace{0.3cm}{\ttfamily [private]}}}\label{classBiasAnalysis_a3d7b92e9a8d64907accd1ddf0db3426a}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Template/\hyperlink{BiasAnalysis_8h}{Bias\+Analysis.\+h}\item 
+Root/\hyperlink{BiasAnalysis_8cxx}{Bias\+Analysis.\+cxx}\end{DoxyCompactItemize}
