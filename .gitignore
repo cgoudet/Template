@@ -29,5 +29,6 @@
 
 *~
 *.pyc
-*.boost
 *.pdf
+latex/
+html/
