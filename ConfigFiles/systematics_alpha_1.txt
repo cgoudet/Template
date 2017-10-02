@@ -1,0 +1,11 @@
+outFileName=/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170707/EnergyScaleFactors.root
+totSystName=totSyst_alpha
+rootFileName=/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170707/AllMC_ClosureResults.root
+histName=syst_Clos_alpha
+systName=syst_Clos_alpha
+mode=110
+rootFileName=/sps/atlas/a/aguerguichon/Calibration/ScaleResults/170420/EnergyScaleFactors.root
+histName=syst_Meth_alpha
+systName=syst_Meth_alpha
+mode=100
+update=1

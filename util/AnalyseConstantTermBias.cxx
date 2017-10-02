@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   desc.add_options()
     ("help", "Display this help message")
     ("dataFiles", po::value<vector <string> >(&dataFiles), "Absolute path of root files to analyze" )
-    ("isConf", po::value<bool> (&isConf)->default_value(0), "Analyse of bin or conf" )
+    ("isConf", po::value<bool> (&isConf)->default_value(0), "Analyse of bin or configuration" )
     ("isAlpha", po::value<bool> (&isAlpha)->default_value(0), "Analyse of alpha or c" )
     ("fileName", po::value<string> (&fileName), "Name of the output file (pattern used)" )
     ;
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   if (isConf) BinOrConf= "Conf";
   else BinOrConf="Bin";
 
-  BiasAnalysis BA("/afs/in2p3.fr/home/a/aguergui/public/Calibration/Systematics/ConfigFile/Bias"+BinOrConf+".boost");
+  BiasAnalysis BA("/afs/in2p3.fr/home/a/aguergui/public/Calibration/Template/ConfigFile/Bias"+BinOrConf+".boost");
 
   string path= "/sps/atlas/a/aguerguichon/Calibration/Bias/";
 
@@ -70,10 +70,6 @@ int main(int argc, char *argv[])
   commandLine = "rm "+fileName+"*";
   system ( commandLine.c_str() );
   
-  // path= "/sps/atlas/a/aguerguichon/Calibration/Bias/Inversion/";
-  // BA.InvertCijMatrix(path, 1);
-  
-  //BA.MakeCompStatPlot(csvFile, "Bias"+BinOrConf+"CompStat_7000", 7000, 0);
   //================
   //End of program
   cout <<"End of programm."<<endl;

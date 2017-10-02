@@ -1,0 +1,9 @@
+variablesBias=statTree
+variablesBias=iConf
+variablesBias=jConf
+
+selectTree= ConfigurationsCTree
+
+nBins=68
+
+methodStats=1

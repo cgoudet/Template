@@ -1,0 +1,8 @@
+variablesBias=statTree
+variablesBias=iBin
+
+selectTree= scalesTree
+
+methodStats=1
+
+nBins=24
